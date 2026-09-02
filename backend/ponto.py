@@ -13,6 +13,7 @@ import re
 import json
 from decimal import Decimal
 import os
+import threading
 from core.database import get_conn
 from core.storage import get_storage
 
@@ -36,31 +37,37 @@ def formatar_cpf_para_busca(cpf):
 
 
 def buscar_colaborador_por_cpf(cpf):
-    """Busca colaborador pelo CPF formatado no banco."""
+    """Busca colaborador comparando apenas os 11 dígitos do CPF."""
+    conn = None
+    cur = None
     try:
         conn = get_conn()
         cur = conn.cursor()
 
-        cpf_formatado = formatar_cpf_para_busca(cpf)
+        cpf_numeros = re.sub(r'\D', '', cpf or '')
+        if len(cpf_numeros) != 11:
+            return None
         if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
-            print(f"🔍 Buscando colaborador: {cpf} -> {cpf_formatado}")
+            print(f"🔍 Buscando colaborador pelo CPF final {cpf_numeros[-4:]}")
 
         cur.execute("""
             SELECT id, nome, email, cpf
             FROM colaboradores
-            WHERE cpf = %s
-        """, (cpf_formatado,))
+            WHERE regexp_replace(COALESCE(cpf, ''), '[^0-9]', '', 'g') = %s
+            LIMIT 1
+        """, (cpf_numeros,))
         dados = cur.fetchone()
-
-        cur.close()
-        conn.close()
-
         return dados
 
     except Exception as e:
         if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
             print("❌ Erro buscar colaborador:", str(e))
         return None
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
 
 def processar_dados_localizacao(dados_localizacao):
@@ -97,6 +104,8 @@ def processar_dados_localizacao(dados_localizacao):
 # ============================================================
 def verificar_ultimo_ponto(colaborador_id, agora):
     """Decide se deve registrar ENTRADA ou SAÍDA."""
+    conn = None
+    cur = None
     try:
         conn = get_conn()
         cur = conn.cursor()
@@ -175,13 +184,22 @@ def verificar_ultimo_ponto(colaborador_id, agora):
         if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
             print("❌ Erro verificar ponto:", str(e))
         return {"tipo": "entrada", "motivo": "erro"}
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
 
 # ============================================================
 #  SISTEMA FACIAL
 # ============================================================
 class SmartFacialSystem:
-    """Sistema facial que utiliza o storage service."""
+    """Reconhecimento local por descritores HOG normalizados do rosto."""
+
+    FORMAT_VERSION = 2
+    RECOGNITION_THRESHOLD = 0.88
+    AMBIGUITY_MARGIN = 0.035
 
     def __init__(self):
         self.storage = get_storage()
@@ -189,13 +207,23 @@ class SmartFacialSystem:
             cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
         )
         self.encodings = {}
+        self._lock = threading.RLock()
+        self._hog = cv2.HOGDescriptor((128, 128), (16, 16), (8, 8), (8, 8), 9)
         self.load_encodings()
 
     def load_encodings(self):
         try:
             if self.storage.key_exists(ENCODINGS_KEY):
                 data = self.storage.open(ENCODINGS_KEY)
-                self.encodings = pickle.loads(data)
+                payload = pickle.loads(data)
+                if isinstance(payload, dict) and payload.get("version") == self.FORMAT_VERSION:
+                    profiles = payload.get("profiles", {})
+                else:
+                    # O formato antigo era apenas um histograma de iluminação e
+                    # não é biometricamente compatível nem seguro para reutilizar.
+                    profiles = {}
+                with self._lock:
+                    self.encodings = profiles
                 if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
                     print(f"📦 Encodings carregados do storage ({len(self.encodings)} rostos)")
         except Exception as e:
@@ -204,14 +232,9 @@ class SmartFacialSystem:
             self.encodings = {}
 
     def save_encodings(self):
-        try:
-            data = pickle.dumps(self.encodings)
-            self.storage.save_bytes(data, subdir="data", filename="facial_encodings.pkl")
-            if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
-                print("💾 Encodings salvos no storage.")
-        except Exception as e:
-            if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
-                print(f"❌ Erro ao salvar encodings no storage: {e}")
+        payload = {"version": self.FORMAT_VERSION, "profiles": self.encodings}
+        data = pickle.dumps(payload, protocol=pickle.HIGHEST_PROTOCOL)
+        self.storage.save_bytes(data, subdir="data", filename="facial_encodings.pkl")
 
     def processar_imagem(self, image_bytes):
         nparr = np.frombuffer(image_bytes, np.uint8)
@@ -220,41 +243,71 @@ class SmartFacialSystem:
         if img is None:
             return None, "Imagem inválida"
 
+        if img.shape[0] < 240 or img.shape[1] < 240:
+            return None, "Imagem com resolução insuficiente"
+
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
+        detection_gray = cv2.equalizeHist(gray)
+        faces = self.face_cascade.detectMultiScale(
+            detection_gray, scaleFactor=1.15, minNeighbors=6,
+            minSize=(100, 100), flags=cv2.CASCADE_SCALE_IMAGE
+        )
 
         if len(faces) == 0:
             return None, "Nenhum rosto detectado"
+        if len(faces) > 1:
+            return None, "Mantenha apenas uma pessoa em frente à câmera"
 
         x, y, w, h = sorted(faces, key=lambda f: f[2] * f[3], reverse=True)[0]
-        face = gray[y:y + h, x:x + w]
+        margem_x, margem_y = int(w * .12), int(h * .12)
+        x1, y1 = max(0, x - margem_x), max(0, y - margem_y)
+        x2, y2 = min(gray.shape[1], x + w + margem_x), min(gray.shape[0], y + h + margem_y)
+        face = gray[y1:y2, x1:x2]
 
-        if w < 100 or h < 100:
-            return None, "Rosto muito pequeno"
+        brilho = float(np.mean(face))
+        nitidez = float(cv2.Laplacian(face, cv2.CV_64F).var())
+        if brilho < 35:
+            return None, "Ambiente muito escuro. Melhore a iluminação"
+        if brilho > 225:
+            return None, "Imagem muito clara. Evite luz direta na câmera"
+        if nitidez < 28:
+            return None, "Imagem desfocada. Fique imóvel e tente novamente"
 
-        face_std = cv2.resize(face, (100, 100))
+        face_std = cv2.resize(face, (128, 128), interpolation=cv2.INTER_AREA)
+        face_std = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8)).apply(face_std)
         return face_std, None
 
     def gerar_encoding(self, face_img):
-        hist = cv2.calcHist([face_img], [0], None, [256], [0, 256])
-        return cv2.normalize(hist, hist).flatten()
+        descriptor = self._hog.compute(face_img).reshape(-1).astype(np.float32)
+        norm = float(np.linalg.norm(descriptor))
+        if norm == 0:
+            raise ValueError("Não foi possível extrair características do rosto")
+        return descriptor / norm
 
     def reconhecer_face(self, image_bytes):
+        # Gunicorn mantém uma instância por worker. Recarregar garante que um
+        # cadastro feito em outro worker fique disponível imediatamente.
+        self.load_encodings()
         face_img, erro = self.processar_imagem(image_bytes)
         if erro:
             return False, erro
 
-        hist = self.gerar_encoding(face_img)
-        melhor, score_max, threshold = None, 0, 0.7
+        descriptor = self.gerar_encoding(face_img)
+        scores = []
+        with self._lock:
+            profiles = list(self.encodings.items())
+        for cpf, descriptors in profiles:
+            if not isinstance(descriptors, list):
+                continue
+            score = max((float(np.dot(descriptor, saved)) for saved in descriptors), default=0.0)
+            scores.append((score, cpf))
 
-        for cpf, enc_salvo in self.encodings.items():
-            score = cv2.compareHist(hist, enc_salvo, cv2.HISTCMP_CORREL)
-            if score > score_max and score > threshold:
-                melhor = cpf
-                score_max = score
-
-        if melhor:
-            return True, {"cpf": melhor, "confidence": float(score_max)}
+        scores.sort(reverse=True)
+        if scores:
+            melhor_score, melhor_cpf = scores[0]
+            segundo_score = scores[1][0] if len(scores) > 1 else 0.0
+            if melhor_score >= self.RECOGNITION_THRESHOLD and melhor_score - segundo_score >= self.AMBIGUITY_MARGIN:
+                return True, {"cpf": melhor_cpf, "confidence": round(melhor_score, 4)}
         return False, "Rosto não reconhecido"
 
     def cadastrar_rosto(self, cpf, image_bytes):
@@ -262,11 +315,20 @@ class SmartFacialSystem:
         if erro:
             return False, erro
 
-        hist = self.gerar_encoding(face_img)
+        descriptor = self.gerar_encoding(face_img)
         cpf_fmt = formatar_cpf_para_busca(cpf)
 
-        self.encodings[cpf_fmt] = hist
-        self.save_encodings()
+        with self._lock:
+            anterior = self.encodings.get(cpf_fmt)
+            self.encodings[cpf_fmt] = [descriptor]
+            try:
+                self.save_encodings()
+            except Exception:
+                if anterior is None:
+                    self.encodings.pop(cpf_fmt, None)
+                else:
+                    self.encodings[cpf_fmt] = anterior
+                raise
 
         # Salvar a imagem do rosto no storage
         try:
@@ -281,7 +343,9 @@ class SmartFacialSystem:
         return True, f"Rosto cadastrado para {cpf_fmt}"
 
     def cpf_tem_rosto(self, cpf):
-        return formatar_cpf_para_busca(cpf) in self.encodings
+        self.load_encodings()
+        descriptors = self.encodings.get(formatar_cpf_para_busca(cpf))
+        return isinstance(descriptors, list) and bool(descriptors)
 
 
 
@@ -378,14 +442,18 @@ def bater_ponto():
             })
 
         if resultado == "Nenhum rosto detectado":
-            return jsonify({"success": False, "acao": "sem_rosto"})
+            return jsonify({"success": False, "acao": "sem_rosto", "error": resultado}), 422
+
+        if resultado != "Rosto não reconhecido":
+            return jsonify({"success": False, "acao": "foto_invalida", "error": resultado}), 422
 
         return jsonify({"success": False, "acao": "rosto_nao_cadastrado"})
 
     except Exception as e:
         if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
             print(f"❌ Erro ao bater ponto: {str(e)}")
-        return jsonify({"success": False, "error": str(e)})
+        current_app.logger.exception("Erro ao registrar ponto facial")
+        return jsonify({"success": False, "error": "Não foi possível registrar o ponto. Tente novamente."}), 500
 
 # ============================================================
 # ROTA — CADASTRAR ROSTO COM CPF E LOCALIZAÇÃO
@@ -446,7 +514,8 @@ def cadastrar_com_cpf():
     except Exception as e:
         if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
             print(f"❌ Erro ao cadastrar com CPF: {str(e)}")
-        return jsonify({"success": False, "error": str(e)})
+        current_app.logger.exception("Erro ao cadastrar biometria facial")
+        return jsonify({"success": False, "error": "Não foi possível salvar a biometria facial."}), 500
 
 
 

@@ -784,6 +784,10 @@
     async function iniciarCamera() {
         try {
             const video = document.getElementById('video');
+
+            if (!navigator.mediaDevices?.getUserMedia) {
+                throw new Error('Câmera indisponível. Use HTTPS ou acesse pelo localhost.');
+            }
             
             // Parar câmera atual
             if (estado.stream) {
@@ -803,15 +807,18 @@
             video.srcObject = estado.stream;
             estado.cameraAtiva = true;
             
-            video.onloadedmetadata = () => {
-                video.play();
+            video.onloadedmetadata = async () => {
+                await video.play();
                 atualizarStatusCamera('✅ Câmera pronta');
             };
             
         } catch (error) {
             console.error('Erro na câmera:', error);
             atualizarStatusCamera('❌ Erro na câmera');
-            mostrarStatus('Erro ao acessar a câmera. Verifique as permissões.', 'error');
+            const detalhe = error.name === 'NotAllowedError'
+                ? 'Permissão da câmera negada. Libere o acesso no navegador.'
+                : (error.message || 'Verifique as permissões da câmera.');
+            mostrarStatus(detalhe, 'error');
         }
     }
 
@@ -823,6 +830,9 @@
     // ========== CAPTURA E PROCESSAMENTO ==========
     async function capturarFoto() {
         const video = document.getElementById('video');
+        if (!estado.cameraAtiva || video.readyState < 2 || !video.videoWidth) {
+            throw new Error('A câmera ainda não está pronta. Aguarde alguns segundos.');
+        }
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
@@ -830,9 +840,9 @@
         canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             canvas.toBlob(blob => {
-                resolve(blob);
+                blob ? resolve(blob) : reject(new Error('Não foi possível capturar a imagem.'));
             }, 'image/jpeg', 0.9);
         });
     }
@@ -877,7 +887,7 @@
                 body: formData
             });
             
-            const dados = await resposta.json();
+            const dados = await resposta.json().catch(() => ({ error: 'Resposta inválida do servidor' }));
             console.log('Resposta do servidor:', dados);
             
             // Processar resposta
@@ -885,7 +895,7 @@
             
         } catch (error) {
             console.error('Erro:', error);
-            mostrarStatus('Erro de conexão com o servidor', 'error');
+            mostrarStatus(error.message || 'Erro de conexão com o servidor', 'error');
             btn.classList.add('shake');
             setTimeout(() => btn.classList.remove('shake'), 500);
         } finally {
@@ -937,6 +947,11 @@
             const btn = document.getElementById('capture-btn');
             btn.classList.add('shake');
             setTimeout(() => btn.classList.remove('shake'), 500);
+        }
+
+        else if (dados.acao === 'foto_invalida') {
+            mostrarStatus(`❌ ${dados.error || 'A foto não passou na verificação de qualidade.'}`, 'error');
+            atualizarStatusCamera('⚠️ Tente novamente');
         }
         
         // CASO 4: CPF não encontrado na base
@@ -1337,7 +1352,7 @@
     function configurarHotkeys() {
         document.addEventListener('keydown', (e) => {
             // Espaço para capturar foto
-            if (e.code === 'Space' && !estado.processando && !document.getElementById('modal-cpf').classList.contains('hidden')) {
+            if (e.code === 'Space' && !estado.processando && document.getElementById('modal-cpf').classList.contains('hidden')) {
                 e.preventDefault();
                 processarFoto();
             }
