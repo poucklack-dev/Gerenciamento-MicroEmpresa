@@ -1,0 +1,2021 @@
+{% extends "base.html" %}
+{% block conteudo %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --verde-principal: #093D2C;
+            --verde-secundario: #1C6B49;
+            --verde-hover: #0a4d35;
+            --verde-claro: #e8f5e8;
+            --verde-gradiente: linear-gradient(135deg, #093D2C 0%, #1C6B49 100%);
+            --fundo: #f8faf9;
+            --texto: #2d3748;
+            --texto-claro: #718096;
+            --branco: #ffffff;
+            --cinza-borda: #e2e8f0;
+            --cinza-claro: #f7fafc;
+            --sombra: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --sombra-suave: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --transicao: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --erro: #e53e3e;
+            --sucesso: #38a169;
+            --warning: #d69e2e;
+            --info: #3182ce;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--fundo);
+            color: var(--texto);
+            line-height: 1.7;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* Header Premium - Mobile First */
+        .page-header {
+            background: var(--verde-gradiente);
+            color: var(--branco);
+            padding: 30px 0;
+            margin: -15px -15px 25px -15px;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(-100px) translateY(-100px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            line-height: 1.2;
+        }
+
+        .page-title p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Botões - Mobile First */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transicao);
+            font-family: 'Poppins', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            font-size: 14px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--transicao);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--branco);
+            color: var(--verde-principal);
+            box-shadow: 0 4px 15px rgba(9, 61, 44, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(9, 61, 44, 0.4);
+            background: var(--verde-claro);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--branco);
+            color: var(--branco);
+        }
+
+        .btn-outline:hover {
+            background: var(--branco);
+            color: var(--verde-principal);
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 6px;
+            width: auto;
+        }
+
+        .btn-verde {
+            background: var(--verde-principal);
+            color: var(--branco);
+            border: none;
+        }
+
+        .btn-verde:hover {
+            background: var(--verde-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Cards - Mobile First */
+        .card {
+            background: var(--branco);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--sombra);
+            border: 1px solid var(--cinza-borda);
+            transition: var(--transicao);
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sombra-suave);
+        }
+
+        .card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--verde-principal);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header h2::before {
+            content: '';
+            width: 3px;
+            height: 18px;
+            background: var(--verde-principal);
+            border-radius: 2px;
+        }
+
+        /* KPI Cards - Mobile First */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .kpi-card {
+            background: var(--branco);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--sombra-suave);
+            border-left: 4px solid var(--verde-principal);
+            transition: var(--transicao);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sombra);
+        }
+
+        .kpi-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: var(--verde-gradiente);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .kpi-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--verde-principal);
+            margin-bottom: 3px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--texto-claro);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        /* Tabela - Mobile First com scroll horizontal */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            background: var(--branco);
+            box-shadow: var(--sombra-suave);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+            font-size: 12px;
+        }
+
+        .table th {
+            background: var(--verde-gradiente);
+            color: var(--branco);
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--cinza-borda);
+            transition: var(--transicao);
+            white-space: nowrap;
+        }
+
+        .table tbody tr {
+            transition: var(--transicao);
+            cursor: pointer;
+        }
+
+        .table tbody tr:hover {
+            background: var(--verde-claro);
+        }
+
+        /* Badges - Mobile First */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .badge-success {
+            background: rgba(56, 161, 105, 0.15);
+            color: var(--sucesso);
+            border: 1px solid rgba(56, 161, 105, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(214, 158, 46, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(214, 158, 46, 0.3);
+        }
+
+        .badge-info {
+            background: rgba(49, 130, 206, 0.15);
+            color: var(--info);
+            border: 1px solid rgba(49, 130, 206, 0.3);
+        }
+
+        .badge-danger {
+            background: rgba(229, 62, 62, 0.15);
+            color: var(--erro);
+            border: 1px solid rgba(229, 62, 62, 0.3);
+        }
+
+        /* Alertas - Mobile First */
+        .alert {
+            padding: 15px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            animation: slideDown 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid;
+            font-size: 13px;
+        }
+
+        .alert-error {
+            background: rgba(229, 62, 62, 0.1);
+            color: var(--erro);
+            border-left-color: var(--erro);
+        }
+
+        .alert-success {
+            background: rgba(56, 161, 105, 0.1);
+            color: var(--sucesso);
+            border-left-color: var(--sucesso);
+        }
+
+        .alert-info {
+            background: rgba(49, 130, 206, 0.1);
+            color: var(--info);
+            border-left-color: var(--info);
+        }
+
+        .alert-warning {
+            background: rgba(214, 158, 46, 0.1);
+            color: var(--warning);
+            border-left-color: var(--warning);
+        }
+
+        /* Modal - Mobile First */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(9, 61, 44, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--branco);
+            border-radius: 16px;
+            padding: 25px;
+            width: 100%;
+            max-width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--cinza-borda);
+        }
+
+        .modal-header h3 {
+            color: var(--verde-principal);
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--texto-claro);
+            transition: var(--transicao);
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .close-modal:hover {
+            background: var(--cinza-claro);
+            color: var(--erro);
+        }
+
+        /* Formulários - Mobile First */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--texto);
+            font-size: 13px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--cinza-borda);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: var(--transicao);
+            background-color: var(--cinza-claro);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--verde-principal);
+            background-color: var(--branco);
+            box-shadow: 0 0 0 3px rgba(9, 61, 44, 0.1);
+        }
+
+        /* Animações */
+        @keyframes slideDown {
+            from { 
+                opacity: 0; 
+                transform: translateY(-20px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Loading */
+        .btn-loader {
+            display: none;
+        }
+
+        .btn.loading .btn-text {
+            opacity: 0;
+        }
+
+        .btn.loading .btn-loader {
+            display: inline-block;
+        }
+
+        /* Detalhes do Registro - Mobile First */
+        .detalhes-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detalhes-item {
+            background: var(--cinza-claro);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid var(--verde-principal);
+        }
+
+        .detalhes-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--texto-claro);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .detalhes-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--texto);
+        }
+
+        /* Ações da tabela - Mobile First */
+        .acoes-tabela {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn-tabela {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transicao);
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .btn-tabela:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-ver {
+            background: rgba(49, 130, 206, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(49, 130, 206, 0.3);
+        }
+
+        .btn-ver:hover {
+            background: rgba(49, 130, 206, 0.2);
+        }
+
+        .btn-editar {
+            background: rgba(214, 158, 46, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(214, 158, 46, 0.3);
+        }
+
+        .btn-editar:hover {
+            background: rgba(214, 158, 46, 0.2);
+        }
+
+        .btn-excluir {
+            background: rgba(229, 62, 62, 0.1);
+            color: var(--erro);
+            border: 1px solid rgba(229, 62, 62, 0.3);
+        }
+
+        .btn-excluir:hover {
+            background: rgba(229, 62, 62, 0.2);
+        }
+
+        .text-muted {
+            color: var(--texto-claro);
+            font-size: 12px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Links */
+        .link-verde {
+            color: var(--verde-principal);
+            text-decoration: none;
+            transition: var(--transicao);
+            font-weight: 500;
+        }
+
+        .link-verde:hover {
+            color: var(--verde-hover);
+            text-decoration: underline;
+        }
+
+        /* Botão de download */
+        .btn-download {
+            background: rgba(9, 61, 44, 0.1);
+            color: var(--verde-principal);
+            border: 1px solid rgba(9, 61, 44, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: var(--transicao);
+        }
+
+        .btn-download:hover {
+            background: rgba(9, 61, 44, 0.2);
+            transform: translateY(-1px);
+            text-decoration: none;
+            color: var(--verde-principal);
+        }
+
+        /* Estado vazio da tabela */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--texto-claro);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+            color: var(--verde-principal);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--texto);
+        }
+
+        /* Indicador de scroll horizontal */
+        .scroll-indicator {
+            text-align: center;
+            padding: 10px;
+            color: var(--texto-claro);
+            font-size: 12px;
+            display: none;
+        }
+
+        /* Filtros */
+        .filtros-container {
+            background: var(--branco);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--sombra-suave);
+        }
+
+        .filtros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        /* Abas */
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            border-bottom: 2px solid var(--cinza-borda);
+            margin-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: var(--texto-claro);
+            cursor: pointer;
+            transition: var(--transicao);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .tab.active {
+            color: var(--verde-principal);
+            border-bottom-color: var(--verde-principal);
+            background: var(--verde-claro);
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--verde-hover);
+        }
+
+        /* Media Queries para telas maiores */
+        @media (min-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+
+            .page-header {
+                padding: 40px 0;
+                margin: -25px -25px 35px -25px;
+                border-radius: 0 0 25px 25px;
+            }
+
+            .header-content {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .page-title h1 {
+                font-size: 32px;
+            }
+
+            .page-title p {
+                font-size: 16px;
+            }
+
+            .btn {
+                width: auto;
+                padding: 14px 28px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+
+            .kpi-card {
+                padding: 25px;
+            }
+
+            .kpi-value {
+                font-size: 24px;
+            }
+
+            .card {
+                padding: 30px;
+                border-radius: 18px;
+            }
+
+            .card-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .card-header h2 {
+                font-size: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .table {
+                font-size: 14px;
+            }
+
+            .table th {
+                font-size: 12px;
+                padding: 15px 10px;
+            }
+
+            .table td {
+                padding: 15px 10px;
+            }
+
+            .badge {
+                font-size: 11px;
+                padding: 5px 12px;
+            }
+
+            .modal-content {
+                max-width: 700px;
+                padding: 30px;
+            }
+
+            .modal-header h3 {
+                font-size: 22px;
+            }
+
+            .detalhes-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .filtros-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                padding: 30px;
+            }
+
+            .page-header {
+                margin: -30px -30px 40px -30px;
+                padding: 50px 0;
+            }
+
+            .page-title h1 {
+                font-size: 42px;
+            }
+
+            .kpi-grid {
+                gap: 25px;
+            }
+
+            .kpi-card {
+                padding: 30px;
+            }
+
+            .kpi-value {
+                font-size: 32px;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 25px;
+            }
+
+            .table {
+                min-width: 1000px;
+            }
+
+            .modal-content {
+                max-width: 800px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .scroll-indicator {
+                display: block;
+            }
+        }
+
+        /* Preview de imagem */
+        .preview-img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Debug info */
+        .debug-info {
+            background: var(--cinza-claro);
+            border: 1px solid var(--cinza-borda);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: var(--texto-claro);
+        }
+    </style>
+
+    <!-- Header Premium -->
+    <div class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="page-title">
+                    <h1 style="color: white;">
+                        <i class="fas fa-gas-pump"></i> Gestão de Custos Veiculares
+                    </h1>
+                    <p>Controle e análise de custos operacionais dos veículos</p>
+                </div>
+                <button class="btn btn-primary" onclick="abrirModalCusto()">
+                    <i class="fas fa-plus"></i> Novo Custo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Alertas -->
+        <div id="alert" class="alert" style="display: none;"></div>
+
+        <!-- Debug Info (remover em produção) -->
+        <div id="debugInfo" class="debug-info" style="display: none;">
+            <strong>Debug Info:</strong> <span id="debugText"></span>
+        </div>
+
+        <!-- Cards de KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="kpi-value" id="kpi-total-mes">R$ 0,00</div>
+                <div class="kpi-label">Total do Mês</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="fas fa-gas-pump"></i>
+                </div>
+                <div class="kpi-value" id="kpi-abastecimento">R$ 0,00</div>
+                <div class="kpi-label">Abastecimento</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="kpi-value" id="kpi-manutencao">R$ 0,00</div>
+                <div class="kpi-label">Manutenção</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="kpi-value" id="kpi-veiculos-ativos">0</div>
+                <div class="kpi-label">Veículos Ativos</div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filtros-container">
+            <div class="filtros-grid">
+                <div class="form-group">
+                    <label><i class="fas fa-car"></i> Veículo</label>
+                    <select class="form-control" id="filtro-veiculo">
+                        <option value="">Todos os veículos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-file-contract"></i> Contrato</label>
+                    <select class="form-control" id="filtro-contrato">
+                        <option value="">Todos os contratos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Tipo de Custo</label>
+                    <select class="form-control" id="filtro-tipo">
+                        <option value="">Todos os tipos</option>
+                        <option value="abastecimento">Abastecimento</option>
+                        <option value="manutencao">Manutenção</option>
+                        <option value="seguro">Seguro</option>
+                        <option value="ipva">IPVA</option>
+                        <option value="multa">Multa</option>
+                        <option value="estacionamento">Estacionamento</option>
+                        <option value="lavagem">Lavagem</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Mês/Ano</label>
+                    <input type="month" class="form-control" id="filtro-mes" value="{{ data_atual[:7] if data_atual else '' }}">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-verde" onclick="aplicarFiltros()">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Custos -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-list"></i> Registros de Custos</h2>
+                <span class="text-muted" id="totalRegistros">Carregando...</span>
+            </div>
+            <div class="scroll-indicator">
+                <i class="fas fa-arrows-left-right"></i> Deslize para ver mais colunas
+            </div>
+            <div class="table-responsive" id="conteudoTabela">
+                <!-- Conteúdo carregado via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Custo -->
+    <div class="modal" id="modalCusto">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Registrar Novo Custo</h3>
+                <button class="close-modal" onclick="fecharModalCusto()">&times;</button>
+            </div>
+            <form id="formCusto" enctype="multipart/form-data">
+                <div class="tabs">
+                    <button type="button" class="tab active" onclick="selecionarTab('geral')">
+                        <i class="fas fa-info-circle"></i> Informações Gerais
+                    </button>
+                    <button type="button" class="tab" onclick="selecionarTab('abastecimento')">
+                        <i class="fas fa-gas-pump"></i> Abastecimento
+                    </button>
+                </div>
+
+                <!-- Tab: Informações Gerais -->
+                <div id="tab-geral" class="tab-content" style="display: block;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="veiculo_id"><i class="fas fa-car"></i> Veículo *</label>
+                            <select class="form-control" id="veiculo_id" name="veiculo_id" required>
+                                <option value="">Selecione o veículo...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contrato_id"><i class="fas fa-file-contract"></i> Contrato (Opcional)</label>
+                            <select class="form-control" id="contrato_id" name="contrato_id">
+                                <option value="">Nenhum contrato</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo_custo"><i class="fas fa-tag"></i> Tipo de Custo *</label>
+                            <select class="form-control" id="tipo_custo" name="tipo_custo" required onchange="toggleAbastecimento()">
+                                <option value="">Selecione o tipo...</option>
+                                <option value="abastecimento">Abastecimento</option>
+                                <option value="manutencao">Manutenção</option>
+                                <option value="seguro">Seguro</option>
+                                <option value="ipva">IPVA</option>
+                                <option value="multa">Multa</option>
+                                <option value="estacionamento">Estacionamento</option>
+                                <option value="lavagem">Lavagem</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="data"><i class="fas fa-calendar"></i> Data *</label>
+                            <input type="date" class="form-control" id="data" name="data" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="valor"><i class="fas fa-money-bill-wave"></i> Valor (R$) *</label>
+                            <input type="number" class="form-control" id="valor" name="valor" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fornecedor"><i class="fas fa-store"></i> Fornecedor</label>
+                            <input type="text" class="form-control" id="fornecedor" name="fornecedor" placeholder="Nome do fornecedor...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="descricao"><i class="fas fa-sticky-note"></i> Descrição *</label>
+                        <input type="text" class="form-control" id="descricao" name="descricao" required placeholder="Ex: Troca de óleo, Abastecimento diesel...">
+                    </div>
+                    <div class="form-group">
+                        <label for="observacao"><i class="fas fa-comment-alt"></i> Observações</label>
+                        <textarea class="form-control" id="observacao" name="observacao" rows="3" placeholder="Observações adicionais..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Tab: Abastecimento -->
+                <div id="tab-abastecimento" class="tab-content" style="display: none;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="litros"><i class="fas fa-oil-can"></i> Litros *</label>
+                            <input type="number" class="form-control" id="litros" name="litros" step="0.001" min="0.001">
+                            <small class="text-muted">Apenas para abastecimento</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="preco_litro"><i class="fas fa-dollar-sign"></i> Preço por Litro *</label>
+                            <input type="number" class="form-control" id="preco_litro" name="preco_litro" step="0.001" min="0.001">
+                        </div>
+                        <div class="form-group">
+                            <label for="km_atual"><i class="fas fa-tachometer-alt"></i> KM Atual *</label>
+                            <input type="number" class="form-control" id="km_atual" name="km_atual" step="0.1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="local"><i class="fas fa-map-marker-alt"></i> Local</label>
+                            <input type="text" class="form-control" id="local" name="local" placeholder="Posto, cidade...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="comprovante"><i class="fas fa-file-upload"></i> Comprovante (Opcional)</label>
+                    <input type="file" class="form-control" id="comprovante" name="comprovante" accept=".pdf,.png,.jpg,.jpeg,.gif" onchange="previewComprovante(event)">
+                    <small class="text-muted">Formatos aceitos: PDF, PNG, JPG, JPEG, GIF (máx. 10MB)</small>
+                    <img id="preview-comprovante" class="preview-img" alt="Preview do comprovante">
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 25px; flex-direction: column;">
+                    <button type="submit" class="btn btn-verde" id="submitBtnCusto">
+                        <span class="btn-text"><i class="fas fa-save"></i> Salvar Custo</span>
+                        <div class="btn-loader">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="fecharModalCusto()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Detalhes do Custo -->
+    <div class="modal" id="modalDetalhes">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-eye"></i> Detalhes do Custo</h3>
+                <button class="close-modal" onclick="fecharModalDetalhes()">&times;</button>
+            </div>
+            <div id="detalhesConteudo">
+                <!-- Conteúdo carregado via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Variáveis globais
+    let custos = [];
+    let veiculos = [];
+    let contratos = [];
+    let filtrosAtivos = {};
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Inicializando sistema de custos...');
+        configurarDataAtual();
+        carregarDadosIniciais();
+        configurarFormulario();
+        configurarEventos();
+    });
+
+    function configurarDataAtual() {
+        const hoje = new Date().toISOString().split('T')[0];
+        document.getElementById('data').value = hoje;
+        
+        // Configurar mês atual no filtro
+        const mesAtual = hoje.slice(0, 7);
+        document.getElementById('filtro-mes').value = mesAtual;
+    }
+
+    function configurarFormulario() {
+        document.getElementById('formCusto').addEventListener('submit', salvarCusto);
+    }
+
+    function configurarEventos() {
+        document.getElementById('filtro-mes').addEventListener('change', function() {
+            aplicarFiltros();
+        });
+    }
+
+    function selecionarTab(tabName) {
+        // Remover classe active de todas as tabs
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+        
+        // Adicionar classe active à tab selecionada
+        document.querySelector(`.tab[onclick="selecionarTab('${tabName}')"]`).classList.add('active');
+        document.getElementById(`tab-${tabName}`).style.display = 'block';
+    }
+
+    function toggleAbastecimento() {
+        const tipo = document.getElementById('tipo_custo').value;
+        const isAbastecimento = tipo === 'abastecimento';
+        
+        const litros = document.getElementById('litros');
+        const precoLitro = document.getElementById('preco_litro');
+        const kmAtual = document.getElementById('km_atual');
+        
+        if (isAbastecimento) {
+            litros.required = true;
+            precoLitro.required = true;
+            kmAtual.required = true;
+            litros.disabled = false;
+            precoLitro.disabled = false;
+            kmAtual.disabled = false;
+        } else {
+            litros.required = false;
+            precoLitro.required = false;
+            kmAtual.required = false;
+            litros.disabled = true;
+            precoLitro.disabled = true;
+            kmAtual.disabled = true;
+            litros.value = '';
+            precoLitro.value = '';
+            kmAtual.value = '';
+        }
+    }
+
+    function previewComprovante(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('preview-comprovante');
+        
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+
+    // ====================================================================
+    // FUNÇÕES PRINCIPAIS DE CARREGAMENTO DE DADOS
+    // ====================================================================
+
+    async function carregarDadosIniciais() {
+        console.log('📊 Carregando dados iniciais...');
+        
+        try {
+            // 1. Testar conexão com a API
+            console.log('🔍 Testando conexão com API...');
+            const healthResponse = await fetch('/api/custos/health');
+            
+            if (!healthResponse.ok) {
+                throw new Error(`API não respondeu (status: ${healthResponse.status})`);
+            }
+            
+            const healthData = await healthResponse.json();
+            console.log('✅ API Health:', healthData);
+            
+            // 2. Carregar veículos EM PARALELO
+            console.log('🚗 Carregando veículos...');
+            const veiculosPromise = carregarVeiculos();
+            
+            // 3. Carregar contratos EM PARALELO
+            console.log('📄 Carregando contratos...');
+            const contratosPromise = carregarContratos();
+            
+            // 4. Carregar custos EM PARALELO
+            console.log('💰 Carregando custos...');
+            const custosPromise = carregarCustos();
+            
+            // Aguardar todas as promises
+            await Promise.all([veiculosPromise, contratosPromise, custosPromise]);
+            
+            console.log('✅ Todos os dados carregados com sucesso!');
+            mostrarAlerta('Sistema carregado com sucesso!', 'success');
+            
+        } catch (error) {
+            console.error('❌ Erro ao carregar dados iniciais:', error);
+            mostrarAlerta('Erro ao carregar dados: ' + error.message, 'error');
+            
+            // Mostrar detalhes do erro no console
+            if (error.response) {
+                console.error('Detalhes do erro:', await error.response.text());
+            }
+        }
+    }
+
+    async function carregarVeiculos() {
+        try {
+            console.log('🔄 Fazendo requisição para /api/custos/veiculos');
+            const response = await fetch('/api/custos/veiculos');
+            
+            console.log('📥 Status da resposta:', response.status);
+            console.log('📥 Headers:', response.headers);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Erro na resposta:', errorText);
+                throw new Error(`Erro ${response.status}: ${errorText}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Veículos recebidos:', data);
+            console.log('📊 Total de veículos:', data.length);
+            
+            if (data.length > 0) {
+                console.log('📝 Estrutura do primeiro veículo:');
+                console.log('- ID:', data[0].id);
+                console.log('- Placa:', data[0].placa);
+                console.log('- Modelo:', data[0].modelo);
+                console.log('- Marca:', data[0].marca);
+                console.log('- Ano:', data[0].ano);
+                console.log('- KM Atual:', data[0].km_atual);
+                console.log('- Status:', data[0].status);
+                console.log('- Todas as chaves:', Object.keys(data[0]));
+            }
+            
+            veiculos = data;
+            
+            // PREENCHER SELECT DO MODAL
+            const selectVeiculoModal = document.getElementById('veiculo_id');
+            console.log('🔄 Preenchendo select do modal:', selectVeiculoModal);
+            
+            selectVeiculoModal.innerHTML = '<option value="">Selecione o veículo...</option>';
+            
+            veiculos.forEach(veiculo => {
+                const option = document.createElement('option');
+                option.value = veiculo.id;
+                
+                // Montar texto para exibição
+                let texto = '';
+                
+                if (veiculo.placa) {
+                    texto += veiculo.placa;
+                }
+                
+                if (veiculo.modelo) {
+                    if (texto) texto += ' - ';
+                    texto += veiculo.modelo;
+                }
+                
+                if (veiculo.marca) {
+                    if (texto) texto += ' ';
+                    texto += `(${veiculo.marca})`;
+                }
+                
+                if (veiculo.ano) {
+                    if (texto) texto += ' - ';
+                    texto += veiculo.ano;
+                }
+                
+                // Se não houver nenhum dado, mostrar apenas o ID
+                if (!texto) {
+                    texto = `Veículo ${veiculo.id}`;
+                }
+                
+                option.textContent = texto;
+                option.setAttribute('data-placa', veiculo.placa || '');
+                option.setAttribute('data-modelo', veiculo.modelo || '');
+                option.setAttribute('data-marca', veiculo.marca || '');
+                option.setAttribute('data-ano', veiculo.ano || '');
+                
+                selectVeiculoModal.appendChild(option);
+            });
+            
+            console.log('✅ Select do modal preenchido com', veiculos.length, 'opções');
+            
+            // PREENCHER FILTRO DE VEÍCULOS
+            const filtroVeiculo = document.getElementById('filtro-veiculo');
+            console.log('🔄 Preenchendo filtro de veículos:', filtroVeiculo);
+            
+            filtroVeiculo.innerHTML = '<option value="">Todos os veículos</option>';
+            
+            veiculos.forEach(veiculo => {
+                const option = document.createElement('option');
+                option.value = veiculo.id;
+                
+                let texto = '';
+                if (veiculo.placa) {
+                    texto += veiculo.placa;
+                }
+                if (veiculo.modelo) {
+                    if (texto) texto += ' - ';
+                    texto += veiculo.modelo;
+                }
+                
+                option.textContent = texto || `Veículo ${veiculo.id}`;
+                filtroVeiculo.appendChild(option);
+            });
+            
+            console.log('✅ Filtro de veículos preenchido');
+            
+            // ATUALIZAR KPI DE VEÍCULOS ATIVOS
+            const veiculosAtivos = veiculos.filter(v => v.status === 'ativo').length;
+            document.getElementById('kpi-veiculos-ativos').textContent = veiculosAtivos;
+            console.log('✅ KPI atualizado:', veiculosAtivos, 'veículos ativos');
+            
+            return true;
+            
+        } catch (error) {
+            console.error('❌ ERRO CRÍTICO ao carregar veículos:', error);
+            mostrarAlerta('Erro ao carregar veículos: ' + error.message, 'error');
+            
+            // Forçar exibição de algum veículo para debug
+            const selectVeiculoModal = document.getElementById('veiculo_id');
+            selectVeiculoModal.innerHTML = `
+                <option value="">Erro ao carregar veículos</option>
+                <option value="1">TESTE - Veículo 1</option>
+                <option value="2">TESTE - Veículo 2</option>
+            `;
+            
+            return false;
+        }
+    }
+
+    async function carregarContratos() {
+        try {
+            console.log('🔄 Fazendo requisição para /api/custos/contratos');
+            const response = await fetch('/api/custos/contratos');
+            
+            console.log('📥 Status da resposta:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Erro na resposta:', errorText);
+                throw new Error(`Erro ${response.status}: ${errorText}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Contratos recebidos:', data);
+            console.log('📊 Total de contratos:', data.length);
+            
+            if (data.length > 0) {
+                console.log('📝 Estrutura do primeiro contrato:');
+                console.log('- ID:', data[0].id);
+                console.log('- Código:', data[0].codigo_contrato);
+                console.log('- Empresa:', data[0].nome_empresa);
+                console.log('- Valor:', data[0].valor_orcado);
+                console.log('- Todas as chaves:', Object.keys(data[0]));
+            }
+            
+            contratos = data;
+            
+            // PREENCHER SELECT DO MODAL
+            const selectContratoModal = document.getElementById('contrato_id');
+            console.log('🔄 Preenchendo select do modal:', selectContratoModal);
+            
+            selectContratoModal.innerHTML = '<option value="">Nenhum contrato</option>';
+            
+            contratos.forEach(contrato => {
+                const option = document.createElement('option');
+                option.value = contrato.id;
+                
+                let texto = '';
+                if (contrato.codigo_contrato) {
+                    texto += contrato.codigo_contrato;
+                }
+                if (contrato.nome_empresa) {
+                    if (texto) texto += ' - ';
+                    texto += contrato.nome_empresa;
+                }
+                
+                option.textContent = texto || `Contrato ${contrato.id}`;
+                selectContratoModal.appendChild(option);
+            });
+            
+            console.log('✅ Select do modal preenchido com', contratos.length, 'opções');
+            
+            // PREENCHER FILTRO DE CONTRATOS
+            const filtroContrato = document.getElementById('filtro-contrato');
+            console.log('🔄 Preenchendo filtro de contratos:', filtroContrato);
+            
+            filtroContrato.innerHTML = '<option value="">Todos os contratos</option>';
+            
+            contratos.forEach(contrato => {
+                const option = document.createElement('option');
+                option.value = contrato.id;
+                
+                let texto = '';
+                if (contrato.codigo_contrato) {
+                    texto += contrato.codigo_contrato;
+                }
+                if (contrato.nome_empresa) {
+                    if (texto) texto += ' - ';
+                    texto += contrato.nome_empresa;
+                }
+                
+                option.textContent = texto || `Contrato ${contrato.id}`;
+                filtroContrato.appendChild(option);
+            });
+            
+            console.log('✅ Filtro de contratos preenchido');
+            
+            return true;
+            
+        } catch (error) {
+            console.error('❌ Erro ao carregar contratos:', error);
+            mostrarAlerta('Erro ao carregar contratos: ' + error.message, 'warning');
+            return false;
+        }
+    }
+
+    async function carregarCustos(filtros = {}) {
+        try {
+            let url = '/api/custos/?limite=200';
+            const params = [];
+            
+            if (filtros.veiculo_id) {
+                params.push(`veiculo_id=${filtros.veiculo_id}`);
+            }
+            if (filtros.contrato_id) {
+                params.push(`contrato_id=${filtros.contrato_id}`);
+            }
+            if (filtros.tipo_custo) {
+                params.push(`tipo_custo=${filtros.tipo_custo}`);
+            }
+            if (filtros.data_inicio) {
+                params.push(`data_inicio=${filtros.data_inicio}`);
+            }
+            if (filtros.data_fim) {
+                params.push(`data_fim=${filtros.data_fim}`);
+            }
+            
+            if (params.length > 0) {
+                url += '&' + params.join('&');
+            }
+            
+            console.log('🔄 Carregando custos:', url);
+            const response = await fetch(url);
+            
+            console.log('📥 Status da resposta:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Erro na resposta:', errorText);
+                throw new Error(`Erro ${response.status}: ${errorText}`);
+            }
+            
+            custos = await response.json();
+            console.log('✅ Custos carregados:', custos.length, 'registros');
+            
+            if (custos.length > 0) {
+                console.log('📝 Primeiro custo:', custos[0]);
+            }
+            
+            exibirCustos(custos);
+            
+            // Atualizar KPIs
+            atualizarKPIs(custos);
+            
+            document.getElementById('totalRegistros').textContent = `${custos.length} registros encontrados`;
+            
+            console.log('✅ Custos exibidos na tabela');
+            
+        } catch (error) {
+            console.error('❌ Erro ao carregar custos:', error);
+            mostrarAlerta('Erro ao carregar registros: ' + error.message, 'error');
+        }
+    }
+
+    function exibirCustos(custos) {
+        const conteudoTabela = document.getElementById('conteudoTabela');
+        
+        if (!custos || custos.length === 0) {
+            conteudoTabela.innerHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Data</th>
+                            <th>Veículo</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th>Valor</th>
+                            <th>Fornecedor</th>
+                            <th>Comprovante</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>Nenhum registro encontrado</h3>
+                    <p>Comece registrando seu primeiro custo veicular.</p>
+                </div>
+            `;
+            return;
+        }
+
+        conteudoTabela.innerHTML = `
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Veículo</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Fornecedor</th>
+                        <th>Comprovante</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${custos.map(custo => `
+                        <tr>
+                            <td style="font-weight: 600; color: var(--verde-principal);">#${custo.id}</td>
+                            <td>${formatarData(custo.data)}</td>
+                            <td>${custo.placa || 'N/A'}</td>
+                            <td>
+                                <span class="badge ${getBadgeClass(custo.tipo_custo)}">
+                                    ${custo.tipo_custo}
+                                </span>
+                            </td>
+                            <td>${custo.descricao || ''}</td>
+                            <td style="font-weight: 600;">R$ ${formatarValor(custo.valor)}</td>
+                            <td>${custo.fornecedor || '-'}</td>
+                            <td>
+                                ${custo.comprovante ? 
+                                    `<a href="${custo.comprovante}" target="_blank" class="link-verde" title="Ver comprovante">
+                                        <i class="fas fa-paperclip"></i>
+                                    </a>` : 
+                                    '<span class="text-muted">-</span>'
+                                }
+                            </td>
+                            <td>
+                                <div class="acoes-tabela">
+                                    <button class="btn-tabela btn-ver" onclick="verDetalhes(${custo.id})" title="Visualizar">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    function getBadgeClass(tipo) {
+        const classes = {
+            'abastecimento': 'badge-info',
+            'manutencao': 'badge-warning',
+            'seguro': 'badge-success',
+            'ipva': 'badge-danger',
+            'multa': 'badge-danger',
+            'estacionamento': 'badge-info',
+            'lavagem': 'badge-info',
+            'outros': 'badge-info'
+        };
+        return classes[tipo] || 'badge-info';
+    }
+
+    function atualizarKPIs(custos) {
+        const mesSelecionado = document.getElementById('filtro-mes').value;
+        
+        let totalMes = 0;
+        let totalAbastecimento = 0;
+        let totalManutencao = 0;
+        
+        custos.forEach(custo => {
+            if (custo.data) {
+                const dataCusto = new Date(custo.data);
+                const mesCusto = dataCusto.getFullYear() + '-' + 
+                               (dataCusto.getMonth() + 1).toString().padStart(2, '0');
+                
+                // Se houver filtro de mês, considerar apenas os custos do mês selecionado
+                if (!mesSelecionado || mesCusto === mesSelecionado) {
+                    totalMes += parseFloat(custo.valor || 0);
+                    
+                    if (custo.tipo_custo === 'abastecimento') {
+                        totalAbastecimento += parseFloat(custo.valor || 0);
+                    } else if (custo.tipo_custo === 'manutencao') {
+                        totalManutencao += parseFloat(custo.valor || 0);
+                    }
+                }
+            }
+        });
+        
+        document.getElementById('kpi-total-mes').textContent = `R$ ${formatarValor(totalMes)}`;
+        document.getElementById('kpi-abastecimento').textContent = `R$ ${formatarValor(totalAbastecimento)}`;
+        document.getElementById('kpi-manutencao').textContent = `R$ ${formatarValor(totalManutencao)}`;
+    }
+
+    async function salvarCusto(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const submitBtn = document.getElementById('submitBtnCusto');
+        submitBtn.classList.add('loading');
+
+        try {
+            // Validar campos específicos para abastecimento
+            const tipoCusto = document.getElementById('tipo_custo').value;
+            if (tipoCusto === 'abastecimento') {
+                const litros = document.getElementById('litros').value;
+                const precoLitro = document.getElementById('preco_litro').value;
+                const kmAtual = document.getElementById('km_atual').value;
+                
+                if (!litros || litros <= 0) {
+                    throw new Error('Litros é obrigatório para abastecimento');
+                }
+                if (!precoLitro || precoLitro <= 0) {
+                    throw new Error('Preço por litro é obrigatório para abastecimento');
+                }
+                if (!kmAtual || kmAtual <= 0) {
+                    throw new Error('KM atual é obrigatório para abastecimento');
+                }
+            }
+
+            console.log('📤 Enviando formulário...', Object.fromEntries(formData));
+            const response = await fetch('/api/custos/', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            console.log('📥 Resposta do servidor:', result);
+            
+            if (response.ok) {
+                mostrarAlerta('Custo registrado com sucesso!', 'success');
+                fecharModalCusto();
+                carregarCustos(filtrosAtivos);
+            } else {
+                throw new Error(result.error || `Erro ${response.status}`);
+            }
+        } catch (error) {
+            console.error('❌ Erro ao salvar:', error);
+            mostrarAlerta(error.message || 'Erro ao registrar custo', 'error');
+        } finally {
+            submitBtn.classList.remove('loading');
+        }
+    }
+
+    function aplicarFiltros() {
+        const veiculoId = document.getElementById('filtro-veiculo').value;
+        const contratoId = document.getElementById('filtro-contrato').value;
+        const tipoCusto = document.getElementById('filtro-tipo').value;
+        const mesSelecionado = document.getElementById('filtro-mes').value;
+        
+        // Construir filtros
+        filtrosAtivos = {};
+        
+        if (veiculoId) filtrosAtivos.veiculo_id = veiculoId;
+        if (contratoId) filtrosAtivos.contrato_id = contratoId;
+        if (tipoCusto) filtrosAtivos.tipo_custo = tipoCusto;
+        
+        // Se houver mês selecionado, calcular início e fim do mês
+        if (mesSelecionado) {
+            const [ano, mes] = mesSelecionado.split('-');
+            const primeiroDia = `${ano}-${mes}-01`;
+            const ultimoDia = new Date(ano, mes, 0).toISOString().split('T')[0];
+            
+            filtrosAtivos.data_inicio = primeiroDia;
+            filtrosAtivos.data_fim = ultimoDia;
+        }
+        
+        console.log('🔍 Aplicando filtros:', filtrosAtivos);
+        mostrarAlerta('Aplicando filtros...', 'info');
+        carregarCustos(filtrosAtivos);
+    }
+
+    function limparFiltros() {
+        document.getElementById('filtro-veiculo').value = '';
+        document.getElementById('filtro-contrato').value = '';
+        document.getElementById('filtro-tipo').value = '';
+        
+        // Resetar mês para o atual
+        const hoje = new Date().toISOString().split('T')[0];
+        const mesAtual = hoje.slice(0, 7);
+        document.getElementById('filtro-mes').value = mesAtual;
+        
+        filtrosAtivos = {};
+        console.log('🧹 Filtros limpos');
+        carregarCustos();
+    }
+
+    async function verDetalhes(id) {
+        try {
+            const custo = custos.find(c => c.id == id);
+            if (!custo) {
+                throw new Error('Custo não encontrado');
+            }
+            
+            console.log('👁️ Visualizando custo #', id);
+            
+            let detalhesHTML = `
+                <div class="detalhes-grid">
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">ID</div>
+                        <div class="detalhes-value">#${custo.id}</div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Data</div>
+                        <div class="detalhes-value">${formatarData(custo.data)}</div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Veículo</div>
+                        <div class="detalhes-value">${custo.placa || 'N/A'}</div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Tipo de Custo</div>
+                        <div class="detalhes-value">
+                            <span class="badge ${getBadgeClass(custo.tipo_custo)}">
+                                ${custo.tipo_custo}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Valor</div>
+                        <div class="detalhes-value" style="font-size: 18px; color: var(--verde-principal);">
+                            R$ ${formatarValor(custo.valor)}
+                        </div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Descrição</div>
+                        <div class="detalhes-value">${custo.descricao || '-'}</div>
+                    </div>
+            `;
+            
+            if (custo.fornecedor) {
+                detalhesHTML += `
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Fornecedor</div>
+                        <div class="detalhes-value">${custo.fornecedor}</div>
+                    </div>
+                `;
+            }
+            
+            if (custo.local) {
+                detalhesHTML += `
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Local</div>
+                        <div class="detalhes-value">${custo.local}</div>
+                    </div>
+                `;
+            }
+            
+            if (custo.contrato_id && custo.nome_empresa) {
+                detalhesHTML += `
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Contrato</div>
+                        <div class="detalhes-value">${custo.codigo_contrato} - ${custo.nome_empresa}</div>
+                    </div>
+                `;
+            }
+            
+            // Campos específicos para abastecimento
+            if (custo.tipo_custo === 'abastecimento') {
+                detalhesHTML += `
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Litros</div>
+                        <div class="detalhes-value">${custo.litros ? formatarValor(custo.litros) + ' L' : '-'}</div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Preço por Litro</div>
+                        <div class="detalhes-value">R$ ${custo.preco_litro ? formatarValor(custo.preco_litro) : '-'}</div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">KM Atual</div>
+                        <div class="detalhes-value">${custo.km_atual ? formatarValor(custo.km_atual) + ' km' : '-'}</div>
+                    </div>
+                `;
+            }
+            
+            if (custo.observacao) {
+                detalhesHTML += `
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Observações</div>
+                        <div class="detalhes-value">${custo.observacao}</div>
+                    </div>
+                `;
+            }
+            
+            if (custo.comprovante) {
+                detalhesHTML += `
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Comprovante</div>
+                        <div class="detalhes-value">
+                            <a href="${custo.comprovante}" target="_blank" class="btn-download">
+                                <i class="fas fa-download"></i> Baixar Comprovante
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            detalhesHTML += `
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Registrado em</div>
+                        <div class="detalhes-value">${formatarDataHora(custo.criado_em)}</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 25px;">
+                    <button class="btn btn-outline" onclick="fecharModalDetalhes()">
+                        <i class="fas fa-times"></i> Fechar
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('detalhesConteudo').innerHTML = detalhesHTML;
+            document.getElementById('modalDetalhes').classList.add('active');
+            
+        } catch (error) {
+            console.error('❌ Erro ao carregar detalhes:', error);
+            mostrarAlerta('Erro ao carregar detalhes: ' + error.message, 'error');
+        }
+    }
+
+    // ====================================================================
+    // FUNÇÕES AUXILIARES
+    // ====================================================================
+
+    function abrirModalCusto() {
+        console.log('➕ Abrindo modal para novo custo');
+        
+        // Verificar se veículos foram carregados
+        if (veiculos.length === 0) {
+            console.log('⚠️ Nenhum veículo carregado, recarregando...');
+            carregarVeiculos();
+        }
+        
+        // Verificar se contratos foram carregados
+        if (contratos.length === 0) {
+            console.log('⚠️ Nenhum contrato carregado, recarregando...');
+            carregarContratos();
+        }
+        
+        document.getElementById('modalCusto').classList.add('active');
+        selecionarTab('geral');
+    }
+
+    function fecharModalCusto() {
+        document.getElementById('modalCusto').classList.remove('active');
+        document.getElementById('formCusto').reset();
+        configurarDataAtual();
+        const preview = document.getElementById('preview-comprovante');
+        if (preview) preview.style.display = 'none';
+        toggleAbastecimento();
+    }
+
+    function fecharModalDetalhes() {
+        document.getElementById('modalDetalhes').classList.remove('active');
+    }
+
+    function formatarData(dataString) {
+        if (!dataString) return 'N/A';
+        try {
+            const data = new Date(dataString);
+            return data.toLocaleDateString('pt-BR');
+        } catch (e) {
+            return dataString;
+        }
+    }
+
+    function formatarDataHora(dataString) {
+        if (!dataString) return 'N/A';
+        try {
+            const data = new Date(dataString);
+            return data.toLocaleString('pt-BR');
+        } catch (e) {
+            return dataString;
+        }
+    }
+
+    function formatarValor(valor) {
+        if (!valor) return '0,00';
+        try {
+            return parseFloat(valor).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        } catch (e) {
+            return valor;
+        }
+    }
+
+    function mostrarAlerta(mensagem, tipo = 'info') {
+        const alert = document.getElementById('alert');
+        let icon = 'info-circle';
+        if (tipo === 'error') icon = 'exclamation-triangle';
+        if (tipo === 'success') icon = 'check-circle';
+        if (tipo === 'warning') icon = 'exclamation-circle';
+
+        alert.innerHTML = `<i class="fas fa-${icon}"></i> ${mensagem}`;
+        alert.className = `alert alert-${tipo}`;
+        alert.style.display = 'flex';
+
+        // Auto-esconder após 5 segundos
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 5000);
+    }
+
+    // Função para testar manualmente o endpoint
+    async function testarEndpointVeiculos() {
+        console.log('🧪 TESTE MANUAL: /api/custos/veiculos');
+        try {
+            const response = await fetch('/api/custos/veiculos');
+            console.log('Status:', response.status);
+            const data = await response.json();
+            console.log('Dados:', data);
+            console.log('Primeiro item:', data[0]);
+            console.log('Estrutura:', Object.keys(data[0]));
+            
+            // Mostrar na tela também
+            alert(`Veículos carregados: ${data.length}\nPrimeiro: ${JSON.stringify(data[0])}`);
+        } catch (error) {
+            console.error('Erro no teste:', error);
+            alert('Erro: ' + error.message);
+        }
+    }
+
+    // Adicionar botão de teste ao console
+    console.log('💡 Para testar manualmente, execute: testarEndpointVeiculos()');
+</script>
+{% endblock %}

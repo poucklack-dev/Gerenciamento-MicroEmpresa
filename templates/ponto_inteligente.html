@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="pt-BR" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='img/site.webmanifest') }}">
+    <title>Sistema Inteligente de Ponto com Localização</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --verde-principal: #0a5c36;
+            --verde-escuro: #064028;
+            --verde-claro: #10b981;
+            --azul: #3b82f6;
+            --amarelo: #f59e0b;
+            --vermelho: #ef4444;
+            --cinza-claro: #f1f5f9;
+            --cinza-escuro: #64748b;
+            --branco: #ffffff;
+            --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        
+        html, body {
+            direction: ltr;
+            text-align: left;
+        }
+        
+        body { 
+            background: var(--cinza-claro); 
+            color: #1e293b; 
+            line-height: 1.6; 
+            unicode-bidi: plaintext;
+        }
+        
+        .container { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--verde-principal), var(--verde-escuro));
+            color: white;
+            padding: 24px 20px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--sombra);
+            text-align: center;
+        }
+        
+        .logo { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px; 
+            margin-bottom: 16px; 
+        }
+        
+        .logo-icon { 
+            width: 44px; 
+            height: 44px; 
+            background: rgba(255,255,255,0.2); 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .app-title { 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            margin-bottom: 4px; 
+        }
+        
+        .app-subtitle { 
+            font-size: 0.95rem; 
+            opacity: 0.9; 
+        }
+        
+        .clock-container { 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 16px; 
+            padding: 20px; 
+            margin-top: 16px; 
+        }
+        
+        .time { 
+            font-size: 2.8rem; 
+            font-weight: 700; 
+            margin-bottom: 4px; 
+            font-family: 'Courier New', monospace; 
+        }
+        
+        .date { 
+            font-size: 1.1rem; 
+            opacity: 0.9; 
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* Localização Status */
+        .localizacao-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--azul);
+        }
+        
+        .localizacao-status.inativa {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--cinza-escuro);
+        }
+        
+        .localizacao-status.ativa {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--verde-claro);
+        }
+        
+        .localizacao-status.erro {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--vermelho);
+        }
+        
+        /* Card Principal */
+        .card { 
+            background: var(--branco); 
+            border-radius: 20px; 
+            padding: 30px; 
+            margin-bottom: 20px; 
+            box-shadow: var(--sombra);
+            text-align: center;
+        }
+        
+        .card-title { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 12px; 
+            font-size: 1.3rem; 
+            margin-bottom: 20px; 
+            color: var(--verde-escuro);
+        }
+        
+        /* Câmera */
+        .camera-container { 
+            position: relative; 
+            width: 100%; 
+            border-radius: 16px; 
+            overflow: hidden; 
+            background: #1a1f36; 
+            aspect-ratio: 4/3; 
+            margin-bottom: 25px; 
+        }
+        
+        #video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .face-guide {
+            width: 220px;
+            height: 280px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .camera-status {
+            color: white;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .capture-btn { 
+            position: absolute; 
+            bottom: 25px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 70px; 
+            height: 70px; 
+            border-radius: 50%; 
+            background: var(--branco); 
+            border: 5px solid var(--verde-principal); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.3s;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .capture-btn:hover { 
+            transform: translateX(-50%) scale(1.1); 
+        }
+        
+        .capture-btn:active { 
+            transform: translateX(-50%) scale(0.95); 
+        }
+        
+        .capture-btn:after { 
+            content: ''; 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            background: var(--verde-principal); 
+            transition: all 0.3s;
+        }
+        
+        .capture-btn.capturing:after { 
+            background: var(--vermelho); 
+            transform: scale(0.8); 
+        }
+        
+        .capture-btn.cadastrando:after { 
+            background: var(--azul); 
+        }
+        
+        /* Modal de CPF */
+        .modal-cpf {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            color: var(--verde-escuro);
+        }
+        
+        /* Formulários - FIX LTR */
+        .form-group { 
+            margin-bottom: 25px; 
+        }
+        
+        label { 
+            display: block; 
+            margin-bottom: 10px; 
+            font-weight: 600; 
+            color: var(--verde-escuro); 
+            text-align: left; 
+        }
+        
+        input[type="text"], 
+        input[type="tel"] {
+            width: 100%; 
+            padding: 18px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 12px; 
+            font-size: 1.1rem; 
+            transition: all 0.3s;
+            text-align: left !important;
+            letter-spacing: 1px;
+            direction: ltr !important;
+            unicode-bidi: plaintext !important;
+            font-family: 'Courier New', monospace, sans-serif !important;
+        }
+        
+        input[type="text"]:focus,
+        input[type="tel"]:focus { 
+            border-color: var(--verde-principal); 
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(10, 92, 54, 0.1);
+        }
+        
+        /* Forçar LTR em todos os inputs */
+        input, 
+        textarea, 
+        .cpf-field {
+            direction: ltr !important;
+            text-align: left !important;
+            unicode-bidi: plaintext !important;
+        }
+        
+        /* Inputs de CPF específicos */
+        .cpf-input {
+            direction: ltr !important;
+            text-align: left !important;
+            unicode-bidi: plaintext !important;
+            font-family: 'Courier New', monospace !important;
+            letter-spacing: 1px;
+        }
+        
+        /* Botões */
+        .btn { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            width: 100%; 
+            background: var(--verde-principal); 
+            color: white; 
+            border: none; 
+            padding: 18px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            margin-bottom: 15px; 
+            transition: all 0.3s ease; 
+        }
+        
+        .btn:hover { 
+            background: var(--verde-escuro); 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 15px rgba(6, 64, 40, 0.3); 
+        }
+        
+        .btn:active { 
+            transform: translateY(0); 
+        }
+        
+        .btn:disabled { 
+            background: var(--cinza-escuro); 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+            opacity: 0.7; 
+        }
+        
+        .btn-secondary { 
+            background: var(--azul); 
+        }
+        
+        .btn-secondary:hover { 
+            background: #2563eb; 
+        }
+        
+        .btn-outline { 
+            background: transparent; 
+            border: 2px solid var(--cinza-escuro); 
+            color: var(--cinza-escuro); 
+        }
+        
+        .btn-outline:hover { 
+            background: var(--cinza-escuro); 
+            color: white; 
+        }
+        
+        /* Status Messages */
+        .status-message { 
+            padding: 18px; 
+            border-radius: 12px; 
+            margin: 25px 0; 
+            text-align: center; 
+            font-weight: 600; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px; 
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn { 
+            from { opacity: 0; transform: translateY(-10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .status-success { 
+            background: rgba(16,185,129,0.15); 
+            color: var(--verde-claro); 
+            border: 2px solid rgba(16,185,129,0.3); 
+        }
+        
+        .status-warning { 
+            background: rgba(245,158,11,0.15); 
+            color: var(--amarelo); 
+            border: 2px solid rgba(245,158,11,0.3); 
+        }
+        
+        .status-error { 
+            background: rgba(239,68,68,0.15); 
+            color: var(--vermelho); 
+            border: 2px solid rgba(239,68,68,0.3); 
+        }
+        
+        .status-info { 
+            background: rgba(59,130,246,0.15); 
+            color: var(--azul); 
+            border: 2px solid rgba(59,130,246,0.3); 
+        }
+        
+        .hidden { 
+            display: none !important; 
+        }
+        
+        /* Loading */
+        .loading { 
+            position: relative; 
+        }
+        
+        .loading:after {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border: 3px solid transparent;
+            border-top-color: var(--verde-claro);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        
+        /* Instruções */
+        .instrucoes {
+            background: rgba(10, 92, 54, 0.05);
+            border-left: 4px solid var(--verde-principal);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            text-align: left;
+        }
+        
+        .instrucoes ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .instrucoes li {
+            margin-bottom: 8px;
+        }
+        
+        /* Footer */
+        footer { 
+            text-align: center; 
+            margin-top: 30px; 
+            padding: 20px; 
+            color: var(--cinza-escuro); 
+            font-size: 0.9rem; 
+        }
+        
+        /* Responsivo */
+        @media (max-width: 480px) {
+            .container { padding: 15px; }
+            .header { padding: 20px 15px; }
+            .time { font-size: 2.2rem; }
+            .camera-container { aspect-ratio: 3/4; }
+            .face-guide { width: 180px; height: 230px; }
+            .card { padding: 20px; }
+        }
+        
+        /* Efeitos */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(-50%); }
+            25% { transform: translateX(-52%); }
+            75% { transform: translateX(-48%); }
+        }
+    </style>
+</head>
+<body dir="ltr">
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div>
+                    <div class="app-title">Ponto com Localização</div>
+                    <div class="app-subtitle">Topografia - Sistema de campo</div>
+                </div>
+            </div>
+            
+            <div class="clock-container">
+                <div class="time" id="current-time">00:00:00</div>
+                <div class="date" id="current-date">--/--/----</div>
+            </div>
+            
+            <!-- Status da Localização -->
+            <div class="localizacao-status inativa" id="localizacao-status">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="localizacao-texto">Localização: Aguardando...</span>
+            </div>
+            
+            <div class="status-bar">
+                <div><i class="fas fa-users"></i> <span id="total-cadastrados">0</span> rostos</div>
+                <div><i class="fas fa-check-circle"></i> Sistema Online</div>
+            </div>
+        </header>
+        
+        <!-- Card Principal -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-camera"></i> 
+                <span id="titulo-acao">Ponto com Geolocalização</span>
+            </h2>
+            
+            <div class="instrucoes">
+                <strong><i class="fas fa-lightbulb"></i> Para funcionários de campo:</strong>
+                <ol>
+                    <li>Permita o acesso à localização no navegador</li>
+                    <li>Posicione seu rosto no quadro da câmera</li>
+                    <li>Clique no botão para bater ponto</li>
+                    <li>Sua localização atual será registrada automaticamente</li>
+                    <li><strong>Importante:</strong> Bata o ponto no local exato do serviço</li>
+                </ol>
+            </div>
+            
+            <!-- Informações de Localização -->
+            <div id="info-localizacao" class="instrucoes hidden">
+                <strong><i class="fas fa-map-pin"></i> Localização Atual:</strong>
+                <div id="localizacao-detalhes">Carregando...</div>
+            </div>
+            
+            <div class="camera-container">
+                <video id="video" autoplay playsinline></video>
+                <div class="camera-overlay">
+                    <div class="face-guide"></div>
+                    <div class="camera-status" id="camera-status">
+                        <i class="fas fa-check-circle"></i> Câmera pronta
+                    </div>
+                </div>
+                <div class="capture-btn" id="capture-btn" title="Clique para bater ponto com localização"></div>
+            </div>
+            
+            <div id="status-message" class="status-message hidden"></div>
+            
+            <!-- Opção Manual -->
+            <div style="margin-top: 25px; padding-top: 25px; border-top: 2px solid var(--cinza-claro);">
+                <h3 style="margin-bottom: 15px; color: var(--cinza-escuro);">
+                    <i class="fas fa-keyboard"></i> Opção Manual
+                </h3>
+                <div class="form-group">
+                    <input type="tel" id="cpf-manual" class="cpf-input" placeholder="Digite seu CPF (formato: 000.000.000-00)" dir="ltr">
+                </div>
+                <button id="btn-manual" class="btn btn-secondary">
+                    <i class="fas fa-user-check"></i> Registrar Ponto (CPF)
+                </button>
+            </div>
+        </div>
+        
+        <!-- Modal CPF (aparece automaticamente quando necessário) -->
+        <div class="modal-cpf hidden" id="modal-cpf">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="fas fa-user-plus fa-2x"></i>
+                    <h2>Cadastrar Rosto</h2>
+                </div>
+                
+                <div class="status-message" id="modal-status">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Rosto detectado mas não reconhecido</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cpf-cadastro">
+                        <i class="fas fa-id-card"></i> Informe seu CPF:
+                    </label>
+                    <input type="tel" id="cpf-cadastro" class="cpf-input" placeholder="000.000.000-00" dir="ltr">
+                    <div style="font-size: 0.85rem; color: var(--cinza-escuro); margin-top: 8px;">
+                        O CPF será usado para associar seu rosto
+                    </div>
+                </div>
+                
+                <div id="info-usuario" class="instrucoes hidden">
+                    <!-- Informações do usuário aparecem aqui -->
+                </div>
+                
+                <div id="modal-buttons">
+                    <button id="btn-cadastrar" class="btn">
+                        <i class="fas fa-save"></i> Cadastrar Rosto e Registrar Ponto
+                    </button>
+                    <button id="btn-cancelar" class="btn btn-outline">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p><i class="fas fa-copyright"></i> Sistema de Ponto com Localização - Topografia</p>
+            <p id="version-info">Versão Campo v3.1</p>
+        </footer>
+    </div>
+
+<script>
+    // ========== CONFIGURAÇÕES ==========
+    const CONFIG = {
+        endpoints: {
+            baterPonto: '/ponto/bater',
+            cadastrarComCPF: '/ponto/cadastrar-com-cpf',
+            registrarManual: '/ponto/registrar-manual',
+            verificarStatus: (cpf) => `/ponto/verificar-status/${cpf}`,
+            estatisticas: '/ponto/estatisticas',
+            atualizarFoto: (cpf) => `/ponto/atualizar-foto/${cpf}`
+        }
+    };
+
+    // ========== ESTADO GLOBAL ==========
+    let estado = {
+        processando: false,
+        cameraAtiva: false,
+        stream: null,
+        fotoAtual: null,
+        modoAtual: 'reconhecimento',
+        usuarioInfo: null,
+        localizacaoAtual: null,
+        cpfNoModal: null
+    };
+
+    // ========== INICIALIZAÇÃO ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        // Garantir direção LTR para todo o documento
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.body.setAttribute('dir', 'ltr');
+        
+        // Configurar relógio
+        atualizarRelogio();
+        setInterval(atualizarRelogio, 1000);
+        
+        // Configurar eventos
+        configurarEventos();
+        
+        // Iniciar câmera
+        iniciarCamera();
+        
+        // Carregar estatísticas
+        carregarEstatisticas();
+        
+        // Configurar máscara de CPF
+        configurarMascaraCPF();
+        
+        // Configurar hotkeys
+        configurarHotkeys();
+        
+        // Focar no input manual
+        setTimeout(() => {
+            const inputManual = document.getElementById('cpf-manual');
+            inputManual.focus();
+            // Colocar cursor no final
+            inputManual.setSelectionRange(inputManual.value.length, inputManual.value.length);
+        }, 1000);
+    });
+
+    // ========== LOCALIZAÇÃO SIMPLES ==========
+    function obterLocalizacao() {
+        return new Promise((resolve) => {
+            if (!navigator.geolocation) {
+                console.log('Geolocalização não suportada pelo navegador');
+                resolve(null);
+                return;
+            }
+            
+            // Tentar obter localização rapidamente
+            navigator.geolocation.getCurrentPosition(
+                (posicao) => {
+                    const localizacao = {
+                        latitude: posicao.coords.latitude,
+                        longitude: posicao.coords.longitude,
+                        accuracy: posicao.coords.accuracy,
+                        timestamp: posicao.timestamp
+                    };
+                    resolve(localizacao);
+                },
+                (erro) => {
+                    console.log('Não foi possível obter localização:', erro.message);
+                    resolve(null);
+                },
+                { 
+                    enableHighAccuracy: false,
+                    timeout: 5000,
+                    maximumAge: 60000
+                }
+            );
+        });
+    }
+
+    function atualizarStatusLocalizacao(ativa) {
+        const elemento = document.getElementById('localizacao-status');
+        const texto = document.getElementById('localizacao-texto');
+        
+        elemento.className = 'localizacao-status';
+        
+        if (ativa) {
+            elemento.classList.add('ativa');
+            texto.textContent = '📍 Localização ativa';
+        } else {
+            elemento.classList.add('inativa');
+            texto.textContent = '📍 Localização não disponível';
+        }
+    }
+
+    // ========== RELÓGIO ==========
+    function atualizarRelogio() {
+        const agora = new Date();
+        document.getElementById('current-time').textContent = 
+            agora.toLocaleTimeString('pt-BR', { hour12: false });
+        document.getElementById('current-date').textContent = 
+            agora.toLocaleDateString('pt-BR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+    }
+
+    // ========== CÂMERA ==========
+    async function iniciarCamera() {
+        try {
+            const video = document.getElementById('video');
+            
+            // Parar câmera atual
+            if (estado.stream) {
+                estado.stream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Solicitar câmera
+            estado.stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'user',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: false
+            });
+            
+            video.srcObject = estado.stream;
+            estado.cameraAtiva = true;
+            
+            video.onloadedmetadata = () => {
+                video.play();
+                atualizarStatusCamera('✅ Câmera pronta');
+            };
+            
+        } catch (error) {
+            console.error('Erro na câmera:', error);
+            atualizarStatusCamera('❌ Erro na câmera');
+            mostrarStatus('Erro ao acessar a câmera. Verifique as permissões.', 'error');
+        }
+    }
+
+    function atualizarStatusCamera(mensagem) {
+        document.getElementById('camera-status').innerHTML = 
+            `<i class="fas fa-${mensagem.includes('✅') ? 'check-circle' : 'exclamation-circle'}"></i> ${mensagem}`;
+    }
+
+    // ========== CAPTURA E PROCESSAMENTO ==========
+    async function capturarFoto() {
+        const video = document.getElementById('video');
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        return new Promise((resolve) => {
+            canvas.toBlob(blob => {
+                resolve(blob);
+            }, 'image/jpeg', 0.9);
+        });
+    }
+
+    async function processarFoto() {
+        if (estado.processando) return;
+        
+        estado.processando = true;
+        const btn = document.getElementById('capture-btn');
+        btn.classList.add('capturing');
+        
+        // Feedback visual
+        mostrarStatus('Capturando ponto...', 'warning');
+        atualizarStatusCamera('🔍 Analisando...');
+        
+        try {
+            // Capturar foto
+            const fotoBlob = await capturarFoto();
+            
+            // Tentar obter localização (sem bloquear)
+            const localizacao = await obterLocalizacao();
+            estado.localizacaoAtual = localizacao;
+            
+            if (localizacao) {
+                atualizarStatusLocalizacao(true);
+            } else {
+                atualizarStatusLocalizacao(false);
+            }
+            
+            // Preparar dados para envio
+            const formData = new FormData();
+            formData.append('foto', fotoBlob, 'foto.jpg');
+            
+            // Adicionar localização se obtida
+            if (localizacao) {
+                formData.append('localizacao', JSON.stringify(localizacao));
+            }
+            
+            // Enviar para análise
+            const resposta = await fetch(CONFIG.endpoints.baterPonto, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const dados = await resposta.json();
+            console.log('Resposta do servidor:', dados);
+            
+            // Processar resposta
+            await processarResposta(dados, fotoBlob);
+            
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarStatus('Erro de conexão com o servidor', 'error');
+            btn.classList.add('shake');
+            setTimeout(() => btn.classList.remove('shake'), 500);
+        } finally {
+            estado.processando = false;
+            btn.classList.remove('capturing');
+        }
+    }
+
+    async function processarResposta(dados, fotoBlob) {
+        estado.fotoAtual = fotoBlob;
+        
+        // CASO 1: Ponto registrado com sucesso
+        if (dados.success) {
+            const nome = dados.colaborador || dados.usuario?.nome || 'Colaborador';
+            let mensagem = dados.mensagem || `✅ Ponto registrado para ${nome}`;
+            
+            mostrarStatus(mensagem, 'success');
+            atualizarStatusCamera('✅ Ponto registrado!');
+            
+            // Feedback visual
+            const btn = document.getElementById('capture-btn');
+            btn.style.borderColor = '#10b981';
+            btn.classList.add('pulse');
+            
+            setTimeout(() => {
+                btn.style.borderColor = '';
+                btn.classList.remove('pulse');
+            }, 3000);
+            
+            // Atualizar estatísticas
+            carregarEstatisticas();
+        }
+        
+        // CASO 2: Rosto detectado mas não cadastrado
+        else if (dados.acao === 'rosto_nao_cadastrado') {
+            mostrarStatus('📝 Rosto detectado, mas não cadastrado', 'info');
+            atualizarStatusCamera('📝 Precisa cadastrar rosto');
+            
+            // Mostrar modal para cadastro
+            mostrarModalCadastro();
+        }
+        
+        // CASO 3: Sem rosto detectado
+        else if (dados.acao === 'sem_rosto') {
+            mostrarStatus('❌ Nenhum rosto detectado. Posicione-se melhor.', 'error');
+            atualizarStatusCamera('❌ Rosto não detectado');
+            
+            // Feedback visual
+            const btn = document.getElementById('capture-btn');
+            btn.classList.add('shake');
+            setTimeout(() => btn.classList.remove('shake'), 500);
+        }
+        
+        // CASO 4: CPF não encontrado na base
+        else if (dados.acao === 'cpf_nao_encontrado') {
+            const cpfReconhecido = dados.cpf || '';
+            mostrarStatus(`❌ CPF não encontrado na base de colaboradores`, 'error');
+            
+            // Mostrar modal com CPF preenchido mas com aviso
+            mostrarModalCadastro(true, cpfReconhecido);
+        }
+        
+        // CASO 5: CPF já tem rosto cadastrado
+        else if (dados.acao === 'cpf_ja_cadastrado') {
+            const cpf = dados.cpf || '';
+            mostrarStatus('✅ CPF já cadastrado. Bata ponto normalmente.', 'success');
+            
+            // Fechar modal se estiver aberto
+            esconderModalCadastro();
+            
+            // Registrar ponto automaticamente com a mesma foto
+            await registrarPontoComCPFExistente(cpf);
+        }
+        
+        // CASO 6: Outros erros
+        else {
+            mostrarStatus(dados.error || 'Erro desconhecido', 'error');
+        }
+    }
+
+    // ========== MODAL DE CADASTRO MODIFICADO ==========
+    function mostrarModalCadastro(cpfPreenchido = false, cpfValor = '') {
+        const modal = document.getElementById('modal-cpf');
+        const inputCPF = document.getElementById('cpf-cadastro');
+        const modalStatus = document.getElementById('modal-status');
+        const modalTitle = document.querySelector('.modal-header h2');
+        const btnCadastrar = document.getElementById('btn-cadastrar');
+        const btnCancelar = document.getElementById('btn-cancelar');
+        
+        // Salvar CPF no estado
+        estado.cpfNoModal = cpfValor;
+        
+        // Configurar modal
+        if (cpfPreenchido && cpfValor) {
+            inputCPF.value = formatarCPF(cpfValor);
+            inputCPF.readOnly = true; // CPF já reconhecido, não pode editar
+            
+            // Configurar status do modal
+            modalStatus.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i> 
+                <span>CPF não encontrado na base de colaboradores</span>
+            `;
+            modalStatus.className = 'status-message status-error';
+            
+            modalTitle.textContent = 'CPF Não Encontrado';
+            btnCadastrar.innerHTML = '<i class="fas fa-times"></i> Fechar';
+            btnCadastrar.onclick = esconderModalCadastro;
+            btnCancelar.classList.add('hidden');
+        } else {
+            inputCPF.value = '';
+            inputCPF.readOnly = false;
+            
+            // Configurar status do modal
+            modalStatus.innerHTML = `
+                <i class="fas fa-info-circle"></i>
+                <span>Rosto detectado mas não reconhecido</span>
+            `;
+            modalStatus.className = 'status-message status-info';
+            
+            modalTitle.textContent = 'Cadastrar Novo Rosto';
+            btnCadastrar.innerHTML = '<i class="fas fa-save"></i> Cadastrar Rosto e Registrar Ponto';
+            btnCadastrar.onclick = cadastrarRostoComCPF;
+            btnCancelar.classList.remove('hidden');
+        }
+        
+        // Limpar informações anteriores
+        document.getElementById('info-usuario').innerHTML = '';
+        document.getElementById('info-usuario').classList.add('hidden');
+        
+        // Mostrar modal
+        modal.classList.remove('hidden');
+        
+        // Focar no input se não estiver preenchido
+        if (!cpfPreenchido) {
+            setTimeout(() => {
+                inputCPF.focus();
+                // Colocar cursor no final do texto
+                inputCPF.setSelectionRange(inputCPF.value.length, inputCPF.value.length);
+            }, 300);
+        }
+    }
+
+    function esconderModalCadastro() {
+        const modal = document.getElementById('modal-cpf');
+        const inputCPF = document.getElementById('cpf-cadastro');
+        
+        modal.classList.add('hidden');
+        inputCPF.value = '';
+        inputCPF.readOnly = false;
+        estado.fotoAtual = null;
+        estado.cpfNoModal = null;
+        
+        // Restaurar status do modal
+        const modalStatus = document.getElementById('modal-status');
+        modalStatus.innerHTML = `
+            <i class="fas fa-info-circle"></i>
+            <span>Rosto detectado mas não reconhecido</span>
+        `;
+        modalStatus.className = 'status-message status-info';
+        
+        // Restaurar botões
+        const btnCadastrar = document.getElementById('btn-cadastrar');
+        const btnCancelar = document.getElementById('btn-cancelar');
+        const modalTitle = document.querySelector('.modal-header h2');
+        
+        modalTitle.textContent = 'Cadastrar Rosto';
+        btnCadastrar.innerHTML = '<i class="fas fa-save"></i> Cadastrar Rosto e Registrar Ponto';
+        btnCadastrar.onclick = cadastrarRostoComCPF;
+        btnCancelar.classList.remove('hidden');
+        
+        // Retornar foco para input manual
+        setTimeout(() => {
+            const inputManual = document.getElementById('cpf-manual');
+            inputManual.focus();
+            inputManual.setSelectionRange(inputManual.value.length, inputManual.value.length);
+        }, 100);
+    }
+
+    // ========== FUNÇÃO NOVA: BATER PONTO PARA CPF JÁ CADASTRADO ==========
+    async function registrarPontoComCPFExistente(cpf) {
+        if (!estado.fotoAtual) {
+            mostrarStatus('Nenhuma foto disponível', 'error');
+            return;
+        }
+        
+        mostrarStatus('Registrando ponto...', 'warning');
+        
+        // Tentar obter localização
+        const localizacao = await obterLocalizacao();
+        
+        const formData = new FormData();
+        formData.append('cpf', cpf);
+        
+        // Adicionar localização se obtida
+        if (localizacao) {
+            formData.append('localizacao', JSON.stringify(localizacao));
+        }
+        
+        try {
+            const resposta = await fetch(CONFIG.endpoints.registrarManual, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const dados = await resposta.json();
+            
+            if (dados.success) {
+                let mensagem = dados.mensagem || '✅ Ponto registrado!';
+                mostrarStatus(mensagem, 'success');
+                
+                // Atualizar estatísticas
+                carregarEstatisticas();
+            } else {
+                mostrarStatus(dados.error, 'error');
+            }
+            
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarStatus('Erro de conexão', 'error');
+        }
+    }
+
+    async function cadastrarRostoComCPF() {
+        if (!estado.fotoAtual) {
+            mostrarStatusModal('Nenhuma foto disponível', 'error');
+            return;
+        }
+        
+        const inputCPF = document.getElementById('cpf-cadastro');
+        const cpf = extrairNumerosCPF(inputCPF.value);
+        
+        if (cpf.length !== 11) {
+            mostrarStatusModal('CPF inválido (11 dígitos)', 'error');
+            inputCPF.style.borderColor = 'var(--vermelho)';
+            setTimeout(() => inputCPF.style.borderColor = '', 2000);
+            return;
+        }
+        
+        // Desabilitar botões durante processamento
+        document.getElementById('btn-cadastrar').disabled = true;
+        document.getElementById('btn-cancelar').disabled = true;
+        
+        // Verificar status do CPF
+        mostrarStatusModal('Verificando CPF...', 'warning');
+        
+        try {
+            const respostaStatus = await fetch(CONFIG.endpoints.verificarStatus(cpf));
+            const status = await respostaStatus.json();
+            
+            if (!status.success) {
+                mostrarStatusModal('Erro ao verificar CPF', 'error');
+                return;
+            }
+            
+            if (status.existe_no_banco) {
+                if (status.tem_rosto) {
+                    // CPF JÁ TEM ROSTO - PERMITIR BATER PONTO DIRETO
+                    mostrarStatusModal('CPF já cadastrado. Registrando ponto...', 'info');
+                    
+                    // Tentar obter localização
+                    const localizacao = await obterLocalizacao();
+                    
+                    // Registrar ponto manualmente
+                    const formData = new FormData();
+                    formData.append('cpf', cpf);
+                    
+                    if (localizacao) {
+                        formData.append('localizacao', JSON.stringify(localizacao));
+                    }
+                    
+                    const resposta = await fetch(CONFIG.endpoints.registrarManual, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const dados = await resposta.json();
+                    
+                    if (dados.success) {
+                        mostrarStatusModal(`✅ ${dados.mensagem}`, 'success');
+                        
+                        // Fechar modal após 2 segundos
+                        setTimeout(() => {
+                            esconderModalCadastro();
+                            mostrarStatus(`✅ Ponto registrado para ${status.colaborador?.nome || 'Colaborador'}`, 'success');
+                            atualizarStatusCamera('✅ Ponto registrado!');
+                            
+                            // Atualizar estatísticas
+                            carregarEstatisticas();
+                        }, 2000);
+                    } else {
+                        mostrarStatusModal(dados.error, 'error');
+                    }
+                    
+                } else {
+                    // CPF SEM ROSTO - CADASTRAR NORMALMENTE
+                    // Mostrar informações do colaborador
+                    const infoUsuario = document.getElementById('info-usuario');
+                    infoUsuario.innerHTML = `
+                        <strong><i class="fas fa-user-check"></i> Colaborador encontrado:</strong><br>
+                        <strong>Nome:</strong> ${status.colaborador?.nome || 'Não informado'}<br>
+                        <strong>CPF:</strong> ${formatarCPF(cpf)}
+                    `;
+                    infoUsuario.classList.remove('hidden');
+                    
+                    // Proceder com cadastro
+                    await enviarCadastro(cpf, status.colaborador?.nome || 'Colaborador');
+                }
+                
+            } else {
+                mostrarStatusModal('CPF não encontrado na base de colaboradores', 'error');
+            }
+            
+        } catch (error) {
+            console.error('Erro ao verificar CPF:', error);
+            mostrarStatusModal('Erro ao verificar CPF', 'error');
+        } finally {
+            // Reabilitar botões
+            document.getElementById('btn-cadastrar').disabled = false;
+            document.getElementById('btn-cancelar').disabled = false;
+        }
+    }
+
+    async function enviarCadastro(cpf, nomeUsuario) {
+        mostrarStatusModal('Cadastrando rosto...', 'warning');
+        
+        // Tentar obter localização
+        const localizacao = await obterLocalizacao();
+        
+        const formData = new FormData();
+        formData.append('cpf', cpf);
+        formData.append('foto', estado.fotoAtual, `${cpf}.jpg`);
+        
+        // Adicionar localização se obtida
+        if (localizacao) {
+            formData.append('localizacao', JSON.stringify(localizacao));
+        }
+        
+        try {
+            const resposta = await fetch(CONFIG.endpoints.cadastrarComCPF, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const dados = await resposta.json();
+            
+            if (dados.success) {
+                let mensagem = `✅ ${dados.mensagem}`;
+                
+                mostrarStatusModal(mensagem, 'success');
+                
+                // Fechar modal após 2 segundos
+                setTimeout(() => {
+                    esconderModalCadastro();
+                    mostrarStatus(`✅ Rosto cadastrado para ${nomeUsuario}`, 'success');
+                    atualizarStatusCamera('✅ Rosto cadastrado!');
+                    
+                    // Atualizar estatísticas
+                    carregarEstatisticas();
+                }, 2000);
+                
+            } else {
+                mostrarStatusModal(dados.error, 'error');
+            }
+            
+        } catch (error) {
+            console.error('Erro ao cadastrar rosto:', error);
+            mostrarStatusModal('Erro ao cadastrar rosto', 'error');
+        }
+    }
+
+    // ========== REGISTRO MANUAL (CPF) ==========
+    async function registrarPontoManual() {
+        const input = document.getElementById('cpf-manual');
+        const cpf = extrairNumerosCPF(input.value);
+        
+        if (cpf.length !== 11) {
+            mostrarStatus('CPF inválido (11 dígitos)', 'error');
+            input.style.borderColor = 'var(--vermelho)';
+            setTimeout(() => input.style.borderColor = '', 2000);
+            return;
+        }
+        
+        mostrarStatus('Registrando ponto...', 'warning');
+        
+        // Tentar obter localização
+        const localizacao = await obterLocalizacao();
+        
+        const formData = new FormData();
+        formData.append('cpf', cpf);
+        
+        // Adicionar localização se obtida
+        if (localizacao) {
+            formData.append('localizacao', JSON.stringify(localizacao));
+        }
+        
+        try {
+            const resposta = await fetch(CONFIG.endpoints.registrarManual, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const dados = await resposta.json();
+            
+            if (dados.success) {
+                let mensagem = dados.mensagem || '✅ Ponto registrado!';
+                
+                mostrarStatus(mensagem, 'success');
+                input.value = '';
+                input.style.borderColor = '#10b981';
+                setTimeout(() => input.style.borderColor = '', 2000);
+            } else {
+                mostrarStatus(dados.error, 'error');
+            }
+            
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarStatus('Erro de conexão', 'error');
+        }
+    }
+
+    // ========== FUNÇÕES UTILITÁRIAS ==========
+    function configurarEventos() {
+        // Botão de captura
+        document.getElementById('capture-btn').addEventListener('click', processarFoto);
+        
+        // Modal de cadastro
+        document.getElementById('btn-cadastrar').addEventListener('click', cadastrarRostoComCPF);
+        document.getElementById('btn-cancelar').addEventListener('click', esconderModalCadastro);
+        
+        // Enter no CPF do modal
+        document.getElementById('cpf-cadastro').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') cadastrarRostoComCPF();
+        });
+        
+        // Registro manual
+        document.getElementById('btn-manual').addEventListener('click', registrarPontoManual);
+        document.getElementById('cpf-manual').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') registrarPontoManual();
+        });
+        
+        // Click fora do modal para fechar
+        document.getElementById('modal-cpf').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-cpf') {
+                esconderModalCadastro();
+            }
+        });
+    }
+
+    function configurarHotkeys() {
+        document.addEventListener('keydown', (e) => {
+            // Espaço para capturar foto
+            if (e.code === 'Space' && !estado.processando && !document.getElementById('modal-cpf').classList.contains('hidden')) {
+                e.preventDefault();
+                processarFoto();
+            }
+            
+            // Escape para fechar modal
+            if (e.code === 'Escape') {
+                const modal = document.getElementById('modal-cpf');
+                if (!modal.classList.contains('hidden')) {
+                    esconderModalCadastro();
+                }
+            }
+        });
+    }
+
+    // ========== FUNÇÕES DE FORMATAÇÃO DE CPF ==========
+    function configurarMascaraCPF() {
+        const inputs = [
+            document.getElementById('cpf-manual'),
+            document.getElementById('cpf-cadastro')
+        ];
+        
+        inputs.forEach(input => {
+            if (!input) return;
+            
+            // Remover qualquer maxlength do HTML
+            input.removeAttribute('maxlength');
+            
+            // Forçar atributos LTR
+            input.setAttribute('dir', 'ltr');
+            input.setAttribute('inputmode', 'numeric');
+            
+            // Garantir estilos LTR
+            input.style.direction = 'ltr';
+            input.style.textAlign = 'left';
+            
+            // Adicionar event listener para formatação
+            input.addEventListener('input', function(e) {
+                formatarInputCPF(this);
+            });
+            
+            // Permitir colar
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const texto = (e.clipboardData || window.clipboardData).getData('text');
+                const numeros = texto.replace(/\D/g, '');
+                if (numeros.length <= 11) {
+                    this.value = formatarCPF(numeros);
+                    // Forçar cursor para o final
+                    setTimeout(() => {
+                        this.setSelectionRange(this.value.length, this.value.length);
+                    }, 10);
+                }
+            });
+            
+            // Foco - garantir cursor à direita
+            input.addEventListener('focus', function() {
+                setTimeout(() => {
+                    this.setSelectionRange(this.value.length, this.value.length);
+                }, 10);
+            });
+        });
+    }
+
+    function formatarInputCPF(input) {
+        // Garantir direção LTR explicitamente
+        input.style.direction = 'ltr';
+        input.style.textAlign = 'left';
+        
+        // Salvar posição do cursor
+        const cursorPos = input.selectionStart;
+        const valorOriginal = input.value;
+        
+        // Extrair apenas números
+        let numeros = valorOriginal.replace(/\D/g, '');
+        
+        // Limitar a 11 números
+        if (numeros.length > 11) {
+            numeros = numeros.substring(0, 11);
+        }
+        
+        // Aplicar formatação
+        let novoValor = '';
+        if (numeros.length === 0) {
+            novoValor = '';
+        } else if (numeros.length <= 3) {
+            novoValor = numeros;
+        } else if (numeros.length <= 6) {
+            novoValor = numeros.replace(/(\d{3})(\d{0,})/, '$1.$2');
+        } else if (numeros.length <= 9) {
+            novoValor = numeros.replace(/(\d{3})(\d{3})(\d{0,})/, '$1.$2.$3');
+        } else {
+            novoValor = numeros.replace(/(\d{3})(\d{3})(\d{3})(\d{0,})/, '$1.$2.$3-$4');
+        }
+        
+        // Atribuir novo valor
+        input.value = novoValor;
+        
+        // Calcular nova posição do cursor
+        let novaPosicaoCursor = cursorPos;
+        
+        // Se adicionou caracteres antes da posição do cursor
+        if (valorOriginal.length < novoValor.length) {
+            if (cursorPos === 3 || cursorPos === 7 || cursorPos === 11) {
+                novaPosicaoCursor++;
+            }
+        } 
+        // Se removeu caracteres antes da posição do cursor
+        else if (valorOriginal.length > novoValor.length) {
+            if (cursorPos === 4 || cursorPos === 8 || cursorPos === 12) {
+                novaPosicaoCursor--;
+            }
+        }
+        
+        // Se o cursor estava no final, manter no final
+        if (cursorPos >= valorOriginal.length) {
+            novaPosicaoCursor = novoValor.length;
+        }
+        
+        // Garantir que o cursor não vá além do comprimento
+        if (novaPosicaoCursor > novoValor.length) {
+            novaPosicaoCursor = novoValor.length;
+        }
+        
+        if (novaPosicaoCursor < 0) {
+            novaPosicaoCursor = 0;
+        }
+        
+        // Definir nova posição do cursor
+        setTimeout(() => {
+            input.setSelectionRange(novaPosicaoCursor, novaPosicaoCursor);
+        }, 0);
+    }
+
+    function extrairNumerosCPF(cpfFormatado) {
+        // Remove tudo que não for número
+        return cpfFormatado.replace(/\D/g, '');
+    }
+
+    function formatarCPF(cpfNumeros) {
+        // Formata 12345678901 para 123.456.789-01
+        cpfNumeros = cpfNumeros.replace(/\D/g, '');
+        if (cpfNumeros.length === 11) {
+            return cpfNumeros.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+        return cpfNumeros;
+    }
+
+    // ========== FUNÇÕES DE STATUS ==========
+    function mostrarStatus(mensagem, tipo) {
+        const elemento = document.getElementById('status-message');
+        
+        const icones = {
+            'success': 'check-circle',
+            'warning': 'spinner fa-spin',
+            'error': 'exclamation-circle',
+            'info': 'info-circle'
+        };
+        
+        elemento.innerHTML = `<i class="fas fa-${icones[tipo]}"></i> ${mensagem}`;
+        elemento.className = `status-message status-${tipo}`;
+        elemento.classList.remove('hidden');
+        
+        // Auto-esconder para mensagens de sucesso/erro
+        if (tipo === 'success' || tipo === 'error') {
+            setTimeout(() => {
+                elemento.classList.add('hidden');
+            }, 5000);
+        }
+    }
+
+    function mostrarStatusModal(mensagem, tipo) {
+        const elemento = document.getElementById('modal-status');
+        
+        const icones = {
+            'success': 'check-circle',
+            'warning': 'spinner fa-spin',
+            'error': 'exclamation-circle',
+            'info': 'info-circle'
+        };
+        
+        elemento.innerHTML = `<i class="fas fa-${icones[tipo]}"></i> ${mensagem}`;
+        elemento.className = `status-message status-${tipo}`;
+    }
+
+    async function carregarEstatisticas() {
+        try {
+            const resposta = await fetch(CONFIG.endpoints.estatisticas);
+            const dados = await resposta.json();
+            
+            if (dados.success) {
+                document.getElementById('total-cadastrados').textContent = 
+                    dados.rostos_cadastrados;
+            }
+        } catch (error) {
+            console.error('Erro ao carregar estatísticas:', error);
+        }
+    }
+
+    // ========== MANUTENÇÃO DA CÂMERA ==========
+    // Verificar periodicamente se a câmera ainda está ativa
+    setInterval(() => {
+        if (estado.stream) {
+            const video = document.getElementById('video');
+            if (video.readyState === 0) {
+                console.log('Câmera desconectada, reiniciando...');
+                iniciarCamera();
+            }
+        }
+    }, 10000);
+
+    // Parar câmera ao sair
+    window.addEventListener('beforeunload', () => {
+        if (estado.stream) {
+            estado.stream.getTracks().forEach(track => track.stop());
+        }
+    });
+</script>
+</body>
+</html>

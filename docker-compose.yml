@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: patagonia_web
+    # O comando agora está no Dockerfile, então não é mais necessário aqui
+    # Monta o código-fonte para desenvolvimento e o arquivo de credenciais
+    volumes:
+      - ./:/app
+      - ./uploads:/tmp/uploads
+    ports:
+      - "8080:8080"
+    environment:
+      ENV: development
+      STORAGE_DRIVER: local
+      LOCAL_STORAGE_PATH: /tmp/uploads
+      SECRET_KEY: dev-secret-key-change-me
+      ENABLE_DEBUG_ROUTES: "0"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: patagonia
+      DB_USER: patagonia
+      DB_PASS: patagonia
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    container_name: patagonia_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: patagonia
+      POSTGRES_USER: patagonia
+      POSTGRES_PASSWORD: patagonia
+
+volumes:
+  postgres_data:

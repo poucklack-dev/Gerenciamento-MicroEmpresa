@@ -1,0 +1,1381 @@
+{% extends "base.html" %}
+{% block conteudo %}
+
+<title>Meu Perfil • Sistema Patagonia</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --verde-principal: #093D2C;
+        --verde-secundario: #1C6B49;
+        --verde-hover: #0a4d35;
+        --verde-claro: #e8f5e8;
+        --verde-gradiente: linear-gradient(135deg, #093D2C 0%, #1C6B49 100%);
+        --fundo: #f8faf9;
+        --texto: #2d3748;
+        --texto-claro: #718096;
+        --branco: #ffffff;
+        --cinza-borda: #e2e8f0;
+        --cinza-claro: #f7fafc;
+        --sombra: 0 10px 30px rgba(0, 0, 0, 0.08);
+        --sombra-suave: 0 4px 20px rgba(0, 0, 0, 0.06);
+        --transicao: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        --erro: #e53e3e;
+        --sucesso: #38a169;
+        --warning: #d69e2e;
+        --info: #3182ce;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: var(--fundo);
+        color: var(--texto);
+        line-height: 1.7;
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Header Premium */
+    .page-header {
+        background: var(--verde-gradiente);
+        color: var(--branco);
+        padding: 40px 0;
+        margin: -20px -20px 30px -20px;
+        border-radius: 0 0 20px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+        animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+        0% { transform: translateX(0) translateY(0); }
+        100% { transform: translateX(-100px) translateY(-100px); }
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .page-title h1 {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .page-title p {
+        font-size: 16px;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+
+    /* Layout Principal */
+    .profile-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 25px;
+        margin-top: 20px;
+    }
+
+    @media (min-width: 1024px) {
+        .profile-layout {
+            grid-template-columns: 350px 1fr;
+        }
+    }
+
+    /* Cards Premium */
+    .card {
+        background: var(--branco);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: var(--sombra);
+        border: 1px solid var(--cinza-borda);
+        transition: var(--transicao);
+        position: relative;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--sombra-suave);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--cinza-borda);
+    }
+
+    .card-header h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--verde-principal);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-header h2::before {
+        content: '';
+        width: 4px;
+        height: 20px;
+        background: var(--verde-principal);
+        border-radius: 2px;
+    }
+
+    /* Sidebar de Perfil */
+    .profile-sidebar {
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+    }
+
+    .profile-card {
+        text-align: center;
+        padding: 30px 25px;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--verde-principal);
+        margin: 0 auto 20px;
+        background: var(--verde-gradiente);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 40px;
+        font-weight: 600;
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .profile-info h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--verde-principal);
+        margin-bottom: 8px;
+    }
+
+    .profile-info .cargo {
+        color: var(--verde-secundario);
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .profile-info .status {
+        display: inline-block;
+        padding: 4px 12px;
+        background: var(--sucesso);
+        color: white;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .profile-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 15px;
+        background: var(--cinza-claro);
+        border-radius: 10px;
+    }
+
+    .stat-number {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--verde-principal);
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: var(--texto-claro);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Botões Premium */
+    .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: var(--transicao);
+        font-family: 'Poppins', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background: var(--verde-principal);
+        color: var(--branco);
+    }
+
+    .btn-primary:hover {
+        background: var(--verde-hover);
+        transform: translateY(-2px);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid var(--verde-principal);
+        color: var(--verde-principal);
+    }
+
+    .btn-outline:hover {
+        background: var(--verde-principal);
+        color: var(--branco);
+    }
+
+    .btn-sm {
+        padding: 8px 16px;
+        font-size: 13px;
+        width: auto;
+    }
+
+    /* Formulários */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--texto);
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--cinza-borda);
+        border-radius: 10px;
+        font-size: 14px;
+        transition: var(--transicao);
+        background-color: var(--cinza-claro);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--verde-principal);
+        background-color: var(--branco);
+        box-shadow: 0 0 0 3px rgba(9, 61, 44, 0.1);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    @media (min-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    /* Upload de Foto */
+    .upload-area {
+        border: 2px dashed var(--cinza-borda);
+        border-radius: 10px;
+        padding: 25px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transicao);
+        background: var(--cinza-claro);
+        margin-bottom: 15px;
+    }
+
+    .upload-area:hover {
+        border-color: var(--verde-principal);
+        background: var(--verde-claro);
+    }
+
+    /* Lista de Logs */
+    .logs-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .log-item {
+        padding: 15px;
+        border-left: 3px solid var(--verde-principal);
+        background: var(--cinza-claro);
+        margin-bottom: 10px;
+        border-radius: 0 8px 8px 0;
+    }
+
+    .log-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .log-acao {
+        font-weight: 600;
+        color: var(--verde-principal);
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .log-detalhes {
+        font-size: 13px;
+        color: var(--texto-claro);
+        margin-bottom: 5px;
+    }
+
+    .log-data {
+        font-size: 11px;
+        color: var(--texto-claro);
+        text-align: right;
+    }
+
+    /* Badges */
+    .badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+    }
+
+    .badge-success {
+        background: rgba(56, 161, 105, 0.15);
+        color: var(--sucesso);
+        border: 1px solid rgba(56, 161, 105, 0.3);
+    }
+
+    .badge-warning {
+        background: rgba(214, 158, 46, 0.15);
+        color: var(--warning);
+        border: 1px solid rgba(214, 158, 46, 0.3);
+    }
+
+    .badge-info {
+        background: rgba(49, 130, 206, 0.15);
+        color: var(--info);
+        border: 1px solid rgba(49, 130, 206, 0.3);
+    }
+
+    /* Alertas */
+    .alert {
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        font-weight: 500;
+        animation: slideDown 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-left: 4px solid;
+    }
+
+    .alert-error {
+        background: rgba(229, 62, 62, 0.1);
+        color: var(--erro);
+        border-left-color: var(--erro);
+    }
+
+    .alert-success {
+        background: rgba(56, 161, 105, 0.1);
+        color: var(--sucesso);
+        border-left-color: var(--sucesso);
+    }
+
+    .alert-info {
+        background: rgba(49, 130, 206, 0.1);
+        color: var(--info);
+        border-left-color: var(--info);
+    }
+
+    /* Tabs */
+    .tabs {
+        display: flex;
+        background: var(--branco);
+        border-radius: 10px;
+        padding: 4px;
+        margin-bottom: 20px;
+        box-shadow: var(--sombra-suave);
+        overflow-x: auto;
+    }
+
+    .tab {
+        flex: 1;
+        padding: 12px 16px;
+        text-align: center;
+        background: none;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transicao);
+        font-weight: 500;
+        color: var(--texto-claro);
+        white-space: nowrap;
+        min-width: 120px;
+        font-size: 14px;
+    }
+
+    .tab.active {
+        background: var(--verde-principal);
+        color: var(--branco);
+    }
+
+    .tab:hover:not(.active) {
+        background: var(--cinza-claro);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    /* Animações */
+    @keyframes slideDown {
+        from { 
+            opacity: 0; 
+            transform: translateY(-20px) scale(0.95); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0) scale(1); 
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Informações do Colaborador */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: var(--texto-claro);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: var(--texto);
+    }
+
+    /* Loading */
+    .btn-loader {
+        display: none;
+    }
+
+    .btn.loading .btn-text {
+        opacity: 0;
+    }
+
+    .btn.loading .btn-loader {
+        display: inline-block;
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(9, 61, 44, 0.9);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .modal.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background: var(--branco);
+        border-radius: 20px;
+        padding: 30px;
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        animation: slideUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--cinza-borda);
+    }
+
+    .modal-header h3 {
+        color: var(--verde-principal);
+        font-size: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--texto-claro);
+        transition: var(--transicao);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .close-modal:hover {
+        background: var(--cinza-claro);
+        color: var(--erro);
+    }
+
+    @keyframes slideUp {
+        from { 
+            opacity: 0; 
+            transform: translateY(20px) scale(0.95); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0) scale(1); 
+        }
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .container {
+            padding: 15px;
+        }
+
+        .page-header {
+            margin: -15px -15px 25px -15px;
+            padding: 30px 0;
+        }
+
+        .page-title h1 {
+            font-size: 28px;
+        }
+
+        .profile-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .card {
+            padding: 20px;
+        }
+    }
+</style>
+
+<!-- Header Premium -->
+<div class="page-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="page-title">
+                <h1 style="color: white;"><i class="fas fa-user-circle"></i> Meu Perfil</h1>
+                <p>Gerencie suas informações pessoais e preferências</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Alertas -->
+    <div id="alert" class="alert" style="display: none;"></div>
+
+    <div class="profile-layout">
+        <!-- Sidebar do Perfil -->
+        <div class="profile-sidebar">
+            <div class="card profile-card">
+                <div class="profile-avatar" id="profileAvatar">
+                    <!-- Avatar será carregado via JavaScript -->
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-info">
+                    <h2 id="profileName">Carregando...</h2>
+                    <div class="cargo" id="profileCargo">-</div>
+                    <div class="status badge-success" id="profileStatus">Ativo</div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="statsLogs">0</span>
+                            <span class="stat-label">Atividades</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="statsDias">0</span>
+                            <span class="stat-label">Dias na Empresa</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="abrirModalEditar()">
+                        <i class="fas fa-edit"></i> Editar Perfil
+                    </button>
+                    <button class="btn btn-outline" onclick="abrirModalSenha()" style="margin-top: 10px;">
+                        <i class="fas fa-key"></i> Alterar Senha
+                    </button>
+                </div>
+            </div>
+
+            <!-- Informações de Contato -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-address-card"></i> Contato</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">E-mail</span>
+                        <span class="info-value" id="contactEmail">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Telefone</span>
+                        <span class="info-value" id="contactPhone">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Usuário</span>
+                        <span class="info-value" id="contactUser">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Membro desde</span>
+                        <span class="info-value" id="contactSince">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="profile-content">
+            <!-- Abas de Navegação -->
+            <div class="tabs">
+                <button class="tab active" onclick="mudarAba('dados')">Dados Pessoais</button>
+                <button class="tab" onclick="mudarAba('colaborador')">Dados Profissionais</button>
+                <button class="tab" onclick="mudarAba('logs')">Atividades Recentes</button>
+                <button class="tab" onclick="mudarAba('documentos')">Documentos</button>
+            </div>
+
+            <!-- Aba: Dados Pessoais -->
+            <div id="aba-dados" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user"></i> Informações Pessoais</h2>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Nome Completo</span>
+                            <span class="info-value" id="infoNome">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">E-mail</span>
+                            <span class="info-value" id="infoEmail">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Telefone</span>
+                            <span class="info-value" id="infoTelefone">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Usuário</span>
+                            <span class="info-value" id="infoUsuario">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Cargo</span>
+                            <span class="info-value" id="infoCargo">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value"><span class="badge badge-success" id="infoStatus">Ativo</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba: Dados do Colaborador -->
+            <div id="aba-colaborador" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-briefcase"></i> Dados Profissionais</h2>
+                    </div>
+                    <div id="colaboradorContent">
+                        <!-- Conteúdo será carregado via JavaScript -->
+                        <div class="text-center" style="padding: 40px 20px; color: var(--texto-claro);">
+                            <i class="fas fa-briefcase fa-3x" style="margin-bottom: 15px; opacity: 0.5;"></i>
+                            <h3 style="margin-bottom: 10px; font-weight: 500;">Nenhum dado profissional encontrado</h3>
+                            <p>Seus dados de colaborador não estão vinculados a este perfil de usuário.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba: Logs de Atividade -->
+            <div id="aba-logs" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-history"></i> Atividades Recentes</h2>
+                        <span class="badge badge-info" id="totalLogs">0 atividades</span>
+                    </div>
+                    <div class="logs-list" id="logsList">
+                        <!-- Logs serão carregados via JavaScript -->
+                        <div class="text-center" style="padding: 40px 20px; color: var(--texto-claro);">
+                            <i class="fas fa-history fa-3x" style="margin-bottom: 15px; opacity: 0.5;"></i>
+                            <h3 style="margin-bottom: 10px; font-weight: 500;">Nenhuma atividade registrada</h3>
+                            <p>Suas atividades no sistema aparecerão aqui.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba: Documentos -->
+            <div id="aba-documentos" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-file-alt"></i> Meus Documentos</h2>
+                    </div>
+                    <div id="documentosContent">
+                        <!-- Conteúdo será carregado via JavaScript -->
+                        <div class="text-center" style="padding: 40px 20px; color: var(--texto-claro);">
+                            <i class="fas fa-folder-open fa-3x" style="margin-bottom: 15px; opacity: 0.5;"></i>
+                            <h3 style="margin-bottom: 10px; font-weight: 500;">Documentos não disponíveis</h3>
+                            <p>Seus documentos aparecerão aqui quando estiverem disponíveis.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Editar Perfil -->
+<div class="modal" id="modalEditar">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-edit"></i> Editar Perfil</h3>
+            <button class="close-modal" onclick="fecharModalEditar()">&times;</button>
+        </div>
+        <form id="formEditarPerfil">
+            <div class="form-group">
+                <label for="editFoto"><i class="fas fa-camera"></i> Foto do Perfil</label>
+                <div class="upload-area" onclick="document.getElementById('fotoInput').click()">
+                    <i class="fas fa-camera" style="font-size: 32px; color: var(--verde-principal); margin-bottom: 10px;"></i>
+                    <h4>Clique para alterar foto</h4>
+                    <p>JPEG, PNG ou GIF (max 5MB)</p>
+                </div>
+                <input type="file" id="fotoInput" accept="image/*" style="display: none;" onchange="previewFoto(this.files[0])">
+                <div id="fotoPreview" style="text-align: center; margin-top: 15px; display: none;">
+                    <img id="previewImg" style="max-width: 150px; border-radius: 10px; border: 2px solid var(--verde-principal);">
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="editNome"><i class="fas fa-signature"></i> Nome Completo *</label>
+                    <input type="text" class="form-control" id="editNome" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail"><i class="fas fa-envelope"></i> E-mail *</label>
+                    <input type="email" class="form-control" id="editEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="editTelefone"><i class="fas fa-phone"></i> Telefone</label>
+                    <input type="text" class="form-control" id="editTelefone" name="telefone">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button type="submit" class="btn btn-primary" id="submitEditar">
+                    <span class="btn-text"><i class="fas fa-save"></i> Salvar Alterações</span>
+                    <div class="btn-loader">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </button>
+                <button type="button" class="btn btn-outline" onclick="fecharModalEditar()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Alterar Senha -->
+<div class="modal" id="modalSenha">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-key"></i> Alterar Senha</h3>
+            <button class="close-modal" onclick="fecharModalSenha()">&times;</button>
+        </div>
+        <form id="formAlterarSenha">
+            <div class="form-group">
+                <label for="senhaAtual"><i class="fas fa-lock"></i> Senha Atual *</label>
+                <input type="password" class="form-control" id="senhaAtual" name="senha_atual" required>
+            </div>
+            <div class="form-group">
+                <label for="novaSenha"><i class="fas fa-lock"></i> Nova Senha *</label>
+                <input type="password" class="form-control" id="novaSenha" name="nova_senha" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label for="confirmarSenha"><i class="fas fa-lock"></i> Confirmar Nova Senha *</label>
+                <input type="password" class="form-control" id="confirmarSenha" name="confirmar_senha" required>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button type="submit" class="btn btn-primary" id="submitSenha">
+                    <span class="btn-text"><i class="fas fa-save"></i> Alterar Senha</span>
+                    <div class="btn-loader">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </button>
+                <button type="button" class="btn btn-outline" onclick="fecharModalSenha()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Variáveis globais
+    let usuarioData = null;
+    let fotoFile = null;
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        carregarDadosPerfil();
+        configurarFormularios();
+        configurarMascaras();
+    });
+
+    // Carregar dados do perfil
+    async function carregarDadosPerfil() {
+        try {
+            const response = await fetch('/perfil/dados');
+            if (!response.ok) throw new Error('Erro ao carregar dados do perfil');
+            
+            usuarioData = await response.json();
+            exibirDadosPerfil();
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarAlerta('Erro ao carregar dados do perfil', 'error');
+        }
+    }
+
+    // Exibir dados no perfil
+    function exibirDadosPerfil() {
+        if (!usuarioData) return;
+
+        // Sidebar
+        document.getElementById('profileName').textContent = usuarioData.nome || 'Nome não informado';
+        document.getElementById('profileCargo').textContent = usuarioData.cargo || 'Cargo não definido';
+        document.getElementById('profileStatus').textContent = usuarioData.status === 'ativo' ? 'Ativo' : 'Inativo';
+        document.getElementById('profileStatus').className = usuarioData.status === 'ativo' ? 'status badge-success' : 'status badge-warning';
+
+        // Avatar
+        const avatar = document.getElementById('profileAvatar');
+        if (usuarioData.foto) {
+            avatar.innerHTML = `<img src="${usuarioData.foto}" alt="${usuarioData.nome}">`;
+        } else {
+            avatar.innerHTML = `<i class="fas fa-user"></i>`;
+        }
+
+        // Contato
+        document.getElementById('contactEmail').textContent = usuarioData.email || 'Não informado';
+        document.getElementById('contactPhone').textContent = usuarioData.telefone || 'Não informado';
+        document.getElementById('contactUser').textContent = usuarioData.usuario || 'Não informado';
+        document.getElementById('contactSince').textContent = usuarioData.criado_em ? 
+            new Date(usuarioData.criado_em).toLocaleDateString('pt-BR') : 'Data não informada';
+
+        // Estatísticas
+        document.getElementById('statsLogs').textContent = usuarioData.logs ? usuarioData.logs.length : 0;
+        if (usuarioData.criado_em) {
+            const dias = Math.floor((new Date() - new Date(usuarioData.criado_em)) / (1000 * 60 * 60 * 24));
+            document.getElementById('statsDias').textContent = dias;
+        }
+
+        // Aba: Dados Pessoais
+        document.getElementById('infoNome').textContent = usuarioData.nome || 'Não informado';
+        document.getElementById('infoEmail').textContent = usuarioData.email || 'Não informado';
+        document.getElementById('infoTelefone').textContent = usuarioData.telefone || 'Não informado';
+        document.getElementById('infoUsuario').textContent = usuarioData.usuario || 'Não informado';
+        document.getElementById('infoCargo').textContent = usuarioData.cargo || 'Não definido';
+        document.getElementById('infoStatus').textContent = usuarioData.status === 'ativo' ? 'Ativo' : 'Inativo';
+        document.getElementById('infoStatus').className = usuarioData.status === 'ativo' ? 'badge badge-success' : 'badge badge-warning';
+
+        // Aba: Dados do Colaborador
+        exibirDadosColaborador();
+
+        // Aba: Logs
+        exibirLogsAtividades();
+
+        // Aba: Documentos
+        exibirDocumentos();
+    }
+
+    // Exibir dados do colaborador
+    function exibirDadosColaborador() {
+        const content = document.getElementById('colaboradorContent');
+        
+        if (usuarioData.colaborador) {
+            const colab = usuarioData.colaborador;
+            content.innerHTML = `
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Nome no RH</span>
+                        <span class="info-value">${colab.nome || 'Não informado'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Função</span>
+                        <span class="info-value">${colab.funcao || 'Não definida'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">
+                            <span class="badge ${colab.status === 'ativo' ? 'badge-success' : 'badge-warning'}">
+                                ${colab.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">CNH</span>
+                        <span class="info-value">${colab.cnh || 'Não informada'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Validade CNH</span>
+                        <span class="info-value">${colab.validade_cnh ? new Date(colab.validade_cnh).toLocaleDateString('pt-BR') : 'Não informada'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Salário</span>
+                        <span class="info-value">${colab.salario ? 'R$ ' + colab.salario.toFixed(2) : 'Não informado'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Data de Admissão</span>
+                        <span class="info-value">${colab.data_admissao ? new Date(colab.data_admissao).toLocaleDateString('pt-BR') : 'Não informada'}</span>
+                    </div>
+                    <div class="info-item" style="grid-column: 1 / -1;">
+                        <span class="info-label">Endereço</span>
+                        <span class="info-value">${colab.endereco || 'Não informado'}</span>
+                    </div>
+                </div>
+            `;
+        } else {
+            content.innerHTML = `
+                <div class="text-center" style="padding: 40px 20px; color: var(--texto-claro);">
+                    <i class="fas fa-briefcase fa-3x" style="margin-bottom: 15px; opacity: 0.5;"></i>
+                    <h3 style="margin-bottom: 10px; font-weight: 500;">Nenhum dado profissional encontrado</h3>
+                    <p>Seus dados de colaborador não estão vinculados a este perfil de usuário.</p>
+                </div>
+            `;
+        }
+    }
+
+    // Exibir logs de atividades
+    function exibirLogsAtividades() {
+        const logsList = document.getElementById('logsList');
+        const totalLogs = document.getElementById('totalLogs');
+        
+        if (usuarioData.logs && usuarioData.logs.length > 0) {
+            totalLogs.textContent = `${usuarioData.logs.length} atividades`;
+            
+            logsList.innerHTML = usuarioData.logs.map(log => `
+                <div class="log-item">
+                    <div class="log-acao">
+                        <i class="fas fa-${getLogIcon(log.acao)}"></i>
+                        ${log.acao}
+                    </div>
+                    <div class="log-detalhes">${log.detalhes || 'Sem detalhes'}</div>
+                    <div class="log-data">${new Date(log.criado_em).toLocaleString('pt-BR')}</div>
+                </div>
+            `).join('');
+        } else {
+            totalLogs.textContent = '0 atividades';
+            logsList.innerHTML = `
+                <div class="text-center" style="padding: 40px 20px; color: var(--texto-claro);">
+                    <i class="fas fa-history fa-3x" style="margin-bottom: 15px; opacity: 0.5;"></i>
+                    <h3 style="margin-bottom: 10px; font-weight: 500;">Nenhuma atividade registrada</h3>
+                    <p>Suas atividades no sistema aparecerão aqui.</p>
+                </div>
+            `;
+        }
+    }
+
+    // Exibir documentos (integrando com outros backends)
+    function exibirDocumentos() {
+        const content = document.getElementById('documentosContent');
+        
+        // Simulando dados de documentos (em um sistema real, viria de outro endpoint)
+        const documentos = [
+            { nome: 'Contrato de Trabalho', tipo: 'PDF', data: '2024-01-15', status: 'Assinado' },
+            { nome: 'Documentos Pessoais', tipo: 'ZIP', data: '2024-01-10', status: 'Enviado' },
+            { nome: 'Exame Admissional', tipo: 'PDF', data: '2024-01-08', status: 'Aprovado' }
+        ];
+
+        if (documentos.length > 0) {
+            content.innerHTML = `
+                <div class="info-grid">
+                    ${documentos.map(doc => `
+                        <div class="info-item">
+                            <span class="info-label">${doc.nome}</span>
+                            <span class="info-value">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>${doc.tipo} • ${new Date(doc.data).toLocaleDateString('pt-BR')}</span>
+                                    <span class="badge ${getDocStatusBadge(doc.status)}">${doc.status}</span>
+                                </div>
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn btn-outline btn-sm" onclick="mostrarAlerta('Funcionalidade em desenvolvimento', 'info')">
+                        <i class="fas fa-download"></i> Gerenciar Documentos
+                    </button>
+                </div>
+            `;
+        } else {
+            content.innerHTML = `
+                <div class="text-center" style="padding: 40px 20px; color: var(--texto-claro);">
+                    <i class="fas fa-folder-open fa-3x" style="margin-bottom: 15px; opacity: 0.5;"></i>
+                    <h3 style="margin-bottom: 10px; font-weight: 500;">Nenhum documento disponível</h3>
+                    <p>Seus documentos aparecerão aqui quando estiverem disponíveis.</p>
+                </div>
+            `;
+        }
+    }
+
+    // Funções auxiliares
+    function getLogIcon(acao) {
+        const icons = {
+            'login': 'sign-in-alt',
+            'logout': 'sign-out-alt',
+            'cadastro': 'plus-circle',
+            'edição': 'edit',
+            'exclusão': 'trash',
+            'consulta': 'search',
+            'download': 'download',
+            'upload': 'upload'
+        };
+        return icons[acao.toLowerCase()] || 'circle';
+    }
+
+    function getDocStatusBadge(status) {
+        const badges = {
+            'Assinado': 'badge-success',
+            'Enviado': 'badge-info',
+            'Aprovado': 'badge-success',
+            'Pendente': 'badge-warning',
+            'Rejeitado': 'badge-danger'
+        };
+        return badges[status] || 'badge-info';
+    }
+
+    // Configuração de formulários
+    function configurarFormularios() {
+        document.getElementById('formEditarPerfil').addEventListener('submit', salvarPerfil);
+        document.getElementById('formAlterarSenha').addEventListener('submit', alterarSenha);
+    }
+
+    function configurarMascaras() {
+        // Máscara para telefone
+        const telefone = document.getElementById('editTelefone');
+        if (telefone) {
+            telefone.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{2})(\d)/, '($1) $2');
+                    value = value.replace(/(\d{5})(\d)/, '$1-$2');
+                }
+                e.target.value = value;
+            });
+        }
+    }
+
+    // Funções para abas
+    function mudarAba(abaName) {
+        document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        
+        document.getElementById(`aba-${abaName}`).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // Funções para modais
+    function abrirModalEditar() {
+        if (!usuarioData) return;
+        
+        document.getElementById('editNome').value = usuarioData.nome || '';
+        document.getElementById('editEmail').value = usuarioData.email || '';
+        document.getElementById('editTelefone').value = usuarioData.telefone || '';
+        
+        fotoFile = null;
+        document.getElementById('fotoPreview').style.display = 'none';
+        document.getElementById('fotoInput').value = '';
+        
+        document.getElementById('modalEditar').classList.add('active');
+    }
+
+    function fecharModalEditar() {
+        document.getElementById('modalEditar').classList.remove('active');
+    }
+
+    function abrirModalSenha() {
+        document.getElementById('formAlterarSenha').reset();
+        document.getElementById('modalSenha').classList.add('active');
+    }
+
+    function fecharModalSenha() {
+        document.getElementById('modalSenha').classList.remove('active');
+    }
+
+    // Preview de foto
+    function previewFoto(file) {
+        if (!file) return;
+        
+        const tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!tiposPermitidos.includes(file.type)) {
+            mostrarAlerta('Por favor, selecione uma imagem JPEG, PNG ou GIF', 'error');
+            document.getElementById('fotoInput').value = '';
+            return;
+        }
+        
+        if (file.size > 5 * 1024 * 1024) {
+            mostrarAlerta('A imagem deve ter no máximo 5MB', 'error');
+            document.getElementById('fotoInput').value = '';
+            return;
+        }
+        
+        fotoFile = file;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewImg').src = e.target.result;
+            document.getElementById('fotoPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Salvar perfil
+    async function salvarPerfil(e) {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('nome', document.getElementById('editNome').value);
+        formData.append('email', document.getElementById('editEmail').value);
+        formData.append('telefone', document.getElementById('editTelefone').value);
+        
+        if (fotoFile) {
+            formData.append('foto', fotoFile);
+        }
+
+        const submitBtn = document.getElementById('submitEditar');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const originalText = btnText.innerHTML;
+        
+        submitBtn.classList.add('loading');
+        btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+        try {
+            const response = await fetch('/perfil/atualizar', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                mostrarAlerta('Perfil atualizado com sucesso!', 'success');
+                fecharModalEditar();
+                carregarDadosPerfil(); // Recarregar dados
+            } else {
+                throw new Error(result.message || 'Erro ao atualizar perfil');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarAlerta(error.message, 'error');
+        } finally {
+            submitBtn.classList.remove('loading');
+            btnText.innerHTML = originalText;
+        }
+    }
+
+    // Alterar senha
+    async function alterarSenha(e) {
+        e.preventDefault();
+        
+        const senhaAtual = document.getElementById('senhaAtual').value;
+        const novaSenha = document.getElementById('novaSenha').value;
+        const confirmarSenha = document.getElementById('confirmarSenha').value;
+
+        if (novaSenha !== confirmarSenha) {
+            mostrarAlerta('As senhas não coincidem', 'error');
+            return;
+        }
+
+        if (novaSenha.length < 6) {
+            mostrarAlerta('A nova senha deve ter pelo menos 6 caracteres', 'error');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submitSenha');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const originalText = btnText.innerHTML;
+        
+        submitBtn.classList.add('loading');
+        btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Alterando...';
+
+        try {
+            const response = await fetch('/perfil/alterar-senha', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    senha_atual: senhaAtual,
+                    nova_senha: novaSenha
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                mostrarAlerta('Senha alterada com sucesso!', 'success');
+                fecharModalSenha();
+                document.getElementById('formAlterarSenha').reset();
+            } else {
+                throw new Error(result.message || 'Erro ao alterar senha');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarAlerta(error.message, 'error');
+        } finally {
+            submitBtn.classList.remove('loading');
+            btnText.innerHTML = originalText;
+        }
+    }
+
+    // Mostrar alertas
+    function mostrarAlerta(mensagem, tipo = 'info') {
+        const alert = document.getElementById('alert');
+        if (!alert) return;
+        
+        let icon = 'info-circle';
+        let alertClass = 'alert-info';
+        
+        if (tipo === 'error') {
+            icon = 'exclamation-triangle';
+            alertClass = 'alert-error';
+        } else if (tipo === 'success') {
+            icon = 'check-circle';
+            alertClass = 'alert-success';
+        }
+
+        alert.innerHTML = `<i class="fas fa-${icon}"></i> ${mensagem}`;
+        alert.className = `alert ${alertClass}`;
+        alert.style.display = 'flex';
+
+        if (tipo !== 'error') {
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+    }
+
+    // Fechar modais com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            fecharModalEditar();
+            fecharModalSenha();
+        }
+    });
+
+    // Fechar modais ao clicar fora
+    document.getElementById('modalEditar').addEventListener('click', function(e) {
+        if (e.target === this) fecharModalEditar();
+    });
+
+    document.getElementById('modalSenha').addEventListener('click', function(e) {
+        if (e.target === this) fecharModalSenha();
+    });
+</script>
+{% endblock %}

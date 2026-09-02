@@ -1,0 +1,1745 @@
+{% extends "base.html" %}
+{% block conteudo %}
+    <title>Dashboard - Sistema de Gestão</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --verde-principal: #093D2C;
+            --verde-secundario: #1C6B49;
+            --verde-hover: #0a4d35;
+            --verde-claro: #e8f5e8;
+            --verde-gradiente: linear-gradient(135deg, #093D2C 0%, #1C6B49 100%);
+            --verde-gradiente-hover: linear-gradient(135deg, #0a4d35 0%, #228b61 100%);
+            --fundo: linear-gradient(135deg, #f8faf9 0%, #f0f7f3 100%);
+            --texto: #1a202c;
+            --texto-claro: #718096;
+            --branco: #ffffff;
+            --cinza-borda: #e2e8f0;
+            --cinza-claro: #f7fafc;
+            --sombra: 0 20px 40px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.05);
+            --sombra-suave: 0 8px 25px rgba(0, 0, 0, 0.06);
+            --sombra-card: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+            --transicao: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --erro: #e53e3e;
+            --sucesso: #38a169;
+            --warning: #d69e2e;
+            --info: #3182ce;
+            --roxo: #805ad5;
+            --rosa: #d53f8c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--fundo);
+            color: var(--texto);
+            line-height: 1.7;
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Header Premium com Efeitos */
+        .page-header {
+            background: var(--verde-gradiente);
+            color: var(--branco);
+            padding: 50px 40px;
+            margin: -30px -30px 50px -30px;
+            border-radius: 0 0 25px 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(9, 61, 44, 0.2);
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 40c8.84 0 16-7.16 16-16s-7.16-16-16-16-16 7.16-16 16 7.16 16 16 16zm96 50c8.84 0 16-7.16 16-16s-7.16-16-16-16-16 7.16-16 16 7.16 16 16 16zm-86-14c3.31 0 6-2.69 6-6s-2.69-6-6-6-6 2.69-6 6 2.69 6 6 6zm126 62c3.31 0 6-2.69 6-6s-2.69-6-6-6-6 2.69-6 6 2.69 6 6 6zM68 180c3.31 0 6-2.69 6-6s-2.69-6-6-6-6 2.69-6 6 2.69 6 6 6zm112-152c3.31 0 6-2.69 6-6s-2.69-6-6-6-6 2.69-6 6 2.69 6 6 6zM24 172c4.42 0 8-3.58 8-8s-3.58-8-8-8-8 3.58-8 8 3.58 8 8 8zm56-130c4.42 0 8-3.58 8-8s-3.58-8-8-8-8 3.58-8 8 3.58 8 8 8zm46-22c5.52 0 10-4.48 10-10s-4.48-10-10-10-10 4.48-10 10 4.48 10 10 10zm-12 120c4.42 0 8-3.58 8-8s-3.58-8-8-8-8 3.58-8 8 3.58 8 8 8zm58 44c5.52 0 10-4.48 10-10s-4.48-10-10-10-10 4.48-10 10 4.48 10 10 10zM64 126c5.52 0 10-4.48 10-10s-4.48-10-10-10-10 4.48-10 10 4.48 10 10 10zm114-26c5.52 0 10-4.48 10-10s-4.48-10-10-10-10 4.48-10 10 4.48 10 10 10zm-18-42c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM120 182c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM70 82c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM24 120c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z' fill='%23ffffff' fill-opacity='0.08' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.6;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #38a169, #3182ce, #d69e2e, #e53e3e);
+            background-size: 200% 100%;
+            animation: rainbow 10s linear infinite;
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .header-content {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .page-title {
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        .page-title h1 i {
+            font-size: 48px;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .page-title p {
+            font-size: 18px;
+            opacity: 0.95;
+            font-weight: 300;
+            max-width: 600px;
+        }
+
+        /* Header Actions */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        #last-updated {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #last-updated i {
+            font-size: 18px;
+        }
+
+        /* Botão Admin - SIMPLES */
+        .btn-admin {
+            background: linear-gradient(135deg, var(--roxo) 0%, var(--rosa) 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicao);
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 20px rgba(128, 90, 213, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .btn-admin:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(128, 90, 213, 0.3);
+        }
+
+        /* KPIs Ultra Premium */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: var(--branco);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--sombra-card);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transicao);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border-top: 5px solid;
+            cursor: pointer;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--sombra-suave);
+        }
+
+        .kpi-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            background: var(--verde-gradiente);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(9, 61, 44, 0.15);
+        }
+
+        .kpi-value {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: var(--verde-gradiente);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .kpi-label {
+            font-size: 14px;
+            color: var(--texto-claro);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Cards Premium com Efeitos */
+        .card {
+            background: var(--branco);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: var(--sombra);
+            border: 1px solid var(--cinza-borda);
+            transition: var(--transicao);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-suave);
+        }
+
+        .card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        }
+
+        @media (min-width: 768px) {
+            .card-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .card-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--verde-principal);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        /* Badge de Contagem de Alertas */
+        .badge {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: var(--transicao);
+        }
+
+        .badge-danger {
+            background: linear-gradient(135deg, var(--erro) 0%, #c53030 100%);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .badge:hover {
+            transform: scale(1.05);
+        }
+
+        /* Filtros de Alertas */
+        .alert-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid var(--cinza-borda);
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transicao);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn.active {
+            background: var(--verde-principal);
+            color: white;
+            border-color: var(--verde-principal);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Estatísticas dos Alertas */
+        .alertas-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: var(--transicao);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .stat-badge:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .stat-badge i {
+            font-size: 28px;
+            opacity: 0.9;
+        }
+
+        .stat-badge .count {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        /* Alertas Premium Animados */
+        .alert {
+            padding: 20px 25px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            animation: slideIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            border-left: 6px solid;
+            position: relative;
+            overflow: hidden;
+            transform: translateX(-20px);
+            opacity: 0;
+            border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: var(--transicao);
+        }
+
+        .alert:hover {
+            transform: translateX(5px) !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert i {
+            font-size: 22px;
+            margin-top: 2px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, rgba(229, 62, 62, 0.08) 0%, rgba(229, 62, 62, 0.02) 100%);
+            color: var(--erro);
+            border-left-color: var(--erro);
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(214, 158, 46, 0.08) 0%, rgba(214, 158, 46, 0.02) 100%);
+            color: var(--warning);
+            border-left-color: var(--warning);
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, rgba(49, 130, 206, 0.08) 0%, rgba(49, 130, 206, 0.02) 100%);
+            color: var(--info);
+            border-left-color: var(--info);
+        }
+
+        /* Loading Animado */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--cinza-borda);
+            border-left: 5px solid var(--verde-principal);
+            border-radius: 50%;
+            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty State Premium */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--texto-claro);
+            position: relative;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 25px;
+            color: var(--cinza-borda);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .empty-state h3 {
+            margin-bottom: 15px;
+            color: var(--texto-claro);
+            font-weight: 600;
+            font-size: 22px;
+        }
+
+        .empty-state p {
+            color: var(--texto-claro);
+            font-size: 16px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Modal de Gerenciamento de Usuários */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease-out;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--roxo) 0%, var(--rosa) 100%);
+            color: white;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transicao);
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid var(--cinza-borda);
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transicao);
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: var(--roxo);
+            border-bottom-color: var(--roxo);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--texto);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--cinza-borda);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: var(--transicao);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--roxo);
+            box-shadow: 0 0 0 3px rgba(128, 90, 213, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transicao);
+            border: none;
+            flex: 1;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--roxo) 0%, var(--rosa) 100%);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #6b46c1 0%, #b83280 100%);
+        }
+
+        .btn-cancel {
+            background: var(--cinza-claro);
+            color: var(--texto);
+        }
+
+        .btn-cancel:hover {
+            background: var(--cinza-borda);
+        }
+
+        /* Gerenciamento de usuários */
+        .user-modal-content { width: min(1080px, calc(100vw - 40px)); max-width: 1080px; max-height: min(880px, calc(100vh - 40px)); border: 1px solid rgba(128,90,213,.12); border-radius: 20px; overflow: hidden; }
+        .user-modal-content .modal-header { padding: 22px 28px; }
+        .user-modal-title { display: flex; align-items: center; gap: 13px; }
+        .user-modal-title > i { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,.16); font-size: 21px; }
+        .user-modal-title small { display: block; margin-top: 3px; color: rgba(255,255,255,.78); font-size: 12px; font-weight: 400; }
+        .user-modal-body { max-height: calc(100vh - 145px); padding: 26px 28px 30px; overflow-y: auto; background: #f8fafc; }
+        .user-form-panel, .user-list-panel { padding: 22px; background: #fff; border: 1px solid #e8edf3; border-radius: 15px; box-shadow: 0 5px 18px rgba(23,35,58,.045); }
+        .user-list-panel { margin-top: 22px; }
+        .user-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+        .user-section-heading h4 { margin: 0; color: var(--texto); font-size: 17px; font-weight: 650; }
+        .user-section-heading p { margin: 5px 0 0; color: var(--texto-claro); font-size: 13px; }
+        .user-form-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 20px; }
+        .user-form-grid .form-group { margin: 0; }
+        .user-form-grid .form-control { min-height: 44px; padding: 10px 13px; background: #fbfcfe; border-color: #dce3eb; }
+        .user-form-grid .form-control:hover { border-color: #bbc5d1; }
+        .user-form-actions { justify-content: flex-end; margin: 22px 0 0; padding-top: 18px; border-top: 1px solid #edf0f4; }
+        .user-form-actions .btn { flex: 0 0 auto; min-width: 140px; }
+        .user-table-wrap { overflow-x: auto; border: 1px solid #e8edf3; border-radius: 12px; }
+        .user-table { width: 100%; border-collapse: collapse; background: #fff; }
+        .user-table th { padding: 12px 15px; background: #f4f6f9; color: #667085; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-align: left; text-transform: uppercase; white-space: nowrap; }
+        .user-table td { padding: 14px 15px; border-top: 1px solid #edf0f4; color: var(--texto); font-size: 13px; vertical-align: middle; }
+        .user-table tbody tr { transition: background .18s ease; }
+        .user-table tbody tr:hover { background: #faf8ff; }
+        .user-identity { display: flex; align-items: center; gap: 11px; min-width: 180px; }
+        .user-avatar { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; border-radius: 11px; background: linear-gradient(135deg, rgba(128,90,213,.14), rgba(237,100,166,.13)); color: var(--roxo); font-weight: 700; }
+        .user-identity strong { display: block; font-size: 13px; }
+        .user-identity small { display: block; margin-top: 2px; color: var(--texto-claro); }
+        .user-status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: capitalize; }
+        .user-status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .user-status-active { color: #16815f; background: #eaf8f2; }
+        .user-status-inactive { color: #b54747; background: #fff0f0; }
+        .user-table-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .user-table-actions .btn { flex: 0 0 auto; min-width: auto; padding: 8px 11px; font-size: 12px; }
+        .user-edit { color: var(--roxo); background: rgba(128,90,213,.1); }
+        .user-status { color: #667085; background: #f0f2f5; }
+        .users-feedback { min-height: 20px; margin: 14px 2px 0; color: var(--texto-claro); font-size: 12px; }
+
+        @media (max-width: 800px) { .user-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 560px) {
+            .modal { padding: 10px; }
+            .user-modal-content { width: 100%; max-height: calc(100vh - 20px); border-radius: 15px; }
+            .user-modal-content .modal-header { padding: 16px 18px; }
+            .user-modal-body { padding: 16px; }
+            .user-form-panel, .user-list-panel { padding: 16px; }
+            .user-form-grid { grid-template-columns: 1fr; }
+            .user-form-actions { flex-direction: column-reverse; }
+            .user-form-actions .btn { width: 100%; }
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(56, 161, 105, 0.1);
+            color: var(--sucesso);
+            border: 1px solid rgba(56, 161, 105, 0.3);
+        }
+
+        .message.error {
+            background: rgba(229, 62, 62, 0.1);
+            color: var(--erro);
+            border: 1px solid rgba(229, 62, 62, 0.3);
+        }
+
+        .message.info {
+            background: rgba(49, 130, 206, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(49, 130, 206, 0.3);
+        }
+
+        /* Tabela de usuários */
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--cinza-borda);
+        }
+
+        .users-table th {
+            background: var(--cinza-claro);
+            font-weight: 600;
+            color: var(--texto);
+        }
+
+        .users-table tr:hover {
+            background: var(--cinza-claro);
+        }
+
+        .user-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(56, 161, 105, 0.1);
+            color: var(--sucesso);
+        }
+
+        .status-inactive {
+            background: rgba(229, 62, 62, 0.1);
+            color: var(--erro);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .page-header {
+                padding: 30px 20px;
+                margin: -20px -20px 30px -20px;
+            }
+            
+            .page-title h1 {
+                font-size: 32px;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .alert-filters {
+                justify-content: center;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title h1 {
+                font-size: 28px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+
+        /* Animações de Entrada */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Contador de Alertas Flutuante */
+        .alert-counter {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--erro);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+            box-shadow: 0 10px 25px rgba(229, 62, 62, 0.4);
+            cursor: pointer;
+            z-index: 1000;
+            animation: bounceAlert 2s infinite;
+        }
+
+        @keyframes bounceAlert {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+
+<!-- Atualização da verificação de admin -->
+{% if session and session.get('usuarios') and session['usuarios'].get('cargo') %}
+    <script>
+        // Definir cargos que são considerados administradores
+        const CARGOS_ADMIN = [
+            'Gestor', 
+            'admin',
+            'Gerente de Topografia',
+            'Coordenador de Topografia', 
+            'Supervisor de Topografia'
+        ];
+        
+        // Função para verificar se é admin (baseado na lista do backend)
+        function isUserAdmin() {
+            const cargo = "{{ session['usuarios'].get('cargo', '') }}";
+            return CARGOS_ADMIN.includes(cargo);
+        }
+        
+        window.userIsAdmin = isUserAdmin();
+        window.userCargo = "{{ session['usuarios'].get('cargo', '') }}";
+        window.userName = "{{ session['usuarios'].get('nome', '') }}";
+        
+    </script>
+{% else %}
+    <script>
+        window.userIsAdmin = false;
+        window.userCargo = '';
+        window.userName = '';
+    </script>
+{% endif %}
+
+    <div class="container">
+        <!-- Header Premium -->
+        <div class="page-header">
+            <div class="header-content">
+                <div class="page-title">
+                    <h1 style="color: white;"><i class="bi bi-speedometer2"></i>Dashboard de Gestão</h1>
+                    <p>Monitoramento inteligente e alertas em tempo real</p>
+                </div>
+                <div class="header-actions">
+                    <!-- Botão Admin - AGORA VERIFICA CONFORME A LISTA DE CARGOS -->
+                    {% if session and session.get('usuarios') and session['usuarios'].get('cargo') %}
+                    <script>
+                        // Verificação em tempo real no template
+                        const cargosAdminTemplate = ['Gestor', 'admin', 'Gerente de Topografia', 'Coordenador de Topografia', 'Supervisor de Topografia'];
+                        const cargoUsuario = "{{ session['usuarios'].get('cargo', '') }}";
+                        const isAdminTemplate = cargosAdminTemplate.includes(cargoUsuario);
+                        
+                        if (isAdminTemplate) {
+                            document.write(`
+                                <button class="btn-admin" id="user-management-btn">
+                                    <i class="bi bi-person-gear"></i>Gerenciar Usuários
+                                </button>
+                            `);
+                        }
+                    </script>
+                    {% endif %}
+                    
+                    <span class="text-muted" id="last-updated">
+                        <i class="bi bi-clock"></i>
+                        <span>Atualizando...</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs Section -->
+        <div class="card animate-on-scroll">
+            <div class="card-header">
+                <h2>Indicadores Principais</h2>
+                <div class="badge badge-info">
+                    <i class="bi bi-graph-up"></i>
+                    <span>ATUALIZADO AGORA</span>
+                </div>
+            </div>
+            <div class="kpi-grid" id="kpis-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas Section -->
+        <div class="card animate-on-scroll">
+            <div class="card-header">
+                <h2>Alertas e Notificações</h2>
+                <div class="badge badge-danger" id="alert-count">
+                    <i class="bi bi-bell-fill"></i>
+                    <span>0 ALERTAS</span>
+                </div>
+            </div>
+            
+            <!-- Filtros de Alertas -->
+            <div class="alert-filters">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="bi bi-filter-circle"></i>
+                    Todos
+                </button>
+                <button class="filter-btn" data-filter="perigo">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Críticos
+                </button>
+                <button class="filter-btn" data-filter="alerta">
+                    <i class="bi bi-exclamation-circle"></i>
+                    Alertas
+                </button>
+                <button class="filter-btn" data-filter="info">
+                    <i class="bi bi-info-circle"></i>
+                    Informações
+                </button>
+            </div>
+            
+            <!-- Estatísticas dos Alertas -->
+            <div class="alertas-stats" id="alertas-stats">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+
+            <!-- Lista de Alertas -->
+            <div id="alertas-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Gerenciamento de Usuários (APENAS PARA ADMINS) -->
+    <!-- O modal será adicionado dinamicamente pelo JavaScript se for admin -->
+    <div id="modal-container"></div>
+
+    <!-- Contador de Alertas Flutuante -->
+    <div class="alert-counter" id="floating-alert-counter" style="display: none;"></div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    
+    // Carregar os dados do dashboard - usando as novas rotas do backend
+    fetchDashboardData();
+    
+    // Atualizar dados a cada 5 minutos
+    setInterval(fetchDashboardData, 300000);
+    
+    // Configurar animações de scroll
+    setupScrollAnimations();
+    
+    // Configurar funcionalidade do modal (só se for admin)
+    if (window.userIsAdmin === true || window.userIsAdmin === "true") {
+        setupUserManagementModal();
+    } else {
+        // Esconder botão se existir
+        const btn = document.getElementById('user-management-btn');
+        if (btn) {
+            btn.style.display = 'none';
+        }
+    }
+    
+    // Configurar filtros de alertas
+    setupAlertFilters();
+});
+
+// ATUALIZADO: Função para buscar dados do dashboard usando o novo backend
+function fetchDashboardData() {
+    console.log('Buscando dados do dashboard...');
+    
+    // Buscar dados do endpoint principal do novo backend
+    fetch('/api/dashboard/overview')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Falha ao carregar o dashboard (HTTP ${response.status})`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Verificar estrutura da resposta
+            if (data && data.status === 'success' && data.data) {
+                // Estrutura do novo backend
+                updateLastUpdated();
+                renderKPIs(data.data.kpis);
+                renderAlertas(data.data.alertas, data.data.estatisticas);
+            } else if (data && data.status === 'ok') {
+                // Estrutura do backend antigo
+                updateLastUpdated();
+                renderKPIs(data.kpis);
+                renderAlertas(data.alertas, data.estatisticas);
+            } else {
+                throw new Error('Formato de dados inválido');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados:', error);
+            document.getElementById('kpis-container').innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <h3>Erro ao carregar dados</h3>
+                    <p>${error.message || 'Não foi possível conectar ao servidor'}</p>
+                    <p style="font-size: 12px; margin-top: 10px;">Verifique se o backend do dashboard está rodando.</p>
+                </div>
+            `;
+        });
+}
+
+function updateLastUpdated() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('pt-BR');
+    const dateString = now.toLocaleDateString('pt-BR');
+    document.getElementById('last-updated').innerHTML = `
+        <i class="bi bi-clock"></i>
+        <span>${dateString} ${timeString}</span>
+    `;
+}
+
+function renderKPIs(kpis) {
+    console.log('Renderizando KPIs:', kpis);
+    
+    const kpiConfig = {
+        'colaboradores_ativos': { 
+            title: 'Colaboradores Ativos', 
+            icon: 'bi-person-check',
+            subtitle: 'Em atividade',
+            link: '/colaboradores?status=ativo',
+            color: 'success'
+        },
+        'contratos_ativos': { 
+            title: 'Contratos Ativos', 
+            icon: 'bi-file-earmark-text',
+            subtitle: 'Ativos',
+            link: '/contratos',
+            color: 'info'
+        },
+        'contas_pagar': { 
+            title: 'Contas a Pagar', 
+            icon: 'bi-arrow-up-circle',
+            subtitle: 'Pendentes',
+            link: '/contas_pagar',
+            color: 'danger'
+        },
+        'contas_receber': { 
+            title: 'Contas a Receber', 
+            icon: 'bi-arrow-down-circle',
+            subtitle: 'Pendentes',
+            link: '/contas_receber',
+            color: 'success'
+        },
+        'nrs_a_vencer': { 
+            title: 'NRs a Vencer', 
+            icon: 'bi-shield-exclamation',
+            subtitle: 'Próximos 30 dias',
+            link: '/nrs',
+            color: 'warning'
+        },
+        'veiculos_ativos': { 
+            title: 'Veículos Ativos', 
+            icon: 'bi-truck-flatbed',
+            subtitle: 'Em operação',
+            link: '/quilometragem?status=ativo',
+            color: 'primary'
+        },
+        'clientes_ativos': { 
+            title: 'Clientes Ativos', 
+            icon: 'bi-person-circle',
+            subtitle: 'Ativos',
+            link: '/clientes?status=ativo',
+            color: 'info'
+        },
+        'docs_vencidos': { 
+            title: 'Documentos Vencidos', 
+            icon: 'bi-file-earmark-x',
+            subtitle: 'Vencidos',
+            link: '/documentos',
+            color: 'danger'
+        },
+        'cnh_vencida': { 
+            title: 'CNHs Vencidas', 
+            icon: 'bi-card-checklist',
+            subtitle: 'Vencidas',
+            link: '/colaboradores',
+            color: 'danger'
+        }
+    };
+    
+    let kpisHTML = '';
+    let kpisCount = 0;
+    
+    for (const [key, kpiData] of Object.entries(kpis)) {
+        if (kpiConfig[key] && kpiData.valor !== undefined) {
+            const config = kpiConfig[key];
+            const valor = kpiData.valor;
+            const metadata = kpiData.metadata || {};
+            
+            // Definir cor baseada no tipo do KPI
+            let borderColor = 'var(--verde-principal)';
+            let iconColor = 'var(--verde-gradiente)';
+            
+            switch(config.color) {
+                case 'danger':
+                    borderColor = 'var(--erro)';
+                    iconColor = 'linear-gradient(135deg, var(--erro) 0%, #c53030 100%)';
+                    break;
+                case 'warning':
+                    borderColor = 'var(--warning)';
+                    iconColor = 'linear-gradient(135deg, var(--warning) 0%, #b7791f 100%)';
+                    break;
+                case 'info':
+                    borderColor = 'var(--info)';
+                    iconColor = 'linear-gradient(135deg, var(--info) 0%, #2c5282 100%)';
+                    break;
+                case 'success':
+                    borderColor = 'var(--sucesso)';
+                    iconColor = 'linear-gradient(135deg, var(--sucesso) 0%, #2f855a 100%)';
+                    break;
+            }
+            
+            // Formatar valor se tiver metadata de valor total
+            let displayValue = valor;
+            let displaySubtitle = config.subtitle;
+            
+            if (metadata.valor_total !== undefined) {
+                displayValue = `R$ ${metadata.valor_total.toFixed(2).replace('.', ',')}`;
+                displaySubtitle = `${valor} conta${valor !== 1 ? 's' : ''}`;
+            }
+            
+            kpisHTML += `
+                <div class="kpi-card" onclick="window.location.href='${config.link}'" style="border-top-color: ${borderColor};">
+                    <div class="kpi-icon" style="background: ${iconColor};">
+                        <i class="${config.icon}"></i>
+                    </div>
+                    <div class="kpi-value">${displayValue}</div>
+                    <div class="kpi-label">${config.title}</div>
+                    <div class="text-muted">${displaySubtitle}</div>
+                    ${kpiData.tendencia ? `
+                    <div style="margin-top: 10px; font-size: 12px; color: ${kpiData.tendencia === 'up' ? 'var(--sucesso)' : kpiData.tendencia === 'down' ? 'var(--erro)' : 'var(--texto-claro)'}">
+                        <i class="bi bi-arrow-${kpiData.tendencia === 'up' ? 'up' : kpiData.tendencia === 'down' ? 'down' : 'right'}"></i>
+                        ${kpiData.tendencia === 'up' ? 'Crescendo' : kpiData.tendencia === 'down' ? 'Decrescendo' : 'Estável'}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            kpisCount++;
+        }
+    }
+    
+    if (kpisCount === 0) {
+        kpisHTML = `
+            <div class="empty-state">
+                <i class="bi bi-graph-up"></i>
+                <h3>Nenhum KPI disponível</h3>
+                <p>Configure os indicadores no backend do dashboard</p>
+            </div>
+        `;
+    }
+    
+    document.getElementById('kpis-container').innerHTML = kpisHTML;
+}
+
+function renderAlertas(alertas, estatisticas) {
+    const alertasContainer = document.getElementById('alertas-container');
+    const alertCount = document.getElementById('alert-count');
+    const alertasStats = document.getElementById('alertas-stats');
+    const floatingCounter = document.getElementById('floating-alert-counter');
+    
+    // Atualizar contador de alertas
+    const totalAlertas = Array.isArray(alertas) ? alertas.length : 0;
+    alertCount.innerHTML = `
+        <i class="bi bi-bell-fill"></i>
+        <span>${totalAlertas} ALERTA${totalAlertas !== 1 ? 'S' : ''}</span>
+    `;
+    
+    // Atualizar contador flutuante
+    if (totalAlertas > 0) {
+        floatingCounter.textContent = totalAlertas;
+        floatingCounter.style.display = 'flex';
+        
+        // Mudar cor baseada no tipo mais crítico
+        const hasPerigo = alertas.some(a => a.tipo === 'perigo');
+        const hasAlerta = alertas.some(a => a.tipo === 'alerta');
+        
+        if (hasPerigo) {
+            floatingCounter.style.background = 'var(--erro)';
+            floatingCounter.style.boxShadow = '0 10px 25px rgba(229, 62, 62, 0.4)';
+        } else if (hasAlerta) {
+            floatingCounter.style.background = 'var(--warning)';
+            floatingCounter.style.boxShadow = '0 10px 25px rgba(214, 158, 46, 0.4)';
+        } else {
+            floatingCounter.style.background = 'var(--info)';
+            floatingCounter.style.boxShadow = '0 10px 25px rgba(49, 130, 206, 0.4)';
+        }
+    } else {
+        floatingCounter.style.display = 'none';
+    }
+    
+    // Calcular estatísticas por tipo
+    const stats = {
+        perigo: alertas.filter(a => a.tipo === 'perigo').length,
+        alerta: alertas.filter(a => a.tipo === 'alerta').length,
+        info: alertas.filter(a => a.tipo === 'info').length
+    };
+    
+    // Usar estatísticas do backend se disponíveis
+    if (estatisticas) {
+        stats.perigo = estatisticas.perigo || stats.perigo;
+        stats.alerta = estatisticas.alerta || stats.alerta;
+        stats.info = estatisticas.info || stats.info;
+    }
+    
+    // Renderizar estatísticas
+    alertasStats.innerHTML = `
+        <div class="stat-badge" style="background: linear-gradient(135deg, var(--erro) 0%, #c53030 100%);" onclick="filterAlerts('perigo')">
+            <div>
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div>Crítico${stats.perigo !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="count">${stats.perigo}</div>
+        </div>
+        <div class="stat-badge" style="background: linear-gradient(135deg, var(--warning) 0%, #b7791f 100%);" onclick="filterAlerts('alerta')">
+            <div>
+                <i class="bi bi-exclamation-circle-fill"></i>
+                <div>Alerta${stats.alerta !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="count">${stats.alerta}</div>
+        </div>
+        <div class="stat-badge" style="background: linear-gradient(135deg, var(--info) 0%, #2c5282 100%);" onclick="filterAlerts('info')">
+            <div>
+                <i class="bi bi-info-circle-fill"></i>
+                <div>Informativo${stats.info !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="count">${stats.info}</div>
+        </div>
+    `;
+    
+    if (!Array.isArray(alertas) || alertas.length === 0) {
+        alertasContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="bi bi-check-circle"></i>
+                <h3>Nenhum alerta no momento</h3>
+                <p>Todos os sistemas estão funcionando normalmente</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Ordenar alertas por tipo (críticos primeiro) e data
+    const alertasOrdenados = [...alertas].sort((a, b) => {
+        const ordem = {'perigo': 0, 'alerta': 1, 'info': 2};
+        const tipoA = ordem[a.tipo] || 3;
+        const tipoB = ordem[b.tipo] || 3;
+        
+        if (tipoA !== tipoB) return tipoA - tipoB;
+        
+        // Se mesmo tipo, ordenar por data
+        const dataA = a.data_vencimento || '9999-12-31';
+        const dataB = b.data_vencimento || '9999-12-31';
+        return new Date(dataA) - new Date(dataB);
+    });
+    
+    let alertasHTML = '';
+    
+    alertasOrdenados.forEach((alerta, index) => {
+        let alertClass, icon;
+        
+        switch(alerta.tipo) {
+            case 'perigo':
+                alertClass = 'alert-error';
+                icon = 'bi-exclamation-triangle-fill';
+                break;
+            case 'alerta':
+                alertClass = 'alert-warning';
+                icon = 'bi-exclamation-circle-fill';
+                break;
+            case 'info':
+                alertClass = 'alert-info';
+                icon = 'bi-info-circle-fill';
+                break;
+            default:
+                alertClass = 'alert-info';
+                icon = 'bi-info-circle-fill';
+        }
+        
+        // Adicionar delay para animação em cascata
+        const delay = index * 0.1;
+        
+        // Formatar data se existir
+        let dataFormatada = '';
+        if (alerta.data_vencimento) {
+            const data = new Date(alerta.data_vencimento);
+            dataFormatada = `<small style="display: block; margin-top: 5px; opacity: 0.7;">Vencimento: ${data.toLocaleDateString('pt-BR')}</small>`;
+        }
+        
+        // Adicionar origem se existir
+        let origem = '';
+        if (alerta.origem) {
+            origem = `<small style="display: block; margin-top: 2px; opacity: 0.7; font-size: 12px;">Origem: ${alerta.origem}</small>`;
+        }
+        
+        alertasHTML += `
+            <div class="alert ${alertClass}" 
+                 data-tipo="${alerta.tipo}"
+                 data-origem="${alerta.origem || ''}"
+                 style="animation-delay: ${delay}s;"
+                 onclick="showAlertDetail('${alerta.tipo}', '${alerta.mensagem.replace(/'/g, "\\'")}', '${alerta.data_vencimento || ''}', '${alerta.origem || ''}', '${alerta.origem_id || ''}', ${JSON.stringify(alerta.metadata || {})})">
+                <i class="${icon}"></i>
+                <div>
+                    <div>${alerta.mensagem}</div>
+                    ${dataFormatada}
+                    ${origem}
+                </div>
+            </div>
+        `;
+    });
+    
+    alertasContainer.innerHTML = alertasHTML;
+}
+
+function filterAlerts(tipo) {
+    const alerts = document.querySelectorAll('.alert');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    
+    // Atualizar botões de filtro
+    filterButtons.forEach(btn => {
+        if (tipo === 'all' && btn.dataset.filter === 'all') {
+            btn.classList.add('active');
+        } else if (btn.dataset.filter === tipo) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    // Filtrar alertas
+    alerts.forEach(alert => {
+        if (tipo === 'all' || alert.dataset.tipo === tipo) {
+            alert.style.display = 'flex';
+        } else {
+            alert.style.display = 'none';
+        }
+    });
+}
+
+function showAlertDetail(tipo, mensagem, dataVencimento, origem, origemId, metadata = {}) {
+    // Modal de detalhes do alerta
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    
+    let tipoTexto, cor;
+    switch(tipo) {
+        case 'perigo':
+            tipoTexto = 'Crítico';
+            cor = 'var(--erro)';
+            break;
+        case 'alerta':
+            tipoTexto = 'Alerta';
+            cor = 'var(--warning)';
+            break;
+        case 'info':
+            tipoTexto = 'Informativo';
+            cor = 'var(--info)';
+            break;
+        default:
+            tipoTexto = 'Alerta';
+            cor = 'var(--info)';
+    }
+    
+    // Construir detalhes do metadata
+    let metadataHTML = '';
+    if (metadata && Object.keys(metadata).length > 0) {
+        metadataHTML = '<div class="form-group"><label>Detalhes:</label><div style="padding: 12px; background: var(--cinza-claro); border-radius: 8px; font-size: 14px;">';
+        for (const [key, value] of Object.entries(metadata)) {
+            metadataHTML += `<div><strong>${key}:</strong> ${value}</div>`;
+        }
+        metadataHTML += '</div></div>';
+    }
+    
+    // Botões de ação baseados na origem
+    let actionButtons = '';
+    if (origemId) {
+        let actionURL = '#';
+        let actionText = 'Ver Detalhes';
+        
+        switch(origem) {
+            case 'nrs_colaboradores':
+                actionURL = `/nrs?colaborador_id=${origemId}`;
+                actionText = 'Ver NRs do Colaborador';
+                break;
+            case 'documentos':
+                actionURL = `/documentos?id=${origemId}`;
+                actionText = 'Ver Documento';
+                break;
+            case 'contratos':
+                actionURL = `/contratos?id=${origemId}`;
+                actionText = 'Ver Contrato';
+                break;
+            case 'contas_pagar':
+                actionURL = `/contas_pagar?id=${origemId}`;
+                actionText = 'Ver Conta a Pagar';
+                break;
+            case 'contas_receber':
+                actionURL = `/contas_receber?id=${origemId}`;
+                actionText = 'Ver Conta a Receber';
+                break;
+            case 'colaboradores':
+                actionURL = `/colaboradores?id=${origemId}`;
+                actionText = 'Ver Colaborador';
+                break;
+            case 'veiculos':
+                actionURL = `/quilometragem?veiculo_id=${origemId}`;
+                actionText = 'Ver Veículo';
+                break;
+        }
+        
+        if (actionURL !== '#') {
+            actionButtons = `
+                <div class="form-group">
+                    <a href="${actionURL}" class="btn btn-submit" style="text-decoration: none; display: block; text-align: center;">
+                        <i class="bi bi-arrow-right"></i> ${actionText}
+                    </a>
+                </div>
+            `;
+        }
+    }
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header" style="background: ${cor};">
+                <h3>Detalhes do Alerta</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tipo:</label>
+                    <div style="padding: 8px; background: ${cor}20; border-radius: 8px; color: ${cor}; font-weight: 500;">
+                        <i class="bi bi-${tipo === 'perigo' ? 'exclamation-triangle' : tipo === 'alerta' ? 'exclamation-circle' : 'info-circle'}"></i>
+                        ${tipoTexto}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Mensagem:</label>
+                    <div style="padding: 12px; background: var(--cinza-claro); border-radius: 8px; font-size: 15px; line-height: 1.6;">
+                        ${mensagem}
+                    </div>
+                </div>
+                ${dataVencimento ? `
+                <div class="form-group">
+                    <label>Data de Vencimento:</label>
+                    <div style="padding: 8px; background: var(--cinza-claro); border-radius: 8px;">
+                        <i class="bi bi-calendar"></i>
+                        ${new Date(dataVencimento).toLocaleDateString('pt-BR')}
+                    </div>
+                </div>` : ''}
+                ${origem ? `
+                <div class="form-group">
+                    <label>Origem:</label>
+                    <div style="padding: 8px; background: var(--cinza-claro); border-radius: 8px;">
+                        <i class="bi bi-folder"></i>
+                        ${origem}
+                    </div>
+                </div>` : ''}
+                ${metadataHTML}
+                ${actionButtons}
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel close-detail-modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Fechar modal
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    modal.querySelector('.close-detail-modal').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    // Fechar ao clicar fora
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
+}
+
+function setupScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.animate-on-scroll').forEach(element => {
+        observer.observe(element);
+    });
+}
+
+function setupAlertFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.filter;
+            filterAlerts(filter);
+        });
+    });
+}
+
+// Função para configurar o modal de gerenciamento de usuários (mantida igual)
+function setupUserManagementModal() {
+    const button = document.getElementById('user-management-btn');
+    const host = document.getElementById('modal-container');
+    if (!button || !host) return;
+
+    const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
+
+    host.innerHTML = `
+        <div class="modal" id="user-management-modal" aria-hidden="true">
+            <div class="modal-content user-modal-content">
+                <div class="modal-header">
+                    <div class="user-modal-title"><i class="bi bi-people"></i><div><h3>Gerenciar Usuários</h3><small>Cadastre, edite e controle o acesso ao sistema</small></div></div>
+                    <button type="button" class="close-modal" aria-label="Fechar">&times;</button>
+                </div>
+                <div class="user-modal-body">
+                <section class="user-form-panel">
+                    <div class="user-section-heading"><div><h4>Dados do usuário</h4><p>Preencha os dados para adicionar ou atualizar um acesso.</p></div></div>
+                <form id="user-form">
+                    <input type="hidden" id="managed-user-id">
+                    <div class="user-form-grid">
+                        <div class="form-group"><label for="managed-name">Nome *</label><input class="form-control" id="managed-name" required></div>
+                        <div class="form-group"><label for="managed-login">Usuário *</label><input class="form-control" id="managed-login" required></div>
+                        <div class="form-group"><label for="managed-email">E-mail</label><input class="form-control" id="managed-email" type="email"></div>
+                        <div class="form-group"><label for="managed-role">Cargo *</label><select class="form-control" id="managed-role" required></select></div>
+                        <div class="form-group"><label for="managed-password">Senha <span id="password-hint">*</span></label><input class="form-control" id="managed-password" type="password"></div>
+                        <div class="form-group"><label for="managed-status">Status</label><select class="form-control" id="managed-status"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></div>
+                    </div>
+                    <div class="form-actions user-form-actions">
+                        <button type="button" class="btn btn-cancel" id="user-form-clear"><i class="bi bi-x-circle"></i> Limpar</button>
+                        <button type="submit" class="btn btn-submit"><i class="bi bi-check2-circle"></i> Salvar usuário</button>
+                    </div>
+                </form>
+                </section>
+                <section class="user-list-panel">
+                    <div class="user-section-heading"><div><h4>Usuários cadastrados</h4><p>Gerencie permissões e a situação dos acessos.</p></div></div>
+                <div class="user-table-wrap">
+                    <table class="user-table"><thead><tr><th>Usuário</th><th>Cargo</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead><tbody id="users-table-body"></tbody></table>
+                </div>
+                <p id="users-feedback" class="users-feedback" role="status"></p>
+                </section>
+                </div>
+            </div>
+        </div>`;
+
+    const modal = document.getElementById('user-management-modal');
+    const form = document.getElementById('user-form');
+    const feedback = document.getElementById('users-feedback');
+    let users = [];
+
+    function clearForm() {
+        form.reset();
+        document.getElementById('managed-user-id').value = '';
+        document.getElementById('managed-status').value = 'ativo';
+        document.getElementById('password-hint').textContent = '*';
+    }
+
+    async function readJson(response) {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || data.erro || data.message || 'Não foi possível concluir a operação.');
+        return data;
+    }
+
+    async function loadRoles() {
+        const data = await readJson(await fetch('/api/usuarios/cargos'));
+        document.getElementById('managed-role').innerHTML = data.cargos.map(role =>
+            `<option value="${escapeHtml(role)}">${escapeHtml(role)}</option>`).join('');
+    }
+
+    async function loadUsers() {
+        feedback.textContent = 'Carregando usuários...';
+        users = await readJson(await fetch('/api/usuarios/listar'));
+        document.getElementById('users-table-body').innerHTML = users.map(user => `
+            <tr>
+                <td><div class="user-identity"><span class="user-avatar">${escapeHtml((user.nome || user.usuario || '?').charAt(0).toUpperCase())}</span><div><strong>${escapeHtml(user.nome)}</strong><small>@${escapeHtml(user.usuario)}</small></div></div></td>
+                <td>${escapeHtml(user.cargo)}</td>
+                <td><span class="user-status-badge ${user.status === 'ativo' ? 'user-status-active' : 'user-status-inactive'}">${escapeHtml(user.status)}</span></td>
+                <td><div class="user-table-actions"><button type="button" class="btn user-edit" data-id="${user.id}"><i class="bi bi-pencil"></i> Editar</button>
+                <button type="button" class="btn user-status" data-id="${user.id}" data-status="${user.status === 'ativo' ? 'inativo' : 'ativo'}"><i class="bi ${user.status === 'ativo' ? 'bi-person-x' : 'bi-person-check'}"></i> ${user.status === 'ativo' ? 'Desativar' : 'Ativar'}</button></div></td>
+            </tr>`).join('');
+        feedback.textContent = users.length ? `${users.length} usuário(s).` : 'Nenhum usuário cadastrado.';
+    }
+
+    button.addEventListener('click', async () => {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        try { await Promise.all([loadRoles(), loadUsers()]); } catch (error) { feedback.textContent = error.message; }
+    });
+    modal.querySelector('.close-modal').addEventListener('click', () => { modal.classList.remove('active'); modal.setAttribute('aria-hidden', 'true'); });
+    modal.addEventListener('click', event => { if (event.target === modal) modal.querySelector('.close-modal').click(); });
+    document.getElementById('user-form-clear').addEventListener('click', clearForm);
+
+    document.getElementById('users-table-body').addEventListener('click', async event => {
+        const editButton = event.target.closest('.user-edit');
+        const statusButton = event.target.closest('.user-status');
+        if (editButton) {
+            const user = users.find(item => item.id === Number(editButton.dataset.id));
+            if (!user) return;
+            document.getElementById('managed-user-id').value = user.id;
+            document.getElementById('managed-name').value = user.nome || '';
+            document.getElementById('managed-login').value = user.usuario || '';
+            document.getElementById('managed-email').value = user.email || '';
+            document.getElementById('managed-role').value = user.cargo || '';
+            document.getElementById('managed-status').value = user.status || 'ativo';
+            document.getElementById('password-hint').textContent = '(deixe vazia para manter)';
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        if (statusButton) {
+            try {
+                await readJson(await fetch(`/api/usuarios/status/${statusButton.dataset.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({status: statusButton.dataset.status}) }));
+                await loadUsers();
+            } catch (error) { feedback.textContent = error.message; }
+        }
+    });
+
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        const id = document.getElementById('managed-user-id').value;
+        const password = document.getElementById('managed-password').value;
+        const payload = { nome: document.getElementById('managed-name').value.trim(), usuario: document.getElementById('managed-login').value.trim(), email: document.getElementById('managed-email').value.trim(), cargo: document.getElementById('managed-role').value, status: document.getElementById('managed-status').value };
+        if (password) payload.senha = password;
+        if (!id && !password) { feedback.textContent = 'Informe uma senha para o novo usuário.'; return; }
+        try {
+            await readJson(await fetch(id ? `/api/usuarios/editar/${id}` : '/api/usuarios/criar', { method: id ? 'PUT' : 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) }));
+            clearForm();
+            await loadUsers();
+            feedback.textContent = 'Usuário salvo com sucesso.';
+        } catch (error) { feedback.textContent = error.message; }
+    });
+}
+</script>
+{% endblock %}

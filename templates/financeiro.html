@@ -1,0 +1,3796 @@
+{% extends "base.html" %}
+{% block conteudo %}
+{% if session.get('usuarios') and session['usuarios'].get('cargo') in ['admin', 'Administrador', 'gestor'] %}
+    <title>PATAGONIA FINANCE • DASHBOARD EXECUTIVO 360°</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.3.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-green: #00ff9c;
+            --dark-green: #0b2f24;
+            --emerald-green: #00c980;
+            --accent-yellow: #a3ff12;
+            --alert-red: #ff4d4d;
+            --info-blue: #3b82f6;
+            --dark-bg: #0a0f1a;
+            --darker-bg: #050a14;
+            --card-bg: rgba(11, 20, 30, 0.95);
+            --card-border: rgba(0, 255, 156, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --success: #00ff9c;
+            --warning: #a3ff12;
+            --danger: #ff4d4d;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --radius-sm: 4px;
+            --sidebar-width: 140px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            min-height: 100vh;
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 156, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 156, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .dashboard-container {
+            padding: 20px;
+            max-width: calc(1800px - var(--sidebar-width));
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* HEADER EXECUTIVO */
+        .dashboard-header {
+            background: rgba(11, 20, 30, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-lg);
+            border-top: 1px solid rgba(0, 255, 156, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--dark-green), rgba(0, 255, 156, 0.1));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-green);
+            font-size: 22px;
+            border: 1px solid rgba(0, 255, 156, 0.2);
+        }
+
+        .header-text h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-text .subtitle {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        /* PERÍODO E FILTROS */
+        .period-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0, 255, 156, 0.05);
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(0, 255, 156, 0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .date-input {
+            background: rgba(20, 30, 40, 0.9);
+            border: 1px solid rgba(0, 255, 156, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 13px;
+            min-width: 140px;
+            transition: var(--transition);
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 2px rgba(0, 255, 156, 0.1);
+        }
+
+        /* BOTÕES EXECUTIVOS */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green), var(--emerald-green));
+            color: var(--dark-green);
+            font-weight: 700;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 255, 156, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(20, 30, 40, 0.9);
+            color: var(--text-primary);
+            border: 1px solid rgba(163, 255, 18, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(163, 255, 18, 0.1);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--accent-yellow), #ffd700);
+            color: var(--dark-green);
+            font-weight: 700;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info-blue), #60a5fa);
+            color: white;
+            font-weight: 700;
+        }
+
+        /* ALERTAS FINANCEIROS */
+        .alertas-container {
+            margin-bottom: 25px;
+        }
+
+        .alerta-card {
+            background: rgba(255, 77, 77, 0.05);
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            border-radius: var(--radius-md);
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .alerta-card:hover {
+            transform: translateX(5px);
+            border-color: rgba(255, 77, 77, 0.4);
+        }
+
+        .alerta-card.warning {
+            background: rgba(163, 255, 18, 0.05);
+            border-color: rgba(163, 255, 18, 0.2);
+        }
+
+        .alerta-card.warning:hover {
+            border-color: rgba(163, 255, 18, 0.4);
+        }
+
+        .alerta-card.info {
+            background: rgba(0, 255, 156, 0.05);
+            border-color: rgba(0, 255, 156, 0.2);
+        }
+
+        .alerta-card.info:hover {
+            border-color: rgba(0, 255, 156, 0.4);
+        }
+
+        .alerta-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .alerta-card.critico .alerta-icon {
+            background: rgba(255, 77, 77, 0.2);
+            color: var(--alert-red);
+        }
+
+        .alerta-card.warning .alerta-icon {
+            background: rgba(163, 255, 18, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        .alerta-card.info .alerta-icon {
+            background: rgba(0, 255, 156, 0.2);
+            color: var(--primary-green);
+        }
+
+        /* KPIs EXECUTIVOS */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .kpi-card:hover {
+            border-color: rgba(0, 255, 156, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent,
+                var(--primary-green),
+                transparent
+            );
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .kpi-title {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .kpi-badge {
+            font-family: 'Orbitron', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: rgba(0, 255, 156, 0.1);
+            color: var(--primary-green);
+            border: 1px solid rgba(0, 255, 156, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(163, 255, 18, 0.1);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(163, 255, 18, 0.3);
+        }
+
+        .badge-danger {
+            background: rgba(255, 77, 77, 0.1);
+            color: var(--alert-red);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+        }
+
+        .badge-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info-blue);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .kpi-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 5px 0;
+            color: var(--text-primary);
+        }
+
+        .kpi-comparison {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .comparison-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .comparison-up {
+            color: var(--primary-green);
+        }
+
+        .comparison-down {
+            color: var(--alert-red);
+        }
+
+        .comparison-neutral {
+            color: var(--text-secondary);
+        }
+
+        .kpi-insight {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* CHARTS CONTAINER */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 255, 156, 0.1);
+        }
+
+        .chart-title {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-green);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius-sm);
+            background: rgba(0, 255, 156, 0.1);
+            border: 1px solid rgba(0, 255, 156, 0.2);
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 12px;
+        }
+
+        .chart-btn:hover {
+            background: rgba(0, 255, 156, 0.2);
+            border-color: var(--primary-green);
+        }
+
+        .chart-btn.active {
+            background: var(--primary-green);
+            color: var(--dark-green);
+            border-color: var(--primary-green);
+        }
+
+        .chart-container {
+            height: 280px;
+            position: relative;
+        }
+
+        /* TABELAS INTELIGENTES */
+        .data-tables-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .data-table {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modern-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .modern-table th {
+            background: rgba(0, 255, 156, 0.05);
+            padding: 12px 15px;
+            text-align: left;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary-green);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(0, 255, 156, 0.2);
+        }
+
+        .modern-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .modern-table tr {
+            transition: var(--transition);
+        }
+
+        .modern-table tr:hover {
+            background: rgba(0, 255, 156, 0.03);
+        }
+
+        .value-cell {
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+
+        .negative-value {
+            color: var(--alert-red);
+        }
+
+        .warning-value {
+            color: var(--accent-yellow);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-green);
+            border-radius: 2px;
+            transition: width 1s ease;
+        }
+
+        /* INDICADORES ESTRATÉGICOS */
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .indicator-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .indicator-card:hover {
+            border-color: rgba(0, 255, 156, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .indicator-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 10px 0;
+        }
+
+        .indicator-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .indicator-status {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-healthy {
+            background: var(--primary-green);
+            box-shadow: 0 0 8px var(--primary-green);
+        }
+
+        .status-warning {
+            background: var(--accent-yellow);
+            box-shadow: 0 0 8px var(--accent-yellow);
+        }
+
+        .status-critical {
+            background: var(--alert-red);
+            box-shadow: 0 0 8px var(--alert-red);
+        }
+
+        /* MODAL DE ANÁLISE DETALHADA */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            height: 100%;
+            background: rgba(5, 10, 20, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 1000px;
+            margin: 40px auto;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            background: rgba(0, 255, 156, 0.05);
+            border-bottom: 1px solid var(--card-border);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 18px;
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            color: var(--alert-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 77, 77, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .modal-section {
+            background: rgba(20, 30, 40, 0.5);
+            border: 1px solid rgba(0, 255, 156, 0.1);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            color: var(--primary-green);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 156, 0.2);
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .data-label {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .data-value {
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+
+        .data-value.negative {
+            color: var(--alert-red);
+        }
+
+        .data-value.warning {
+            color: var(--accent-yellow);
+        }
+
+        /* NOTIFICAÇÕES */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .notification {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 255, 156, 0.2);
+            border-left: 4px solid var(--primary-green);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.error {
+            border-left-color: var(--alert-red);
+        }
+
+        .notification.warning {
+            border-left-color: var(--accent-yellow);
+        }
+
+        .notification.success {
+            border-left-color: var(--primary-green);
+        }
+
+        /* LOADING OVERLAY */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            height: 100%;
+            background: rgba(5, 10, 20, 0.95);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 2px solid transparent;
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* FOOTER */
+        .dashboard-footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            border-top: 1px solid rgba(0, 255, 156, 0.1);
+            margin-top: 30px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            body {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .grid-bg {
+                left: 0;
+                width: 100%;
+            }
+            
+            .modal,
+            .loading-overlay {
+                left: 0;
+                width: 100%;
+            }
+            
+            .dashboard-container {
+                padding: 15px;
+                max-width: 100%;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .period-info {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .charts-container,
+            .data-tables-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-card {
+                min-width: 100%;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1200px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 255, 156, 0.05);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 156, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 156, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Grid -->
+    <div class="grid-bg"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" style="font-family: 'Orbitron'; color: var(--primary-green); margin-top: 10px;">
+            ANALISANDO DADOS FINANCEIROS...
+        </div>
+    </div>
+
+    <!-- Notifications Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Modal de Análise Detalhada -->
+    <div class="modal" id="analysisModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-chart-network"></i>
+                    <span id="modalAnalysisTitle">ANÁLISE DETALHADA</span>
+                </h2>
+                <button class="modal-close" onclick="fecharModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalAnalysisBody">
+                <!-- Conteúdo será carregado dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Header Executivo -->
+        <div class="dashboard-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1>PATAGONIA FINANCE • DASHBOARD EXECUTIVO 360°</h1>
+                        <p class="subtitle">VISÃO 360° • ANÁLISE ESTRATÉGICA • CONTROLE FINANCEIRO</p>
+                    </div>
+                </div>
+                
+                <div class="period-info">
+                    <div class="filter-group">
+                        <input type="date" class="date-input" id="dataInicio">
+                        <span style="color: var(--text-secondary);">até</span>
+                        <input type="date" class="date-input" id="dataFim">
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn btn-primary" onclick="carregarDashboard360()">
+                            <i class="fas fa-sync-alt"></i> ATUALIZAR
+                        </button>
+                        <button class="btn btn-info" onclick="gerarRelatorioCompleto()">
+                            <i class="fas fa-file-pdf"></i> RELATÓRIO
+                        </button>
+                        <button class="btn btn-warning" onclick="exportarParaExcel()">
+                            <i class="fas fa-file-excel"></i> EXCEL
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas Financeiros -->
+        <div class="alertas-container" id="alertasContainer">
+            <div class="alerta-card info">
+                <div class="alerta-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div>
+                    <strong>CARREGANDO ANÁLISE FINANCEIRA 360°...</strong>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                        Analisando dados em tempo real
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs EXECUTIVOS PRINCIPAIS -->
+        <div class="kpi-grid">
+            <!-- Faturamento Total -->
+            <div class="kpi-card" onclick="abrirAnaliseDetalhada('faturamento')">
+                <div class="kpi-header">
+                    <div class="kpi-title">Receitas Totais</div>
+                    <div class="kpi-badge badge-success" id="badgeReceitas">SAUDÁVEL</div>
+                </div>
+                <div class="kpi-value" id="kpiReceitas">R$ 0,00</div>
+                <div class="kpi-comparison">
+                    <span class="comparison-value comparison-neutral" id="comparisonReceitas">—</span>
+                    <span style="color: var(--text-secondary); font-size: 11px;">inclui serviços e contratos</span>
+                </div>
+                <div class="kpi-insight" id="insightReceitas">Análise de receitas em andamento...</div>
+            </div>
+
+            <!-- Lucro Líquido -->
+            <div class="kpi-card" onclick="abrirAnaliseDetalhada('lucro')">
+                <div class="kpi-header">
+                    <div class="kpi-title">Lucro Líquido</div>
+                    <div class="kpi-badge badge-success" id="badgeLucro">POSITIVO</div>
+                </div>
+                <div class="kpi-value" id="kpiLucro">R$ 0,00</div>
+                <div class="kpi-comparison">
+                    <span style="color: var(--text-secondary); font-size: 11px;">margem: </span>
+                    <span class="comparison-value comparison-neutral" id="margemLucro">0%</span>
+                </div>
+                <div class="kpi-insight" id="insightLucro">Análise de rentabilidade...</div>
+            </div>
+
+            <!-- Despesas Totais -->
+            <div class="kpi-card" onclick="abrirAnaliseDetalhada('despesas')">
+                <div class="kpi-header">
+                    <div class="kpi-title">Despesas Totais</div>
+                    <div class="kpi-badge badge-warning" id="badgeDespesas">CONTROLAR</div>
+                </div>
+                <div class="kpi-value" id="kpiDespesas">R$ 0,00</div>
+                <div class="kpi-comparison">
+                    <span class="comparison-value comparison-neutral" id="comparisonDespesas">—</span>
+                    <span style="color: var(--text-secondary); font-size: 11px;">vs orçamento</span>
+                </div>
+                <div class="kpi-insight" id="insightDespesas">Análise de custos...</div>
+            </div>
+
+            <!-- Burn Rate -->
+            <div class="kpi-card" onclick="abrirAnaliseDetalhada('burnrate')">
+                <div class="kpi-header">
+                    <div class="kpi-title">Burn Rate Mensal</div>
+                    <div class="kpi-badge badge-success" id="badgeBurnrate">ESTÁVEL</div>
+                </div>
+                <div class="kpi-value" id="kpiBurnrate">R$ 0,00</div>
+                <div class="kpi-comparison">
+                    <span style="color: var(--text-secondary); font-size: 11px;">Runway: </span>
+                    <span class="comparison-value comparison-neutral" id="runwayFinanceiro">0 meses</span>
+                </div>
+                <div class="kpi-insight" id="insightBurnrate">Sustentabilidade financeira...</div>
+            </div>
+        </div>
+
+        <!-- GRÁFICOS ESTRATÉGICOS -->
+        <div class="charts-container">
+            <!-- Receitas vs Despesas com Tendência -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-line"></i>
+                        GASTOS TOTAIS POR MÊS • TENDÊNCIA
+                    </div>
+                    <div class="chart-controls">
+                        <button class="chart-btn active" onclick="changeChartType(this, 'line', 'gastosMes')">
+                            <i class="fas fa-chart-line"></i>
+                        </button>
+                        <button class="chart-btn" onclick="changeChartType(this, 'bar', 'gastosMes')">
+                            <i class="fas fa-chart-bar"></i>
+                        </button>
+                        <button class="chart-btn" onclick="exportarGrafico('gastosMes')">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartGastosMes"></canvas>
+                </div>
+            </div>
+
+            <!-- Composição de Custos -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
+                        COMPOSIÇÃO DE CUSTOS REAL
+                    </div>
+                    <div class="chart-controls">
+                        <button class="chart-btn active" onclick="changeChartType(this, 'doughnut', 'composicaoCustos')">
+                            <i class="fas fa-chart-pie"></i>
+                        </button>
+                        <button class="chart-btn" onclick="changeChartType(this, 'pie', 'composicaoCustos')">
+                            <i class="fas fa-circle"></i>
+                        </button>
+                        <button class="chart-btn" onclick="exportarGrafico('composicaoCustos')">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartComposicaoCustos"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELAS INTELIGENTES -->
+        <div class="data-tables-container">
+            <!-- Contratos com Análise de Rentabilidade -->
+            <div class="data-table">
+                <div class="table-header">
+                    <div class="chart-title">
+                        <i class="fas fa-file-contract"></i>
+                        CONTRATOS • ANÁLISE DE RENTABILIDADE
+                    </div>
+                    <button class="btn btn-secondary" onclick="verDetalhesContratos()">
+                        TODOS <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>CÓDIGO</th>
+                                <th>EMPRESA</th>
+                                <th>ORÇADO</th>
+                                <th>GASTO</th>
+                                <th>SALDO</th>
+                                <th>% UTIL.</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableContratos">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 30px;">
+                                    <i class="fas fa-spinner fa-spin" style="color: var(--primary-green);"></i>
+                                    <p style="margin-top: 10px; color: var(--text-secondary);">Carregando contratos...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TODOS OS GASTOS DETALHADOS -->
+            <div class="data-table">
+                <div class="table-header">
+                    <div class="chart-title">
+                        <i class="fas fa-list-ol"></i>
+                        GASTOS DETALHADOS (TOP 10)
+                    </div>
+                    <button class="btn btn-secondary" onclick="verTodosGastos()">
+                        VER TODOS <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>DESCRIÇÃO</th>
+                                <th>VALOR</th>
+                                <th>DATA</th>
+                                <th>CATEGORIA</th>
+                                <th>TIPO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableGastos">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 30px;">
+                                    <i class="fas fa-spinner fa-spin" style="color: var(--primary-green);"></i>
+                                    <p style="margin-top: 10px; color: var(--text-secondary);">Analisando gastos...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+<div class="data-tables-container">
+   <div class="data-table">
+    <div class="table-header">
+        <div class="chart-title">
+            <i class="fas fa-car"></i>
+            CUSTOS POR VEÍCULO (Últimos 3 meses)
+        </div>
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>VEÍCULO</th>
+                    <th>STATUS</th>
+                    <th>KM ATUAL</th>
+                    <th>CUSTO TOTAL</th>
+                    <th>CUSTO/KM</th>
+                    <th>SAÚDE</th>
+                    <th>MANUTENÇÃO</th>
+                </tr>
+            </thead>
+            <tbody id="tableVeiculos">
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 30px;">
+                        <i class="fas fa-spinner fa-spin" style="color: var(--primary-green);"></i>
+                        <p style="margin-top: 10px; color: var(--text-secondary);">Carregando dados de veículos...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="table-footer">
+        <div style="font-size: 11px; color: var(--text-muted);">
+            <i class="fas fa-info-circle"></i>
+            Clique em um veículo para ver detalhes completos
+        </div>
+        <div style="font-size: 10px; color: var(--text-secondary);">
+            Atualizado em: <span id="atualizacaoVeiculos">--:--:--</span>
+        </div>
+    </div>
+</div>
+
+            <!-- DESPESAS POR CATEGORIA REAL -->
+            <div class="data-table">
+                <div class="table-header">
+                    <div class="chart-title">
+                        <i class="fas fa-tags"></i>
+                        DESPESAS POR CATEGORIA REAL
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>CATEGORIA</th>
+                                <th>ORIGEM</th>
+                                <th>VALOR</th>
+                                <th>QTD</th>
+                                <th>% TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableCategorias">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 30px;">
+                                    <i class="fas fa-spinner fa-spin" style="color: var(--primary-green);"></i>
+                                    <p style="margin-top: 10px; color: var(--text-secondary);">Analisando categorias...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- INDICADORES ESTRATÉGICOS -->
+        <div class="indicators-grid">
+            <div class="indicator-card" onclick="abrirAnaliseDetalhada('dependencia')">
+                <div class="kpi-title">Dependência de Contratos</div>
+                <div class="indicator-value" id="indicadorDependencia">0%</div>
+                <div class="indicator-label">
+                    <span class="indicator-status status-healthy"></span>
+                    % da receita de contratos
+                </div>
+                <div class="kpi-insight">Quanto a receita depende de contratos ativos</div>
+            </div>
+
+            <div class="indicator-card" onclick="abrirAnaliseDetalhada('salarios')">
+                <div class="kpi-title">Peso de Salários</div>
+                <div class="indicator-value" id="indicadorSalarios">0%</div>
+                <div class="indicator-label">
+                    <span class="indicator-status status-warning"></span>
+                    % salários sobre custos
+                </div>
+                <div class="kpi-insight">Peso da folha de pagamento nos custos</div>
+            </div>
+
+            <div class="indicator-card" onclick="abrirAnaliseDetalhada('custo_contrato')">
+                <div class="kpi-title">Custo por Contrato</div>
+                <div class="indicator-value" id="indicadorCustoContrato">R$ 0,00</div>
+                <div class="indicator-label">
+                    <span class="indicator-status status-healthy"></span>
+                    Custo médio por contrato
+                </div>
+                <div class="kpi-insight">Média de gastos por contrato ativo</div>
+            </div>
+
+            <div class="indicator-card" onclick="abrirAnaliseDetalhada('custo_operacional')">
+                <div class="kpi-title">Custo Operacional</div>
+                <div class="indicator-value" id="indicadorCustoOperacional">R$ 0,00</div>
+                <div class="indicator-label">
+                    <span class="indicator-status status-critical"></span>
+                    Custo mensal por veículo
+                </div>
+                <div class="kpi-insight">Custo médio operacional por veículo</div>
+            </div>
+        </div>
+
+        <!-- FLUXO DE CAIXA E CONTAS A PAGAR/RECEBER -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-balance-scale"></i>
+                        FLUXO DE CAIXA • ENTRADAS VS SAÍDAS
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartFluxoCaixa"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        CONTAS A PAGAR • STATUS
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartContasPagar"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESUMO DETALHADO -->
+        <div class="data-tables-container">
+            <div class="data-table">
+                <div class="table-header">
+                    <div class="chart-title">
+                        <i class="fas fa-university"></i>
+                        RESUMO FINANCEIRO DETALHADO
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>INDICADOR</th>
+                                <th>VALOR</th>
+                                <th>META</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableResumo">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 30px;">
+                                    <i class="fas fa-spinner fa-spin" style="color: var(--primary-green);"></i>
+                                    <p style="margin-top: 10px; color: var(--text-secondary);">Calculando indicadores...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-bar"></i>
+                        PERFORMANCE E TENDÊNCIAS
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>INDICADOR</th>
+                                <th>VALOR</th>
+                                <th>TENDÊNCIA</th>
+                                <th>SAÚDE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablePerformance">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 30px;">
+                                    <i class="fas fa-spinner fa-spin" style="color: var(--primary-green);"></i>
+                                    <p style="margin-top: 10px; color: var(--text-secondary);">Analisando performance...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="dashboard-footer">
+            <p>
+                <span class="indicator-status status-healthy"></span>
+                SISTEMA ONLINE • DASHBOARD 360° • ÚLTIMA ATUALIZAÇÃO: <span id="lastUpdate">--:--:--</span>
+            </p>
+            <p style="margin-top: 5px; font-family: 'Orbitron'; font-size: 11px; color: var(--primary-green);">
+                PATAGONIA TOPOGRAFIA • FINANCEIRO 360° © 2025
+            </p>
+        </div>
+    </div>
+
+<script>
+// =====================================================
+// VARIÁVEIS GLOBAIS E CONSTANTES
+// =====================================================
+let charts = {};
+let dashboardData = null;
+const META_MARGEM = 20;
+const REFRESH_INTERVAL = 60000;
+
+// Configurações de gráfico
+const chartConfigs = {
+    gastosMes: { type: 'line' },
+    composicaoCustos: { type: 'doughnut' },
+    fluxoCaixa: { type: 'bar' },
+    contasPagar: { type: 'doughnut' },
+    custosVeiculos: { type: 'bar' }
+};
+
+// =====================================================
+// INICIALIZAÇÃO DO DASHBOARD
+// =====================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        const hoje = new Date();
+        const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+        
+        const dataInicio = document.getElementById('dataInicio');
+        const dataFim = document.getElementById('dataFim');
+        
+        if (dataInicio) dataInicio.value = primeiroDia.toISOString().split('T')[0];
+        if (dataFim) dataFim.value = ultimoDia.toISOString().split('T')[0];
+        
+        carregarDashboard360();
+        
+        setInterval(carregarDashboard360, REFRESH_INTERVAL);
+        
+        configurarAtalhosTeclado();
+    } catch (error) {
+        console.error('Erro na inicialização:', error);
+    }
+});
+
+// =====================================================
+// FUNÇÃO PRINCIPAL: CARREGAR DASHBOARD 360
+// =====================================================
+
+async function carregarDashboard360() {
+    try {
+        mostrarLoading(true);
+        
+        const dataInicio = document.getElementById('dataInicio')?.value;
+        const dataFim = document.getElementById('dataFim')?.value;
+        
+        let url = `/api/financeiro/360`;
+        const params = [];
+        
+        if (dataInicio) params.push(`inicio=${dataInicio}`);
+        if (dataFim) params.push(`fim=${dataFim}`);
+        
+        if (params.length > 0) {
+            url += `?${params.join('&')}`;
+        }
+        
+        console.log('Carregando dashboard de:', url);
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            const errorText = await response.text().catch(() => 'Erro desconhecido');
+            console.error('Erro na resposta:', errorText);
+            throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        // Verificar se é um erro
+        if (data.status === 'error' || data.erro) {
+            throw new Error(data.erro || data.message || 'Erro no servidor');
+        }
+        
+        console.log('Dados recebidos do backend:', data);
+        
+        // VALIDAÇÃO DOS DADOS RECEBIDOS
+        if (!data || typeof data !== 'object') {
+            throw new Error('Dados inválidos recebidos do servidor');
+        }
+        
+        // Processar estrutura do backend corrigido
+        dashboardData = data;
+        atualizarDashboardCompleto(data);
+        atualizarUltimaAtualizacao();
+        
+    } catch (error) {
+        console.error('Erro detalhado ao carregar dashboard 360:', error);
+        
+        let mensagemErro = 'Erro ao carregar dados do servidor';
+        if (error.message.includes('index out of range')) {
+            mensagemErro = 'Problema nos dados do servidor: índice fora do alcance.';
+        }
+        
+        mostrarNotificacao(`${mensagemErro}`, 'error');
+        
+        // Mostrar estado vazio no dashboard
+        const emptyData = criarEstruturaVazia();
+        atualizarDashboardCompleto(emptyData);
+    } finally {
+        mostrarLoading(false);
+    }
+}
+
+function criarEstruturaVazia() {
+    return {
+        alertas: [],
+        resumo_360: {
+            receitas_total: 0,
+            despesas_total: 0,
+            lucro: 0,
+            margem: 0,
+            saldo_caixa: 0,
+            valor_contratos: 0,
+            burn_rate: 0,
+            runway: 0,
+            custo_total_veiculos: 0,
+            percentual_custo_veiculos: 0
+        },
+        despesas_por_categoria: [],
+        gastos_mes_categoria: [],
+        contas_pagar: { 
+            por_categoria: [],
+            resumo: {
+                pendente: 0,
+                pago: 0,
+                vencidas: 0
+            }
+        },
+        contratos: [],
+        gastos_detalhados: [],
+        contas_detalhadas: [],
+        contratos_kpi: {
+            ativos: 0,
+            total_orcado: 0,
+            total_gasto_contrato: 0,
+            total_contas_pagar_contrato: 0,
+            total_gasto: 0,
+            total_saldo: 0,
+            media_gasto_contrato: 0
+        },
+        performance: {
+            saude_financeira: 'indisponivel',
+            veiculos: {
+                custo_medio_por_veiculo: 0,
+                km_total_percorrido: 0,
+                veiculo_mais_caro: 'Nenhum',
+                custo_veiculo_mais_caro: 0
+            }
+        },
+        total_despesas_categorias: 0,
+        top_categorias: [],
+        resumo_grupos: [],
+        veiculos: {
+            lista: [],
+            resumo: {
+                total_veiculos: 0,
+                total_ativos: 0,
+                total_custos: 0,
+                total_km_percorrido: 0,
+                custo_medio_por_km: 0,
+                custo_medio_por_veiculo: 0
+            },
+            distribuicao_custos: {
+                combustivel_percent: 0,
+                manutencao_percent: 0,
+                documentacao_percent: 0,
+                seguro_percent: 0
+            },
+            custos_detalhados: [],
+            abastecimentos: {
+                lista: [],
+                resumo: {
+                    total_abastecimentos: 0,
+                    total_litros: 0,
+                    total_valor: 0,
+                    consumo_medio: 0,
+                    preco_medio_litro: 0,
+                    custo_medio_abastecimento: 0
+                }
+            },
+            top_custos: [],
+            alertas: []
+        }
+    };
+}
+
+// =====================================================
+// ATUALIZAÇÃO DA INTERFACE COM DADOS COMPLETOS
+// =====================================================
+
+function atualizarDashboardCompleto(data) {
+    if (!data) {
+        mostrarNotificacao('Nenhum dado recebido do servidor', 'warning');
+        return;
+    }
+    
+    console.log('Atualizando dashboard com dados:', data);
+    
+    // VALIDAÇÃO COMPLETA E SEGURA DOS DADOS
+    const safeData = {
+        alertas: Array.isArray(data.alertas) ? data.alertas : [],
+        resumo_360: data.resumo_360 || {},
+        despesas_por_categoria: Array.isArray(data.despesas_por_categoria) ? data.despesas_por_categoria : [],
+        gastos_mes_categoria: Array.isArray(data.gastos_mes_categoria) ? data.gastos_mes_categoria : [],
+        contas_pagar: data.contas_pagar || { 
+            por_categoria: [],
+            resumo: {
+                pendente: 0,
+                pago: 0,
+                vencidas: 0
+            }
+        },
+        contratos: Array.isArray(data.contratos) ? data.contratos : [],
+        gastos_detalhados: Array.isArray(data.gastos_detalhados) ? data.gastos_detalhados : [],
+        contas_detalhadas: Array.isArray(data.contas_detalhadas) ? data.contas_detalhadas : [],
+        contratos_kpi: data.contratos_kpi || {},
+        performance: data.performance || {},
+        total_despesas_categorias: data.total_despesas_categorias || 0,
+        top_categorias: Array.isArray(data.top_categorias) ? data.top_categorias : [],
+        resumo_grupos: Array.isArray(data.resumo_grupos) ? data.resumo_grupos : [],
+        veiculos: data.veiculos || {
+            lista: [],
+            resumo: {},
+            distribuicao_custos: {},
+            custos_detalhados: [],
+            abastecimentos: { lista: [], resumo: {} },
+            top_custos: [],
+            alertas: []
+        }
+    };
+    
+    // Garantir que todos os valores numéricos existam
+    safeData.resumo_360.receitas_total = safeData.resumo_360.receitas_total || 0;
+    safeData.resumo_360.despesas_total = safeData.resumo_360.despesas_total || 0;
+    safeData.resumo_360.lucro = safeData.resumo_360.lucro || 0;
+    safeData.resumo_360.margem = safeData.resumo_360.margem || 0;
+    safeData.resumo_360.burn_rate = safeData.resumo_360.burn_rate || 0;
+    safeData.resumo_360.runway = safeData.resumo_360.runway || 0;
+    safeData.resumo_360.saldo_caixa = safeData.resumo_360.saldo_caixa || 0;
+    safeData.resumo_360.valor_contratos = safeData.resumo_360.valor_contratos || 0;
+    safeData.resumo_360.custo_total_veiculos = safeData.resumo_360.custo_total_veiculos || 0;
+    safeData.resumo_360.percentual_custo_veiculos = safeData.resumo_360.percentual_custo_veiculos || 0;
+    
+    // Atualizar performance se não existir
+    if (!safeData.performance.saude_financeira) {
+        const margem = safeData.resumo_360.margem || 0;
+        safeData.performance.saude_financeira = margem > 15 ? 'saudavel' : margem > 5 ? 'atencao' : 'critica';
+    }
+    
+    atualizarAlertas(safeData.alertas);
+    atualizarKPIs(safeData.resumo_360);
+    atualizarGraficosCompletos(safeData);
+    atualizarTabelasCompletas(safeData);
+    atualizarIndicadores(safeData.resumo_360, safeData.contratos_kpi, safeData.veiculos);
+}
+
+function atualizarAlertas(alertas) {
+    const container = document.getElementById('alertasContainer');
+    if (!container) return;
+    
+    if (!alertas || !Array.isArray(alertas) || alertas.length === 0) {
+        container.innerHTML = `
+            <div class="alerta-card info">
+                <div class="alerta-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <strong>SITUAÇÃO FINANCEIRA ESTÁVEL</strong>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                        Todos os indicadores dentro dos parâmetros normais
+                    </p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Limitar a 3 alertas
+    const alertasPrioritarios = alertas.slice(0, Math.min(alertas.length, 3));
+    
+    container.innerHTML = alertasPrioritarios.map(alerta => {
+        if (!alerta || typeof alerta !== 'object') return '';
+        
+        const icon = getAlertIcon(alerta.tipo, alerta.nivel);
+        const classe = alerta.nivel || 'info';
+        const tipoSeguro = (alerta.tipo || 'geral').replace(/'/g, "\\'").replace(/"/g, '\\"');
+        const veiculoInfo = alerta.veiculo ? ` | Veículo: ${alerta.veiculo}` : '';
+        
+        return `
+            <div class="alerta-card ${classe}" onclick="abrirAnaliseDetalhada('${tipoSeguro}')">
+                <div class="alerta-icon">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div>
+                    <strong>${alerta.mensagem || 'Alerta sem mensagem'}${veiculoInfo}</strong>
+                    ${alerta.acao ? `
+                        <p style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                            <i class="fas fa-lightbulb"></i> ${alerta.acao}
+                        </p>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function getAlertIcon(tipo, nivel) {
+    const icons = {
+        financeiro: { critico: 'exclamation-triangle', warning: 'chart-line', info: 'chart-line' },
+        caixa: { critico: 'money-bill-wave', warning: 'money-bill-wave', info: 'money-bill-wave' },
+        risco: { critico: 'exclamation-circle', warning: 'exclamation-circle', info: 'file-contract' },
+        pagamento: { critico: 'exclamation-triangle', warning: 'exclamation-triangle', info: 'credit-card' },
+        categoria: { critico: 'exclamation-triangle', warning: 'exclamation-triangle', info: 'tag' },
+        veiculo: { critico: 'car-crash', warning: 'car', info: 'car' },
+        manutencao: { critico: 'tools', warning: 'tools', info: 'tools' },
+        consumo: { critico: 'gas-pump', warning: 'gas-pump', info: 'gas-pump' }
+    };
+    
+    return icons[tipo]?.[nivel] || 'info-circle';
+}
+
+function atualizarKPIs(resumo) {
+    // Atualizar elementos com verificação de existência
+    const receitas = resumo.receitas_total || 0;
+    const lucro = resumo.lucro || 0;
+    const margem = resumo.margem || 0;
+    const despesas = resumo.despesas_total || 0;
+    const burnRate = resumo.burn_rate || 0;
+    const runway = resumo.runway || 0;
+    const custoVeiculos = resumo.custo_total_veiculos || 0;
+    
+    // Receitas
+    const kpiReceitas = document.getElementById('kpiReceitas');
+    const badgeReceitas = document.getElementById('badgeReceitas');
+    const insightReceitas = document.getElementById('insightReceitas');
+    
+    if (kpiReceitas) kpiReceitas.textContent = formatarMoeda(receitas);
+    if (badgeReceitas) {
+        const statusReceitas = receitas > 0 ? { classe: 'badge-success', texto: 'SAUDÁVEL' } : { classe: 'badge-danger', texto: 'ZERO' };
+        badgeReceitas.className = `kpi-badge ${statusReceitas.classe}`;
+        badgeReceitas.textContent = statusReceitas.texto;
+    }
+    if (insightReceitas) insightReceitas.textContent = `Total de receitas do período`;
+    
+    // Lucro
+    const kpiLucro = document.getElementById('kpiLucro');
+    const margemLucro = document.getElementById('margemLucro');
+    const badgeLucro = document.getElementById('badgeLucro');
+    const insightLucro = document.getElementById('insightLucro');
+    
+    if (kpiLucro) kpiLucro.textContent = formatarMoeda(lucro);
+    if (margemLucro) margemLucro.textContent = `${margem.toFixed(1)}%`;
+    if (badgeLucro) {
+        const statusLucro = getMargemStatus(margem);
+        badgeLucro.className = `kpi-badge ${statusLucro.classe}`;
+        badgeLucro.textContent = statusLucro.texto;
+    }
+    if (insightLucro) insightLucro.textContent = `Margem de lucro de ${margem.toFixed(1)}%`;
+    
+    // Despesas
+    const kpiDespesas = document.getElementById('kpiDespesas');
+    const badgeDespesas = document.getElementById('badgeDespesas');
+    const insightDespesas = document.getElementById('insightDespesas');
+    
+    if (kpiDespesas) kpiDespesas.textContent = formatarMoeda(despesas);
+    if (badgeDespesas) {
+        const statusDespesas = despesas > receitas * 0.8 ? { classe: 'badge-danger', texto: 'ALTO' } : { classe: 'badge-warning', texto: 'CONTROLAR' };
+        badgeDespesas.className = `kpi-badge ${statusDespesas.classe}`;
+        badgeDespesas.textContent = statusDespesas.texto;
+    }
+    if (insightDespesas) insightDespesas.textContent = `Total de despesas do período`;
+    
+    // Burn Rate
+    const kpiBurnrate = document.getElementById('kpiBurnrate');
+    const runwayFinanceiro = document.getElementById('runwayFinanceiro');
+    const badgeBurnrate = document.getElementById('badgeBurnrate');
+    const insightBurnrate = document.getElementById('insightBurnrate');
+    
+    if (kpiBurnrate) kpiBurnrate.textContent = formatarMoeda(burnRate);
+    if (runwayFinanceiro) runwayFinanceiro.textContent = `${runway.toFixed(1)} ${runway === 1 ? 'mês' : 'meses'}`;
+    if (badgeBurnrate) {
+        const statusRunway = getRunwayStatus(runway);
+        badgeBurnrate.className = `kpi-badge ${statusRunway.classe}`;
+        badgeBurnrate.textContent = statusRunway.texto;
+    }
+    if (insightBurnrate) insightBurnrate.textContent = `Sustentabilidade de ${runway.toFixed(1)} meses`;
+    
+    // Custos Veículos (novo KPI)
+    const kpiCustosVeiculos = document.getElementById('kpiCustosVeiculos');
+    const percentualVeiculos = document.getElementById('percentualVeiculos');
+    const badgeVeiculos = document.getElementById('badgeVeiculos');
+    const insightVeiculos = document.getElementById('insightVeiculos');
+    
+    if (kpiCustosVeiculos) kpiCustosVeiculos.textContent = formatarMoeda(custoVeiculos);
+    if (percentualVeiculos) percentualVeiculos.textContent = `${resumo.percentual_custo_veiculos?.toFixed(1) || 0}%`;
+    if (badgeVeiculos) {
+        const percentual = resumo.percentual_custo_veiculos || 0;
+        const statusVeiculos = percentual > 30 ? { classe: 'badge-danger', texto: 'ALTO' } : 
+                              percentual > 20 ? { classe: 'badge-warning', texto: 'MODERADO' } : 
+                              { classe: 'badge-success', texto: 'NORMAL' };
+        badgeVeiculos.className = `kpi-badge ${statusVeiculos.classe}`;
+        badgeVeiculos.textContent = statusVeiculos.texto;
+    }
+    if (insightVeiculos) insightVeiculos.textContent = `Custos com veículos: ${resumo.percentual_custo_veiculos?.toFixed(1) || 0}% das despesas`;
+}
+
+function getMargemStatus(margem) {
+    if (margem >= 20) return { classe: 'badge-success', texto: 'SAUDÁVEL' };
+    if (margem >= 10) return { classe: 'badge-warning', texto: 'ATENÇÃO' };
+    return { classe: 'badge-danger', texto: 'CRÍTICO' };
+}
+
+function getRunwayStatus(runway) {
+    if (runway >= 6) return { classe: 'badge-success', texto: 'SAUDÁVEL' };
+    if (runway >= 3) return { classe: 'badge-warning', texto: 'ATENÇÃO' };
+    return { classe: 'badge-danger', texto: 'CRÍTICO' };
+}
+
+function atualizarGraficosCompletos(data) {
+    // Destruir gráficos existentes
+    Object.values(charts).forEach(chart => {
+        if (chart && chart.destroy) {
+            try {
+                chart.destroy();
+            } catch (e) {
+                console.warn('Erro ao destruir gráfico:', e);
+            }
+        }
+    });
+    charts = {};
+    
+    try {
+        // Usar os novos dados do backend com categorias
+        renderizarGraficoGastosMes(data.gastos_mes_categoria || []);
+        renderizarGraficoComposicaoCustos(data.despesas_por_categoria || []);
+        renderizarGraficoFluxoCaixa(data.fluxo_caixa || {});
+        renderizarGraficoContasPagar(data.contas_pagar || {});
+        renderizarGraficoCustosVeiculos(data.veiculos || {});
+    } catch (error) {
+        console.error('Erro ao renderizar gráficos:', error);
+    }
+}
+
+function renderizarGraficoGastosMes(gastosMes) {
+    const canvas = document.getElementById('chartGastosMes');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Verificar se há dados válidos
+    if (!gastosMes || !Array.isArray(gastosMes) || gastosMes.length === 0) {
+        // Mostrar mensagem de "sem dados"
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.font = '14px "Exo 2"';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sem dados históricos disponíveis', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('Configure datas diferentes', canvas.width / 2, canvas.height / 2 + 20);
+        return;
+    }
+    
+    try {
+        // Usar os dados completos (não filtrar apenas últimos 12 meses)
+        const labels = gastosMes.map(g => {
+            if (g.mes_nome && g.ano) {
+                return `${g.mes_nome} ${g.ano}`.trim();
+            }
+            return g.mes || 'Mês';
+        });
+        
+        const valores = gastosMes.map(g => g.total || 0);
+        
+        charts.gastosMes = new Chart(ctx, {
+            type: chartConfigs.gastosMes.type,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Gastos Totais (R$)',
+                    data: valores,
+                    backgroundColor: 'rgba(0, 255, 156, 0.1)',
+                    borderColor: 'rgb(0, 255, 156)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: getChartOptions('line')
+        });
+    } catch (error) {
+        console.error('Erro ao criar gráfico de gastos mensais:', error);
+        // Mensagem de erro no canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255, 77, 77, 0.3)';
+        ctx.font = '14px "Exo 2"';
+        ctx.textAlign = 'center';
+        ctx.fillText('Erro ao renderizar gráfico', canvas.width / 2, canvas.height / 2);
+    }
+}
+
+function renderizarGraficoComposicaoCustos(despesasCategoria) {
+    const canvas = document.getElementById('chartComposicaoCustos');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    if (!despesasCategoria || !Array.isArray(despesasCategoria) || despesasCategoria.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.font = '14px "Exo 2"';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sem dados de categorias disponíveis', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('Configure datas diferentes', canvas.width / 2, canvas.height / 2 + 20);
+        return;
+    }
+    
+    try {
+        // Filtrar categorias com valor > 0
+        const categoriasComValor = despesasCategoria
+            .filter(c => c && c.total && c.total > 0);
+        
+        if (categoriasComValor.length === 0) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.font = '14px "Exo 2"';
+            ctx.textAlign = 'center';
+            ctx.fillText('Nenhuma categoria com gastos no período', canvas.width / 2, canvas.height / 2);
+            return;
+        }
+        
+        // Ordenar por valor e pegar todas as categorias (não limitar a 8)
+        const categoriasOrdenadas = categoriasComValor
+            .sort((a, b) => (b.total || 0) - (a.total || 0));
+        
+        const labels = categoriasOrdenadas.map(c => c.categoria || 'Sem categoria');
+        const valores = categoriasOrdenadas.map(c => c.total || 0);
+        const quantidades = categoriasOrdenadas.map(c => c.quantidade || 0);
+        
+        // Gerar cores dinamicamente baseadas nas categorias
+        const colors = gerarCoresCategoria(labels);
+        
+        charts.composicaoCustos = new Chart(ctx, {
+            type: chartConfigs.composicaoCustos.type,
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valores,
+                    backgroundColor: colors,
+                    borderColor: 'rgba(11, 20, 30, 0.8)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                ...getChartOptions('doughnut'),
+                plugins: {
+                    ...getChartOptions('doughnut').plugins,
+                    tooltip: {
+                        ...getChartOptions('doughnut').plugins.tooltip,
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0;
+                                const qtd = quantidades[context.dataIndex] || 0;
+                                return [
+                                    `${context.label}: ${formatarMoeda(context.raw)}`,
+                                    `${percentage}% do total`,
+                                    `${qtd} ${qtd === 1 ? 'lançamento' : 'lançamentos'}`
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao criar gráfico de composição de custos:', error);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255, 77, 77, 0.3)';
+        ctx.font = '14px "Exo 2"';
+        ctx.textAlign = 'center';
+        ctx.fillText('Erro ao renderizar gráfico', canvas.width / 2, canvas.height / 2);
+    }
+}
+
+function renderizarGraficoCustosVeiculos(veiculosData) {
+    const canvas = document.getElementById('chartCustosVeiculos');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    if (!veiculosData || !veiculosData.distribuicao_custos || 
+        Object.keys(veiculosData.distribuicao_custos).length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.font = '14px "Exo 2"';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sem dados de custos de veículos', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+    
+    try {
+        const distribuicao = veiculosData.distribuicao_custos;
+        const labels = ['Combustível', 'Manutenção', 'Documentação', 'Seguro', 'Outros'];
+        const valores = [
+            distribuicao.combustivel_percent || 0,
+            distribuicao.manutencao_percent || 0,
+            distribuicao.documentacao_percent || 0,
+            distribuicao.seguro_percent || 0,
+            100 - (distribuicao.combustivel_percent || 0) - (distribuicao.manutencao_percent || 0) - 
+            (distribuicao.documentacao_percent || 0) - (distribuicao.seguro_percent || 0)
+        ];
+        
+        charts.custosVeiculos = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valores,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',  // Vermelho - Combustível
+                        'rgba(54, 162, 235, 0.8)',   // Azul - Manutenção
+                        'rgba(255, 206, 86, 0.8)',   // Amarelo - Documentação
+                        'rgba(75, 192, 192, 0.8)',   // Verde - Seguro
+                        'rgba(153, 102, 255, 0.8)'   // Roxo - Outros
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 206, 86)',
+                        'rgb(75, 192, 192)',
+                        'rgb(153, 102, 255)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                ...getChartOptions('doughnut'),
+                plugins: {
+                    ...getChartOptions('doughnut').plugins,
+                    tooltip: {
+                        ...getChartOptions('doughnut').plugins.tooltip,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw.toFixed(1)}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao criar gráfico de custos de veículos:', error);
+    }
+}
+
+function gerarCoresCategoria(labels) {
+    const coresBase = [
+        'rgba(0, 255, 156, 0.8)',    // Verde
+        'rgba(163, 255, 18, 0.8)',   // Verde amarelado
+        'rgba(59, 130, 246, 0.8)',   // Azul
+        'rgba(147, 51, 234, 0.8)',   // Roxo
+        'rgba(251, 191, 36, 0.8)',   // Amarelo
+        'rgba(239, 68, 68, 0.8)',    // Vermelho
+        'rgba(16, 185, 129, 0.8)',   // Verde água
+        'rgba(139, 92, 246, 0.8)',   // Lilás
+        'rgba(245, 158, 11, 0.8)',   // Laranja
+        'rgba(6, 182, 212, 0.8)'     // Ciano
+    ];
+    
+    // Mapear cores por grupos de categorias
+    const gruposCores = {
+        'Alimentação': 'rgba(239, 68, 68, 0.8)',      // Vermelho
+        'Combustível': 'rgba(255, 99, 132, 0.8)',     // Vermelho claro
+        'Diárias': 'rgba(16, 185, 129, 0.8)',         // Verde água
+        'Hospedagem': 'rgba(139, 92, 246, 0.8)',      // Lilás
+        'Transporte': 'rgba(59, 130, 246, 0.8)',      // Azul
+        'Manutenção': 'rgba(54, 162, 235, 0.8)',      // Azul claro
+        'Salários': 'rgba(0, 255, 156, 0.8)',         // Verde
+        'EPIs': 'rgba(163, 255, 18, 0.8)',            // Verde amarelado
+        'Aluguel': 'rgba(147, 51, 234, 0.8)',         // Roxo
+        'Impostos': 'rgba(6, 182, 212, 0.8)',         // Ciano
+        'Veículos': 'rgba(255, 206, 86, 0.8)'         // Amarelo
+    };
+    
+    return labels.map((label, index) => {
+        // Verificar se há uma cor específica para este tipo de categoria
+        for (const [grupo, cor] of Object.entries(gruposCores)) {
+            if (label.includes(grupo)) {
+                return cor;
+            }
+        }
+        // Se não encontrar, usar uma cor da lista base
+        return coresBase[index % coresBase.length];
+    });
+}
+
+function renderizarGraficoFluxoCaixa(fluxoCaixa) {
+    const canvas = document.getElementById('chartFluxoCaixa');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    try {
+        charts.fluxoCaixa = new Chart(ctx, {
+            type: chartConfigs.fluxoCaixa.type,
+            data: {
+                labels: ['Entradas', 'Saídas', 'Saldo'],
+                datasets: [{
+                    label: 'Valor (R$)',
+                    data: [
+                        fluxoCaixa.entrada || 0,
+                        fluxoCaixa.saida || 0,
+                        fluxoCaixa.saldo || 0
+                    ],
+                    backgroundColor: [
+                        'rgba(0, 255, 156, 0.8)',
+                        'rgba(255, 77, 77, 0.8)',
+                        'rgba(59, 130, 246, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(0, 255, 156)',
+                        'rgb(255, 77, 77)',
+                        'rgb(59, 130, 246)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: getChartOptions('vertical')
+        });
+    } catch (error) {
+        console.error('Erro ao criar gráfico de fluxo de caixa:', error);
+    }
+}
+
+function renderizarGraficoContasPagar(contasPagar) {
+    const canvas = document.getElementById('chartContasPagar');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    try {
+        const data = [
+            contasPagar.resumo?.pendente || 0,
+            contasPagar.resumo?.pago || 0,
+            contasPagar.resumo?.vencidas || 0
+        ];
+        
+        charts.contasPagar = new Chart(ctx, {
+            type: chartConfigs.contasPagar.type,
+            data: {
+                labels: ['Pendente', 'Pago', 'Vencidas'],
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        'rgba(251, 191, 36, 0.8)',
+                        'rgba(0, 255, 156, 0.8)',
+                        'rgba(255, 77, 77, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(251, 191, 36)',
+                        'rgb(0, 255, 156)',
+                        'rgb(255, 77, 77)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: getChartOptions('doughnut')
+        });
+    } catch (error) {
+        console.error('Erro ao criar gráfico de contas a pagar:', error);
+    }
+}
+
+function getChartOptions(tipo) {
+    const baseOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    font: {
+                        family: "'Exo 2', sans-serif",
+                        size: 11
+                    }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(11, 20, 30, 0.95)',
+                titleColor: 'rgba(255, 255, 255, 0.9)',
+                bodyColor: 'rgba(255, 255, 255, 0.7)',
+                borderColor: 'rgba(0, 255, 156, 0.3)',
+                borderWidth: 1
+            }
+        }
+    };
+    
+    if (tipo === 'vertical') {
+        baseOptions.scales = {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.05)'
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    callback: function(value) {
+                        return formatarMoeda(value);
+                    }
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    font: {
+                        family: "'Exo 2', sans-serif",
+                        weight: '600'
+                    }
+                }
+            }
+        };
+    } else if (tipo === 'doughnut' || tipo === 'pie') {
+        baseOptions.plugins.tooltip.callbacks = {
+            label: function(context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0;
+                return `${context.label}: ${formatarMoeda(context.raw)} (${percentage}%)`;
+            }
+        };
+        if (tipo === 'doughnut') {
+            baseOptions.cutout = '60%';
+        }
+    } else if (tipo === 'line') {
+        baseOptions.scales = {
+            y: {
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.05)'
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    callback: function(value) {
+                        return formatarMoeda(value);
+                    }
+                }
+            },
+            x: {
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.05)'
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.7)'
+                }
+            }
+        };
+    }
+    
+    return baseOptions;
+}
+
+function atualizarTabelasCompletas(data) {
+    try {
+        atualizarTabelaContratos(data.contratos || []);
+        atualizarTabelaGastos(data.gastos_detalhados || []);
+        atualizarTabelaCategorias(data.despesas_por_categoria || [], data.total_despesas_categorias || 0);
+        atualizarTabelaResumo(data.resumo_360 || {}, data.contratos_kpi || {});
+        atualizarTabelaPerformance(data.performance || {});
+        atualizarTabelaVeiculos(data.veiculos || {});
+        atualizarTabelaTopVeiculos(data.veiculos?.top_custos || []);
+        atualizarTabelaAbastecimentos(data.veiculos?.abastecimentos?.lista || []);
+    } catch (error) {
+        console.error('Erro ao atualizar tabelas:', error);
+    }
+}
+
+function atualizarTabelaContratos(contratos) {
+    const tabela = document.getElementById('tableContratos');
+    if (!tabela) return;
+    
+    if (!contratos || !Array.isArray(contratos) || contratos.length === 0) {
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 30px;">
+                    <i class="fas fa-file-contract" style="color: var(--text-secondary);"></i>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Nenhum contrato no período</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    try {
+        // Filtrar apenas objetos válidos
+        const contratosOrdenados = [...contratos]
+            .filter(c => c && typeof c === 'object')
+            .sort((a, b) => (b.percent_utilizado || 0) - (a.percent_utilizado || 0))
+            .slice(0, Math.min(contratos.length, 5));
+        
+        if (contratosOrdenados.length === 0) {
+            tabela.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 30px;">
+                        Nenhum contrato válido para exibição
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tabela.innerHTML = contratosOrdenados.map(contrato => {
+            const percent = contrato.percent_utilizado || 0;
+            const status = contrato.situacao || 'saudavel';
+            const statusText = status === 'critico' ? 'ALTO' : status === 'atencao' ? 'MÉDIO' : 'BAIXO';
+            const statusClass = status === 'critico' ? 'danger' : status === 'atencao' ? 'warning' : 'success';
+            const contratoId = contrato.id || '';
+            
+            // Sanitizar ID
+            const contratoIdSafe = contratoId.toString().replace(/'/g, "\\'").replace(/"/g, '\\"');
+            
+            return `
+                <tr onclick="verDetalheContrato('${contratoIdSafe}')">
+                    <td>
+                        <strong>${contrato.codigo || 'N/A'}</strong>
+                    </td>
+                    <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">
+                        ${contrato.empresa || 'Sem empresa'}
+                    </td>
+                    <td class="value-cell">${formatarMoeda(contrato.valor_orcado || 0)}</td>
+                    <td class="value-cell">${formatarMoeda(contrato.gasto_total || contrato.gasto_acumulado || 0)}</td>
+                    <td class="value-cell">${formatarMoeda(contrato.saldo_disponivel || 0)}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="${percent > 80 ? 'negative-value' : 
+                                          percent > 60 ? 'warning-value' : 'value-cell'}">
+                                ${percent.toFixed(1)}%
+                            </span>
+                            <div class="progress-bar" style="flex: 1;">
+                                <div class="progress-fill" style="width: ${Math.min(percent, 100)}%; 
+                                    ${percent > 80 ? 'background: var(--alert-red);' : 
+                                     percent > 60 ? 'background: var(--accent-yellow);' : ''}"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="kpi-badge badge-${statusClass}">
+                            ${statusText}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao atualizar tabela de contratos:', error);
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 30px; color: var(--alert-red);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p style="margin-top: 10px;">Erro ao carregar contratos</p>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+function atualizarTabelaGastos(gastos) {
+    const tabela = document.getElementById('tableGastos');
+    if (!tabela) return;
+    
+    if (!gastos || !Array.isArray(gastos) || gastos.length === 0) {
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 30px;">
+                    <i class="fas fa-inbox" style="color: var(--text-secondary);"></i>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Nenhum gasto no período</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    try {
+        const gastosOrdenados = [...gastos]
+            .filter(g => g && typeof g === 'object')
+            .sort((a, b) => (b.valor || 0) - (a.valor || 0))
+            .slice(0, Math.min(gastos.length, 10));
+        
+        if (gastosOrdenados.length === 0) {
+            tabela.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 30px;">
+                        Nenhum gasto válido para exibição
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tabela.innerHTML = gastosOrdenados.map(gasto => {
+            let dataFormatada = 'N/A';
+            try {
+                if (gasto.data || gasto.vencimento) {
+                    const data = gasto.data || gasto.vencimento;
+                    dataFormatada = new Date(data).toLocaleDateString('pt-BR');
+                }
+            } catch (e) {
+                console.warn('Erro ao formatar data:', e);
+            }
+            
+            // Usar categoria REAL do banco de dados
+            const categoriaReal = gasto.categoria || 'Não categorizado';
+            const fornecedor = gasto.fornecedor || '';
+            const descricao = gasto.descricao || 'Sem descrição';
+            const tipo = gasto.tipo || 'conta_pagar';
+            
+            return `
+                <tr>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" 
+                        title="${fornecedor ? fornecedor + ' - ' : ''}${descricao}">
+                        ${fornecedor ? `<strong>${fornecedor}:</strong> ` : ''}${descricao}
+                    </td>
+                    <td class="value-cell">${formatarMoeda(gasto.valor || 0)}</td>
+                    <td>${dataFormatada}</td>
+                    <td>
+                        <span class="kpi-badge ${categoriaReal === 'Não categorizado' ? 'badge-info' : 'badge-warning'}">
+                            ${categoriaReal}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="kpi-badge ${tipo === 'gasto_contrato' ? 'badge-info' : 'badge-warning'}">
+                            ${tipo === 'gasto_contrato' ? 'CONTRATO' : 'CONTA'}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao atualizar tabela de gastos:', error);
+    }
+}
+
+function atualizarTabelaCategorias(despesasCategoria, totalDespesas) {
+    const tabela = document.getElementById('tableCategorias');
+    if (!tabela) return;
+    
+    if (!despesasCategoria || !Array.isArray(despesasCategoria) || despesasCategoria.length === 0) {
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 30px;">
+                    <i class="fas fa-tags" style="color: var(--text-secondary);"></i>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Sem categorias no período</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    try {
+        // Filtrar categorias com valor > 0
+        const categoriasValidas = despesasCategoria
+            .filter(c => c && c.total && c.total > 0)
+            .sort((a, b) => (b.total || 0) - (a.total || 0))
+            .slice(0, 8); // Limitar a 8 para não sobrecarregar a tabela
+        
+        if (categoriasValidas.length === 0) {
+            tabela.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 30px;">
+                        Nenhuma categoria com gastos no período
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tabela.innerHTML = categoriasValidas.map(categoria => {
+            const percent = totalDespesas > 0 ? ((categoria.total || 0) / totalDespesas * 100).toFixed(1) : 0;
+            const pendentePercent = categoria.total > 0 ? ((categoria.pendente || 0) / categoria.total * 100).toFixed(1) : 0;
+            const pagoPercent = categoria.total > 0 ? ((categoria.pago || 0) / categoria.total * 100).toFixed(1) : 0;
+            
+            // Determinar origem (contas_pagar ou gastos_contrato)
+            let origem = 'DESPESA';
+            if (categoria.qtd_pendente > 0 || categoria.qtd_pago > 0) {
+                origem = 'CONTA';
+            }
+            
+            return `
+                <tr>
+                    <td>
+                        <strong>${categoria.categoria || 'Não categorizado'}</strong>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                            ${categoria.quantidade || 0} ${categoria.quantidade === 1 ? 'lançamento' : 'lançamentos'}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="kpi-badge ${origem === 'CONTA' ? 'badge-warning' : 'badge-info'}">
+                            ${origem}
+                        </span>
+                    </td>
+                    <td class="value-cell">${formatarMoeda(categoria.total || 0)}</td>
+                    <td>${categoria.quantidade || 0}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span>${percent}%</span>
+                            <div class="progress-bar" style="flex: 1;">
+                                <div class="progress-fill" style="width: ${Math.min(percent, 100)}%;"></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao atualizar tabela de categorias:', error);
+    }
+}
+
+function atualizarTabelaVeiculos(veiculosData) {
+    const tabela = document.getElementById('tableVeiculos');
+    if (!tabela) return;
+    
+    const veiculos = veiculosData.lista || [];
+    
+    if (!veiculos || !Array.isArray(veiculos) || veiculos.length === 0) {
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 30px;">
+                    <i class="fas fa-car" style="color: var(--text-secondary);"></i>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">
+                        Sem dados de veículos no período
+                    </p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    try {
+        tabela.innerHTML = veiculos.map(veiculo => {
+            const custos = veiculo.custos || {};
+            const estatisticas = veiculo.estatisticas || {};
+            const indicadores = veiculo.indicadores || {};
+            
+            return `
+                <tr onclick="verDetalheVeiculo('${veiculo.id}')" style="cursor: pointer;">
+                    <td>
+                        <strong>${veiculo.placa || 'N/A'}</strong>
+                        <div style="font-size: 11px; color: var(--text-muted);">
+                            ${veiculo.marca || ''} ${veiculo.modelo || ''}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="kpi-badge ${veiculo.status === 'ativo' ? 'badge-success' : 'badge-warning'}">
+                            ${veiculo.status || 'DESCONHECIDO'}
+                        </span>
+                    </td>
+                    <td class="value-cell">${veiculo.km_atual ? veiculo.km_atual.toLocaleString('pt-BR') : 'N/A'}</td>
+                    <td class="value-cell">${formatarMoeda(custos.total || 0)}</td>
+                    <td class="value-cell">${formatarMoeda(estatisticas.custo_por_km || 0)}</td>
+                    <td>
+                        <span class="kpi-badge ${indicadores.saude === 'boa' ? 'badge-success' : 
+                                                indicadores.saude === 'atencao' ? 'badge-warning' : 'badge-danger'}">
+                            ${indicadores.saude ? indicadores.saude.toUpperCase() : 'N/A'}
+                        </span>
+                    </td>
+                    <td>
+                        ${indicadores.manutencao_pendente ? 
+                            '<span class="kpi-badge badge-danger">PENDENTE</span>' : 
+                            '<span class="kpi-badge badge-success">OK</span>'}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        // Adicionar total
+        const resumo = veiculosData.resumo || {};
+        tabela.innerHTML += `
+            <tr style="background: rgba(0, 255, 156, 0.05);">
+                <td colspan="3" style="text-align: right; font-weight: bold; color: var(--primary-green);">
+                    TOTAL (${veiculos.length} veículos):
+                </td>
+                <td class="value-cell" style="font-weight: bold;">${formatarMoeda(resumo.total_custos || 0)}</td>
+                <td class="value-cell" style="font-weight: bold;">${formatarMoeda(resumo.custo_medio_por_km || 0)}/km</td>
+                <td colspan="2"></td>
+            </tr>
+        `;
+        
+    } catch (error) {
+        console.error('Erro ao atualizar tabela de veículos:', error);
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 30px; color: var(--alert-red);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p style="margin-top: 10px;">Erro ao carregar dados de veículos</p>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+function atualizarTabelaTopVeiculos(topVeiculos) {
+    const tabela = document.getElementById('tableTopVeiculos');
+    if (!tabela) return;
+    
+    if (!topVeiculos || !Array.isArray(topVeiculos) || topVeiculos.length === 0) {
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 20px;">
+                    <i class="fas fa-car" style="color: var(--text-secondary);"></i>
+                    <p style="margin-top: 10px; color: var(--text-secondary); font-size: 12px;">
+                        Sem dados de veículos com maior custo
+                    </p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    try {
+        tabela.innerHTML = topVeiculos.map((veiculo, index) => {
+            const posicao = index + 1;
+            const posicaoIcon = posicao === 1 ? '🥇' : posicao === 2 ? '🥈' : posicao === 3 ? '🥉' : `${posicao}º`;
+            
+            return `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px;">${posicaoIcon}</span>
+                            <strong>${veiculo.placa || 'N/A'}</strong>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-muted);">
+                            ${veiculo.modelo || ''}
+                        </div>
+                    </td>
+                    <td class="value-cell">${formatarMoeda(veiculo.total_custos || 0)}</td>
+                    <td class="value-cell">${formatarMoeda(veiculo.custo_por_km || 0)}/km</td>
+                    <td>
+                        <span class="kpi-badge ${veiculo.indicador_saude === 'boa' ? 'badge-success' : 
+                                                veiculo.indicador_saude === 'atencao' ? 'badge-warning' : 'badge-danger'}">
+                            ${veiculo.indicador_saude ? veiculo.indicador_saude.toUpperCase() : 'N/A'}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao atualizar tabela de top veículos:', error);
+    }
+}
+
+function atualizarTabelaAbastecimentos(abastecimentos) {
+    const tabela = document.getElementById('tableAbastecimentos');
+    if (!tabela) return;
+    
+    if (!abastecimentos || !Array.isArray(abastecimentos) || abastecimentos.length === 0) {
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 20px;">
+                    <i class="fas fa-gas-pump" style="color: var(--text-secondary);"></i>
+                    <p style="margin-top: 10px; color: var(--text-secondary); font-size: 12px;">
+                        Sem dados de abastecimentos recentes
+                    </p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    try {
+        tabela.innerHTML = abastecimentos.map(abastecimento => {
+            const dataFormatada = abastecimento.data ? 
+                new Date(abastecimento.data).toLocaleDateString('pt-BR') : 'N/A';
+            
+            return `
+                <tr>
+                    <td>
+                        <strong>${abastecimento.placa || 'N/A'}</strong>
+                    </td>
+                    <td>${dataFormatada}</td>
+                    <td class="value-cell">${abastecimento.litros ? abastecimento.litros.toFixed(2) : '0.00'}L</td>
+                    <td class="value-cell">${formatarMoeda(abastecimento.valor_total || 0)}</td>
+                    <td class="value-cell">
+                        ${abastecimento.preco_litro ? `R$ ${abastecimento.preco_litro.toFixed(3)}` : 'N/A'}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao atualizar tabela de abastecimentos:', error);
+    }
+}
+
+function atualizarTabelaResumo(resumo, kpi) {
+    const tabela = document.getElementById('tableResumo');
+    if (!tabela) return;
+    
+    try {
+        const indicadores = [
+            { 
+                label: 'Receitas Totais', 
+                valor: resumo.receitas_total || 0, 
+                meta: 'Crescente', 
+                tipo: 'receita'
+            },
+            { 
+                label: 'Despesas Totais', 
+                valor: resumo.despesas_total || 0, 
+                meta: 'Controlada', 
+                tipo: 'despesa'
+            },
+            { 
+                label: 'Lucro Líquido', 
+                valor: resumo.lucro || 0, 
+                meta: 'Positivo', 
+                tipo: 'lucro'
+            },
+            { 
+                label: 'Margem de Lucro', 
+                valor: resumo.margem || 0, 
+                meta: '≥ 20%', 
+                tipo: 'percent'
+            },
+            { 
+                label: 'Contratos Ativos', 
+                valor: kpi.ativos || 0, 
+                meta: '≥ 3', 
+                tipo: 'numero'
+            },
+            { 
+                label: 'Saldo de Contratos', 
+                valor: kpi.total_saldo || 0, 
+                meta: 'Positivo', 
+                tipo: 'valor'
+            },
+            { 
+                label: 'Custo com Veículos', 
+                valor: resumo.custo_total_veiculos || 0, 
+                meta: '≤ 30%', 
+                tipo: 'percent_veiculos'
+            }
+        ];
+        
+        tabela.innerHTML = indicadores.map(ind => {
+            let valorFormatado = ind.valor;
+            let status = 'info';
+            
+            if (ind.tipo === 'percent') {
+                valorFormatado = `${(ind.valor).toFixed(1)}%`;
+                status = (ind.valor) >= 20 ? 'success' : (ind.valor) >= 10 ? 'warning' : 'danger';
+            } else if (ind.tipo === 'percent_veiculos') {
+                valorFormatado = `${(ind.valor / resumo.despesas_total * 100).toFixed(1)}%`;
+                status = (ind.valor / resumo.despesas_total * 100) <= 30 ? 'success' : 
+                        (ind.valor / resumo.despesas_total * 100) <= 40 ? 'warning' : 'danger';
+            } else if (ind.tipo === 'numero') {
+                valorFormatado = ind.valor;
+                status = (ind.valor) >= 3 ? 'success' : (ind.valor) >= 2 ? 'warning' : 'danger';
+            } else if (ind.tipo === 'lucro') {
+                valorFormatado = formatarMoeda(ind.valor);
+                status = (ind.valor) > 0 ? 'success' : 'danger';
+            } else if (ind.tipo === 'valor') {
+                valorFormatado = formatarMoeda(ind.valor);
+                status = (ind.valor) > 0 ? 'success' : 'danger';
+            } else {
+                valorFormatado = formatarMoeda(ind.valor);
+                status = 'info';
+            }
+            
+            return `
+                <tr>
+                    <td>${ind.label}</td>
+                    <td class="value-cell">${valorFormatado}</td>
+                    <td>${ind.meta}</td>
+                    <td>
+                        <span class="kpi-badge badge-${status}">
+                            ${status === 'success' ? 'OK' : status === 'warning' ? 'ATENÇÃO' : 'CRÍTICO'}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao atualizar tabela de resumo:', error);
+    }
+}
+
+function atualizarTabelaPerformance(performance) {
+    const tabela = document.getElementById('tablePerformance');
+    if (!tabela) return;
+    
+    try {
+        const veiculos = performance.veiculos || {};
+        
+        const indicadores = [
+            { 
+                label: 'Saúde Financeira', 
+                valor: performance.saude_financeira || '', 
+                tendencia: '—' 
+            },
+            { 
+                label: 'Eficiência Operacional', 
+                valor: performance.eficiencia_operacional || 0, 
+                tendencia: 'percent' 
+            },
+            { 
+                label: 'Custo Médio por Veículo', 
+                valor: veiculos.custo_medio_por_veiculo || 0, 
+                tendencia: 'valor' 
+            },
+            { 
+                label: 'KM Total Percorrido', 
+                valor: veiculos.km_total_percorrido || 0, 
+                tendencia: 'km' 
+            }
+        ];
+        
+        tabela.innerHTML = indicadores.map(ind => {
+            let valorFormatado = ind.valor;
+            let status = 'info';
+            let tendenciaText = ind.tendencia;
+            
+            if (ind.label === 'Saúde Financeira') {
+                status = ind.valor === 'saudavel' ? 'success' : ind.valor === 'atencao' ? 'warning' : 'danger';
+                valorFormatado = ind.valor === 'saudavel' ? 'SAUDÁVEL' : 
+                               ind.valor === 'atencao' ? 'ATENÇÃO' : 'CRÍTICA';
+                tendenciaText = '—';
+            } else if (ind.label === 'Eficiência Operacional') {
+                valorFormatado = `${(ind.valor || 0).toFixed(1)}%`;
+                status = (ind.valor || 0) > 100 ? 'success' : (ind.valor || 0) > 80 ? 'warning' : 'danger';
+                tendenciaText = (ind.valor || 0) > 100 ? 'ALTA' : (ind.valor || 0) > 80 ? 'MÉDIA' : 'BAIXA';
+            } else if (ind.label === 'Custo Médio por Veículo') {
+                valorFormatado = formatarMoeda(ind.valor);
+                tendenciaText = ind.valor > 5000 ? 'ALTO' : ind.valor > 3000 ? 'MÉDIO' : 'BAIXO';
+                status = ind.valor > 5000 ? 'warning' : 'success';
+            } else if (ind.label === 'KM Total Percorrido') {
+                valorFormatado = ind.valor.toLocaleString('pt-BR') + ' km';
+                tendenciaText = ind.valor > 10000 ? 'ALTO' : ind.valor > 5000 ? 'MÉDIO' : 'BAIXO';
+                status = ind.valor > 10000 ? 'success' : ind.valor > 5000 ? 'warning' : 'info';
+            }
+            
+            return `
+                <tr>
+                    <td>${ind.label}</td>
+                    <td class="value-cell">${valorFormatado}</td>
+                    <td>${tendenciaText}</td>
+                    <td>
+                        <span class="kpi-badge badge-${status}">
+                            ${status === 'success' ? 'BOA' : status === 'warning' ? 'MÉDIA' : 'BAIXA'}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao atualizar tabela de performance:', error);
+    }
+}
+
+function atualizarIndicadores(resumo, kpi, veiculosData) {
+    // Atualizar indicadores
+    const indicadorDependencia = document.getElementById('indicadorDependencia');
+    const indicadorSalarios = document.getElementById('indicadorSalarios');
+    const indicadorCustoContrato = document.getElementById('indicadorCustoContrato');
+    const indicadorCustoOperacional = document.getElementById('indicadorCustoOperacional');
+    
+    if (indicadorDependencia) {
+        // Dependência de contratos = valor_contratos / receitas_total * 100
+        const dependencia = resumo.valor_contratos > 0 && resumo.receitas_total > 0 ? 
+            (resumo.valor_contratos / resumo.receitas_total * 100) : 0;
+        indicadorDependencia.textContent = `${dependencia.toFixed(1)}%`;
+    }
+    
+    if (indicadorSalarios) {
+        // Peso de salários (não temos dados específicos, usar 30% como placeholder)
+        indicadorSalarios.textContent = `30%`;
+    }
+    
+    if (indicadorCustoContrato) {
+        indicadorCustoContrato.textContent = formatarMoeda(kpi.media_gasto_contrato || 0);
+    }
+    
+    if (indicadorCustoOperacional) {
+        // Custo operacional por veículo
+        const custoPorVeiculo = veiculosData.resumo?.custo_medio_por_veiculo || 0;
+        indicadorCustoOperacional.textContent = formatarMoeda(custoPorVeiculo);
+    }
+    
+    // Atualizar status dos indicadores
+    const statusDependencia = document.querySelector('#indicadorDependencia')?.parentElement?.querySelector('.indicator-status');
+    if (statusDependencia) {
+        const dependencia = parseFloat(indicadorDependencia?.textContent || '0');
+        statusDependencia.className = 'indicator-status ' + 
+            (dependencia > 80 ? 'status-critical' : dependencia > 60 ? 'status-warning' : 'status-healthy');
+    }
+    
+    const statusSalarios = document.querySelector('#indicadorSalarios')?.parentElement?.querySelector('.indicator-status');
+    if (statusSalarios) {
+        const salarios = parseFloat(indicadorSalarios?.textContent || '0');
+        statusSalarios.className = 'indicator-status ' + 
+            (salarios > 40 ? 'status-critical' : salarios > 30 ? 'status-warning' : 'status-healthy');
+    }
+    
+    // Novo indicador para custo de veículos
+    const indicadorVeiculos = document.getElementById('indicadorVeiculos');
+    if (indicadorVeiculos) {
+        const percentualVeiculos = resumo.percentual_custo_veiculos || 0;
+        indicadorVeiculos.textContent = `${percentualVeiculos.toFixed(1)}%`;
+        
+        const statusVeiculos = document.querySelector('#indicadorVeiculos')?.parentElement?.querySelector('.indicator-status');
+        if (statusVeiculos) {
+            statusVeiculos.className = 'indicator-status ' + 
+                (percentualVeiculos > 30 ? 'status-critical' : percentualVeiculos > 20 ? 'status-warning' : 'status-healthy');
+        }
+    }
+}
+
+function atualizarUltimaAtualizacao() {
+    const lastUpdate = document.getElementById('lastUpdate');
+    if (lastUpdate) {
+        const now = new Date();
+        lastUpdate.textContent = now.toLocaleTimeString('pt-BR');
+    }
+}
+
+// =====================================================
+// FUNÇÕES DE ANÁLISE DETALHADA (MODAIS)
+// =====================================================
+
+function abrirAnaliseDetalhada(tipo) {
+    console.log('Abrindo análise detalhada:', tipo);
+    
+    if (!dashboardData) {
+        mostrarNotificacao('Nenhum dado disponível para análise', 'warning');
+        return;
+    }
+    
+    const modal = document.getElementById('analysisModal');
+    const title = document.getElementById('modalAnalysisTitle');
+    const body = document.getElementById('modalAnalysisBody');
+    
+    if (!modal || !title || !body) {
+        console.error('Elementos do modal não encontrados');
+        mostrarNotificacao('Erro ao abrir análise', 'error');
+        return;
+    }
+    
+    let conteudo = '';
+    let titulo = '';
+    
+    switch(tipo) {
+        case 'faturamento':
+            titulo = 'ANÁLISE DE FATURAMENTO';
+            conteudo = gerarConteudoFaturamento(dashboardData);
+            break;
+        case 'lucro':
+            titulo = 'ANÁLISE DE LUCRO E RENTABILIDADE';
+            conteudo = gerarConteudoLucro(dashboardData);
+            break;
+        case 'despesas':
+            titulo = 'ANÁLISE DE DESPESAS E CUSTOS';
+            conteudo = gerarConteudoDespesas(dashboardData);
+            break;
+        case 'burnrate':
+            titulo = 'ANÁLISE DE BURN RATE E RUNWAY';
+            conteudo = gerarConteudoBurnRate(dashboardData);
+            break;
+        case 'dependencia':
+            titulo = 'ANÁLISE DE DEPENDÊNCIA DE CONTRATOS';
+            conteudo = gerarConteudoDependencia(dashboardData);
+            break;
+        case 'salarios':
+            titulo = 'ANÁLISE DE FOLHA DE PAGAMENTO';
+            conteudo = gerarConteudoSalarios(dashboardData);
+            break;
+        case 'custo_contrato':
+            titulo = 'ANÁLISE DE CUSTO POR CONTRATO';
+            conteudo = gerarConteudoCustoContrato(dashboardData);
+            break;
+        case 'custo_operacional':
+            titulo = 'ANÁLISE DE CUSTOS OPERACIONAIS';
+            conteudo = gerarConteudoCustoOperacional(dashboardData);
+            break;
+        case 'veiculos':
+            titulo = 'ANÁLISE DE CUSTOS COM VEÍCULOS';
+            conteudo = gerarConteudoVeiculos(dashboardData);
+            break;
+        default:
+            titulo = 'ANÁLISE FINANCEIRA 360° COMPLETA';
+            conteudo = gerarConteudoGeral(dashboardData);
+    }
+    
+    title.textContent = titulo;
+    body.innerHTML = conteudo;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Adicionar evento para fechar modal ao clicar fora
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            fecharModal();
+        }
+    });
+}
+
+function gerarConteudoFaturamento(data) {
+    const resumo = data.resumo_360 || {};
+    const fluxoCaixa = data.fluxo_caixa || {};
+    
+    return `
+        <div class="modal-grid">
+            <div class="modal-section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    VISÃO GERAL DO FATURAMENTO
+                </h3>
+                <div class="data-row">
+                    <span class="data-label">Receitas Totais:</span>
+                    <span class="data-value">${formatarMoeda(resumo.receitas_total || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Entrada de Caixa:</span>
+                    <span class="data-value">${formatarMoeda(fluxoCaixa.entrada || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Saldo de Caixa:</span>
+                    <span class="data-value">${formatarMoeda(resumo.saldo_caixa || 0)}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function gerarConteudoLucro(data) {
+    const resumo = data.resumo_360 || {};
+    const margem = resumo.margem || 0;
+    
+    return `
+        <div class="modal-grid">
+            <div class="modal-section">
+                <h3 class="section-title">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    DESEMPENHO DO LUCRO
+                </h3>
+                <div class="data-row">
+                    <span class="data-label">Lucro Líquido:</span>
+                    <span class="data-value ${(resumo.lucro || 0) > 0 ? '' : 'negative'}">
+                        ${formatarMoeda(resumo.lucro || 0)}
+                    </span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Margem de Lucro:</span>
+                    <span class="data-value">
+                        ${margem.toFixed(1)}%
+                    </span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Meta de Margem:</span>
+                    <span class="data-value">${META_MARGEM}%</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Variação vs Meta:</span>
+                    <span class="data-value ${margem >= META_MARGEM ? '' : 'negative'}">
+                        ${(margem - META_MARGEM).toFixed(1)}%
+                    </span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function gerarConteudoDespesas(data) {
+    const resumo = data.resumo_360 || {};
+    const despesasCategoria = data.despesas_por_categoria || [];
+    
+    const topCategorias = despesasCategoria
+        .filter(c => c.total > 0)
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 5);
+    
+    return `
+        <div class="modal-grid">
+            <div class="modal-section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-pie"></i>
+                    ANÁLISE DE DESPESAS
+                </h3>
+                <div class="data-row">
+                    <span class="data-label">Despesas Totais:</span>
+                    <span class="data-value">${formatarMoeda(resumo.despesas_total || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Principais Categorias:</span>
+                    <span class="data-value"></span>
+                </div>
+                ${topCategorias.map(cat => `
+                    <div class="data-row">
+                        <span class="data-label">• ${cat.categoria || 'Não categorizado'}:</span>
+                        <span class="data-value">${formatarMoeda(cat.total || 0)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function gerarConteudoBurnRate(data) {
+    const resumo = data.resumo_360 || {};
+    
+    return `
+        <div class="modal-grid">
+            <div class="modal-section">
+                <h3 class="section-title">
+                    <i class="fas fa-fire"></i>
+                    ANÁLISE DE SUSTENTABILIDADE
+                </h3>
+                <div class="data-row">
+                    <span class="data-label">Burn Rate:</span>
+                    <span class="data-value">${formatarMoeda(resumo.burn_rate || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Runway:</span>
+                    <span class="data-value">${(resumo.runway || 0).toFixed(1)} meses</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Status:</span>
+                    <span class="data-value ${(resumo.runway || 0) >= 6 ? '' : (resumo.runway || 0) >= 3 ? 'warning-value' : 'negative-value'}">
+                        ${(resumo.runway || 0) >= 6 ? 'SAUDÁVEL' : (resumo.runway || 0) >= 3 ? 'ATENÇÃO' : 'CRÍTICO'}
+                </span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function gerarConteudoVeiculos(data) {
+    const veiculosData = data.veiculos || {};
+    const resumo = veiculosData.resumo || {};
+    const distribuicao = veiculosData.distribuicao_custos || {};
+    
+    return `
+        <div class="modal-grid">
+            <div class="modal-section">
+                <h3 class="section-title">
+                    <i class="fas fa-car"></i>
+                    ANÁLISE DE CUSTOS COM VEÍCULOS
+                </h3>
+                <div class="data-row">
+                    <span class="data-label">Total de Veículos:</span>
+                    <span class="data-value">${veiculosData.lista?.length || 0}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Veículos Ativos:</span>
+                    <span class="data-value">${resumo.total_ativos || 0}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Custos Totais:</span>
+                    <span class="data-value">${formatarMoeda(resumo.total_custos || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">KM Total Percorrido:</span>
+                    <span class="data-value">${resumo.total_km_percorrido?.toLocaleString('pt-BR') || 0} km</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Custo Médio por KM:</span>
+                    <span class="data-value">${formatarMoeda(resumo.custo_medio_por_km || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Distribuição de Custos:</span>
+                    <span class="data-value"></span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">• Combustível:</span>
+                    <span class="data-value">${distribuicao.combustivel_percent?.toFixed(1) || 0}%</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">• Manutenção:</span>
+                    <span class="data-value">${distribuicao.manutencao_percent?.toFixed(1) || 0}%</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">• Documentação:</span>
+                    <span class="data-value">${distribuicao.documentacao_percent?.toFixed(1) || 0}%</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">• Seguro:</span>
+                    <span class="data-value">${distribuicao.seguro_percent?.toFixed(1) || 0}%</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function gerarConteudoGeral(data) {
+    const resumo = data.resumo_360 || {};
+    const kpi = data.contratos_kpi || {};
+    const veiculosData = data.veiculos || {};
+    
+    return `
+        <div class="modal-grid">
+            <div class="modal-section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-network"></i>
+                    VISÃO GERAL 360°
+                </h3>
+                <div class="data-row">
+                    <span class="data-label">Receitas:</span>
+                    <span class="data-value">${formatarMoeda(resumo.receitas_total || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Despesas:</span>
+                    <span class="data-value">${formatarMoeda(resumo.despesas_total || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Lucro:</span>
+                    <span class="data-value ${(resumo.lucro || 0) > 0 ? '' : 'negative'}">
+                        ${formatarMoeda(resumo.lucro || 0)}
+                    </span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Margem:</span>
+                    <span class="data-value">${(resumo.margem || 0).toFixed(1)}%</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Contratos Ativos:</span>
+                    <span class="data-value">${kpi.ativos || 0}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Valor em Contratos:</span>
+                    <span class="data-value">${formatarMoeda(kpi.total_orcado || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Custos com Veículos:</span>
+                    <span class="data-value">${formatarMoeda(resumo.custo_total_veiculos || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Veículos Ativos:</span>
+                    <span class="data-value">${veiculosData.resumo?.total_ativos || 0}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Funções de conteúdo restantes (sem dados simulados)
+function gerarConteudoDependencia(data) {
+    const resumo = data.resumo_360 || {};
+    const dependencia = resumo.valor_contratos > 0 && resumo.receitas_total > 0 ? 
+        (resumo.valor_contratos / resumo.receitas_total * 100) : 0;
+    
+    return `
+        <div class="modal-grid">
+            <div class="modal-section">
+                <h3 class="section-title">
+                    <i class="fas fa-sitemap"></i>
+                    DEPENDÊNCIA DE CONTRATOS
+                </h3>
+                <div class="data-row">
+                    <span class="data-label">Dependência Atual:</span>
+                    <span class="data-value">${dependencia.toFixed(1)}%</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Recomendado:</span>
+                    <span class="data-value">&lt; 80%</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Status:</span>
+                    <span class="data-value ${dependencia < 80 ? '' : 'negative-value'}">
+                        ${dependencia < 80 ? 'ACEITÁVEL' : 'ALTA DEPENDÊNCIA'}
+                    </span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function gerarConteudoSalarios(data) {
+    return `
+        <div class="modal-grid">
+            <div class="modal-section">
+                <h3 class="section-title">
+                    <i class="fas fa-users"></i>
+                    FOLHA DE PAGAMENTO
+                </h3>
+                <div class="data-row">
+                    <span class="data-label">Dados Específicos:</span>
+                    <span class="data-value">Necessário endpoint específico</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Sugestão:</span>
+                    <span class="data-value">Criar endpoint /api/rh/folha-pagamento</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function gerarConteudoCustoContrato(data) {
+    const kpi = data.contratos_kpi || {};
+    
+    return `
+        <div class="modal-grid">
+            <div class="modal-section">
+                <h3 class="section-title">
+                    <i class="fas fa-file-contract"></i>
+                    CUSTO POR CONTRATO
+                </h3>
+                <div class="data-row">
+                    <span class="data-label">Custo Médio:</span>
+                    <span class="data-value">${formatarMoeda(kpi.media_gasto_contrato || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Contratos Ativos:</span>
+                    <span class="data-value">${kpi.ativos || 0}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function gerarConteudoCustoOperacional(data) {
+    const veiculosData = data.veiculos || {};
+    const resumo = veiculosData.resumo || {};
+    
+    return `
+        <div class="modal-grid">
+            <div class="modal-section">
+                <h3 class="section-title">
+                    <i class="fas fa-car"></i>
+                    CUSTOS OPERACIONAIS - VEÍCULOS
+                </h3>
+                <div class="data-row">
+                    <span class="data-label">Custo Total Veículos:</span>
+                    <span class="data-value">${formatarMoeda(resumo.total_custos || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Custo Médio por Veículo:</span>
+                    <span class="data-value">${formatarMoeda(resumo.custo_medio_por_veiculo || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Custo por KM:</span>
+                    <span class="data-value">${formatarMoeda(resumo.custo_medio_por_km || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">KM Percorrido Total:</span>
+                    <span class="data-value">${resumo.total_km_percorrido?.toLocaleString('pt-BR') || 0} km</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Top 3 Veículos mais Caros:</span>
+                    <span class="data-value"></span>
+                </div>
+                ${veiculosData.top_custos?.slice(0, 3).map(veiculo => `
+                    <div class="data-row">
+                        <span class="data-label">• ${veiculo.placa || 'N/A'}:</span>
+                        <span class="data-value">${formatarMoeda(veiculo.total_custos || 0)}</span>
+                    </div>
+                `).join('') || '<div class="data-row"><span class="data-label">Nenhum dado disponível</span></div>'}
+            </div>
+        </div>
+    `;
+}
+
+function fecharModal() {
+    const modal = document.getElementById('analysisModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// =====================================================
+// FUNÇÕES DE INTERAÇÃO
+// =====================================================
+
+function changeChartType(button, type, chartId) {
+    if (!charts[chartId]) return;
+    
+    const buttons = button.parentElement.querySelectorAll('.chart-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    
+    chartConfigs[chartId].type = type;
+    
+    if (dashboardData) {
+        atualizarGraficosCompletos(dashboardData);
+    }
+}
+
+// =====================================================
+// FUNÇÕES UTILITÁRIAS
+// =====================================================
+
+function formatarMoeda(valor) {
+    if (valor === undefined || valor === null || isNaN(valor)) return 'R$ 0,00';
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(valor);
+}
+
+function mostrarLoading(mostrar) {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = mostrar ? 'flex' : 'none';
+    }
+}
+
+function mostrarNotificacao(mensagem, tipo = 'info') {
+    const container = document.getElementById('notificationContainer');
+    if (!container) return;
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${tipo}`;
+    notification.innerHTML = `
+        <div style="display: flex; align-items: flex-start; gap: 10px; width: 100%;">
+            <div style="font-size: 16px;">
+                <i class="fas fa-${tipo === 'error' ? 'exclamation-triangle' : 
+                                  tipo === 'success' ? 'check-circle' : 
+                                  tipo === 'warning' ? 'exclamation-circle' : 'info-circle'}"></i>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: 600; font-size: 12px; margin-bottom: 2px;">
+                    ${tipo.toUpperCase()}
+                </div>
+                <div style="font-size: 11px; color: var(--text-secondary);">
+                    ${mensagem}
+                </div>
+            </div>
+            <div style="cursor: pointer; font-size: 12px;" onclick="this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+function configurarAtalhosTeclado() {
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'r') {
+            e.preventDefault();
+            carregarDashboard360();
+        }
+        if (e.key === 'Escape') {
+            fecharModal();
+        }
+    });
+}
+
+// =====================================================
+// EXPORTAÇÃO DE FUNÇÕES
+// =====================================================
+
+async function gerarRelatorioCompleto() {
+    try {
+        mostrarLoading(true);
+        
+        if (!dashboardData) {
+            throw new Error('Nenhum dado disponível para relatório');
+        }
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFillColor(11, 20, 30);
+        doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(0, 255, 156);
+        doc.setFontSize(20);
+        doc.text('PATAGONIA FINANCE 360°', 20, 20);
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.text('Relatório Financeiro Executivo Completo', 20, 30);
+        
+        doc.setTextColor(100, 100, 100);
+        doc.setFontSize(10);
+        doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 45);
+        
+        const resumo = dashboardData.resumo_360 || {};
+        const kpi = dashboardData.contratos_kpi || {};
+        const categorias = dashboardData.despesas_por_categoria || [];
+        const veiculos = dashboardData.veiculos || {};
+        
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(14);
+        doc.text('Indicadores Principais', 20, 60);
+        
+        const kpis = [
+            ['Receitas Totais', formatarMoeda(resumo.receitas_total || 0)],
+            ['Despesas Totais', formatarMoeda(resumo.despesas_total || 0)],
+            ['Lucro Líquido', formatarMoeda(resumo.lucro || 0)],
+            ['Margem', `${(resumo.margem || 0).toFixed(1)}%`],
+            ['Burn Rate', formatarMoeda(resumo.burn_rate || 0)],
+            ['Runway', `${(resumo.runway || 0).toFixed(1)} meses`],
+            ['Contratos Ativos', kpi.ativos || 0],
+            ['Valor Contratos', formatarMoeda(kpi.total_orcado || 0)],
+            ['Custos Veículos', formatarMoeda(resumo.custo_total_veiculos || 0)],
+            ['% Veículos', `${(resumo.percentual_custo_veiculos || 0).toFixed(1)}%`]
+        ];
+        
+        kpis.forEach(([label, value], index) => {
+            doc.setFontSize(11);
+            doc.text(label, 20, 75 + (index * 8));
+            doc.text(value, 100, 75 + (index * 8));
+        });
+        
+        // Adicionar top categorias se houver
+        if (categorias.length > 0) {
+            doc.addPage();
+            doc.setFontSize(14);
+            doc.text('Top Categorias de Gastos', 20, 20);
+            
+            const topCats = categorias
+                .filter(c => c.total > 0)
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 10);
+            
+            topCats.forEach((cat, index) => {
+                doc.setFontSize(11);
+                doc.text(`${cat.categoria || 'Sem categoria'}`, 20, 35 + (index * 8));
+                doc.text(formatarMoeda(cat.total || 0), 100, 35 + (index * 8));
+                doc.text(`${cat.quantidade || 0} lançamentos`, 150, 35 + (index * 8));
+            });
+        }
+        
+        // Adicionar dados de veículos se houver
+        if (veiculos.lista && veiculos.lista.length > 0) {
+            doc.addPage();
+            doc.setFontSize(14);
+            doc.text('Análise de Custos com Veículos', 20, 20);
+            
+            const veiculosResumo = veiculos.resumo || {};
+            doc.setFontSize(11);
+            doc.text(`Total de Veículos: ${veiculos.lista.length}`, 20, 35);
+            doc.text(`Veículos Ativos: ${veiculosResumo.total_ativos || 0}`, 20, 43);
+            doc.text(`Custos Totais: ${formatarMoeda(veiculosResumo.total_custos || 0)}`, 20, 51);
+            doc.text(`KM Percorrido: ${veiculosResumo.total_km_percorrido?.toLocaleString('pt-BR') || 0} km`, 20, 59);
+            doc.text(`Custo Médio por KM: ${formatarMoeda(veiculosResumo.custo_medio_por_km || 0)}`, 20, 67);
+            
+            doc.setFontSize(12);
+            doc.text('Top Veículos por Custo', 20, 80);
+            
+            const topVeiculos = veiculos.top_custos || [];
+            topVeiculos.forEach((veiculo, index) => {
+                const y = 90 + (index * 8);
+                doc.setFontSize(11);
+                doc.text(`${veiculo.placa || 'N/A'} - ${veiculo.modelo || ''}`, 20, y);
+                doc.text(formatarMoeda(veiculo.total_custos || 0), 100, y);
+                doc.text(`${formatarMoeda(veiculo.custo_por_km || 0)}/km`, 150, y);
+            });
+        }
+        
+        doc.save(`relatorio_financeiro_360_${new Date().toISOString().split('T')[0]}.pdf`);
+        
+        mostrarNotificacao('Relatório 360° gerado com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao gerar relatório:', error);
+        mostrarNotificacao(`Erro: ${error.message}`, 'error');
+    } finally {
+        mostrarLoading(false);
+    }
+}
+
+async function exportarParaExcel() {
+    try {
+        mostrarLoading(true);
+        
+        if (!dashboardData) {
+            throw new Error('Nenhum dado disponível para exportação');
+        }
+        
+        const resumo = dashboardData.resumo_360 || {};
+        const kpi = dashboardData.contratos_kpi || {};
+        const categorias = dashboardData.despesas_por_categoria || [];
+        const gastos = dashboardData.gastos_detalhados || [];
+        const veiculos = dashboardData.veiculos || {};
+        
+        let csv = 'PATAGONIA FINANCE - DASHBOARD 360°\n';
+        csv += `Período: ${document.getElementById('dataInicio')?.value || ''} a ${document.getElementById('dataFim')?.value || ''}\n`;
+        csv += `Gerado em: ${new Date().toLocaleString('pt-BR')}\n\n`;
+        
+        csv += 'INDICADORES PRINCIPAIS\n';
+        csv += 'Indicador,Valor\n';
+        csv += `Receitas Totais,${resumo.receitas_total || 0}\n`;
+        csv += `Despesas Totais,${resumo.despesas_total || 0}\n`;
+        csv += `Lucro Líquido,${resumo.lucro || 0}\n`;
+        csv += `Margem de Lucro,${resumo.margem || 0}\n`;
+        csv += `Burn Rate,${resumo.burn_rate || 0}\n`;
+        csv += `Runway,${resumo.runway || 0}\n`;
+        csv += `Contratos Ativos,${kpi.ativos || 0}\n`;
+        csv += `Valor Contratos,${kpi.total_orcado || 0}\n`;
+        csv += `Custos Veículos,${resumo.custo_total_veiculos || 0}\n`;
+        csv += `% Veículos,${resumo.percentual_custo_veiculos || 0}\n\n`;
+        
+        // Adicionar categorias
+        if (categorias.length > 0) {
+            csv += 'CATEGORIAS DE GASTOS\n';
+            csv += 'Categoria,Valor Total,Quantidade,% Pendente,% Pago\n';
+            
+            categorias
+                .filter(c => c.total > 0)
+                .sort((a, b) => b.total - a.total)
+                .forEach(cat => {
+                    const pendentePercent = cat.total > 0 ? ((cat.pendente || 0) / cat.total * 100).toFixed(1) : 0;
+                    const pagoPercent = cat.total > 0 ? ((cat.pago || 0) / cat.total * 100).toFixed(1) : 0;
+                    csv += `"${cat.categoria || 'Sem categoria'}",${cat.total || 0},${cat.quantidade || 0},${pendentePercent},${pagoPercent}\n`;
+                });
+            csv += '\n';
+        }
+        
+        // Adicionar veículos
+        if (veiculos.lista && veiculos.lista.length > 0) {
+            csv += 'VEÍCULOS\n';
+            csv += 'Placa,Modelo,Status,KM Atual,Custo Total,Custo por KM,Saúde\n';
+            
+            veiculos.lista.forEach(v => {
+                const custos = v.custos || {};
+                const estatisticas = v.estatisticas || {};
+                const indicadores = v.indicadores || {};
+                csv += `"${v.placa || ''}","${v.marca || ''} ${v.modelo || ''}",${v.status || ''},${v.km_atual || 0},${custos.total || 0},${estatisticas.custo_por_km || 0},"${indicadores.saude || ''}"\n`;
+            });
+            csv += '\n';
+        }
+        
+        // Adicionar gastos detalhados
+        if (gastos.length > 0) {
+            csv += 'GASTOS DETALHADOS (TOP 20)\n';
+            csv += 'Data,Fornecedor,Descrição,Categoria,Valor,Tipo\n';
+            
+            gastos
+                .slice(0, Math.min(gastos.length, 20))
+                .forEach(gasto => {
+                    const data = gasto.data || gasto.vencimento || '';
+                    const dataFormatada = data ? new Date(data).toLocaleDateString('pt-BR') : '';
+                    csv += `"${dataFormatada}","${gasto.fornecedor || ''}","${gasto.descricao || ''}","${gasto.categoria || ''}",${gasto.valor || 0},"${gasto.tipo || ''}"\n`;
+                });
+        }
+        
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `dados_financeiros_360_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        mostrarNotificacao('Dados 360° exportados com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao exportar para Excel:', error);
+        mostrarNotificacao(`Erro: ${error.message}`, 'error');
+    } finally {
+        mostrarLoading(false);
+    }
+}
+
+function exportarGrafico(chartId) {
+    if (!charts[chartId]) {
+        mostrarNotificacao('Gráfico não disponível para exportação', 'warning');
+        return;
+    }
+    
+    const canvas = charts[chartId].canvas;
+    const link = document.createElement('a');
+    link.download = `grafico_${chartId}_${new Date().toISOString().split('T')[0]}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    
+    mostrarNotificacao('Gráfico exportado com sucesso!', 'success');
+}
+
+function verDetalhesContratos() {
+    window.location.href = '/contratos';
+}
+
+function verTodosGastos() {
+    window.location.href = '/contas_pagar';
+}
+
+function verDetalheContrato(contratoId) {
+    window.location.href = `/contratos/${contratoId}`;
+}
+
+function verDetalheVeiculo(veiculoId) {
+    window.location.href = `/veiculos/${veiculoId}`;
+}
+
+function abrirAnaliseVeiculos() {
+    abrirAnaliseDetalhada('veiculos');
+}
+
+function verTodosVeiculos() {
+    window.location.href = '/quilometragem';
+}
+
+// =====================================================
+// EXPORTAR FUNÇÕES PARA ESCOPO GLOBAL
+// =====================================================
+
+window.carregarDashboard360 = carregarDashboard360;
+window.gerarRelatorioCompleto = gerarRelatorioCompleto;
+window.exportarParaExcel = exportarParaExcel;
+window.abrirAnaliseDetalhada = abrirAnaliseDetalhada;
+window.fecharModal = fecharModal;
+window.changeChartType = changeChartType;
+window.exportarGrafico = exportarGrafico;
+window.verDetalhesContratos = verDetalhesContratos;
+window.verTodosGastos = verTodosGastos;
+window.verDetalheContrato = verDetalheContrato;
+window.verDetalheVeiculo = verDetalheVeiculo;
+window.abrirAnaliseVeiculos = abrirAnaliseVeiculos;
+window.verTodosVeiculos = verTodosVeiculos;
+</script>
+{% else %}
+<div style="
+    background: linear-gradient(135deg, #050a14, #0b2f24);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Orbitron', monospace;
+    text-align: center;
+    padding: 40px;
+">
+    <div style="
+        background: rgba(11, 20, 30, 0.95);
+        border: 1px solid rgba(0, 255, 156, 0.3);
+        border-radius: 12px;
+        padding: 50px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    ">
+        <div style="
+            font-size: 80px;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 255, 156, 0.5);
+        ">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h1 style="
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: var(--primary-green);
+        ">
+            ACESSO RESTRITO
+        </h1>
+        <p style="
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+            max-width: 400px;
+        ">
+            Este dashboard executivo 360° requer permissões de administrador ou gestor financeiro.
+        </p>
+        <button onclick="window.history.back()" style="
+            background: linear-gradient(135deg, var(--primary-green), var(--emerald-green));
+            color: var(--dark-green);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        ">
+            <i class="fas fa-arrow-left"></i> RETORNAR
+        </button>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,64 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: patagonia
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "10"
+        autoscaling.knative.dev/minScale: "1"
+        run.googleapis.com/cpu-throttling: "true"
+    spec:
+      containerConcurrency: 10
+      timeoutSeconds: 300
+      serviceAccountName: patagonia-run-sa@PROJECT_ID.iam.gserviceaccount.com
+      containers:
+        - image: REGION-docker.pkg.dev/PROJECT_ID/patagonia-repo/patagonia-app:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: 1Gi
+              cpu: "1"
+          env:
+            - name: ENV
+              value: "production"
+            - name: WEB_CONCURRENCY
+              value: "2"
+            - name: GUNICORN_THREADS
+              value: "5"
+            - name: STORAGE_DRIVER
+              value: "gcs"
+            - name: GCS_BUCKET
+              value: "your-gcs-bucket-name"
+            - name: UPLOADS_PREFIX
+              value: "uploads"
+            - name: DB_HOST
+              value: "/cloudsql/PROJECT_ID:REGION:INSTANCE"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "patagonia"
+            - name: DB_USER
+              value: "patagonia"
+            - name: DB_CONNECT_TIMEOUT
+              value: "10"
+            - name: ENABLE_DEBUG_ROUTES
+              value: "0"
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: SECRET_KEY
+                  key: latest
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: DB_PASS
+                  key: latest
+            # Optional: enable server-side sessions
+            # - name: REDIS_URL
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: REDIS_URL
+            #       key: latest

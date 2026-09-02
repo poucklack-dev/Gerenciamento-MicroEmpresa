@@ -1,0 +1,1592 @@
+{% extends "base.html" %}
+{% block conteudo %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --verde-principal: #093D2C;
+            --verde-secundario: #1C6B49;
+            --verde-hover: #0a4d35;
+            --verde-claro: #e8f5e8;
+            --verde-gradiente: linear-gradient(135deg, #093D2C 0%, #1C6B49 100%);
+            --fundo: #f8faf9;
+            --texto: #2d3748;
+            --texto-claro: #718096;
+            --branco: #ffffff;
+            --cinza-borda: #e2e8f0;
+            --cinza-claro: #f7fafc;
+            --sombra: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --sombra-suave: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --transicao: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --erro: #e53e3e;
+            --sucesso: #38a169;
+            --warning: #d69e2e;
+            --info: #3182ce;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--fundo);
+            color: var(--texto);
+            line-height: 1.7;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* Header Premium - Mobile First */
+        .page-header {
+            background: var(--verde-gradiente);
+            color: var(--branco);
+            padding: 30px 0;
+            margin: -15px -15px 25px -15px;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(-100px) translateY(-100px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            line-height: 1.2;
+        }
+
+        .page-title p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Botões - Mobile First */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transicao);
+            font-family: 'Poppins', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            font-size: 14px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--transicao);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--branco);
+            color: var(--verde-principal);
+            box-shadow: 0 4px 15px rgba(9, 61, 44, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(9, 61, 44, 0.4);
+            background: var(--verde-claro);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--branco);
+            color: var(--branco);
+        }
+
+        .btn-outline:hover {
+            background: var(--branco);
+            color: var(--verde-principal);
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 6px;
+            width: auto;
+        }
+
+        .btn-verde {
+            background: var(--verde-principal);
+            color: var(--branco);
+            border: none;
+        }
+
+        .btn-verde:hover {
+            background: var(--verde-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Cards - Mobile First */
+        .card {
+            background: var(--branco);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--sombra);
+            border: 1px solid var(--cinza-borda);
+            transition: var(--transicao);
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sombra-suave);
+        }
+
+        .card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--verde-principal);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header h2::before {
+            content: '';
+            width: 3px;
+            height: 18px;
+            background: var(--verde-principal);
+            border-radius: 2px;
+        }
+
+        /* KPI Cards - Mobile First */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .kpi-card {
+            background: var(--branco);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--sombra-suave);
+            border-left: 4px solid var(--verde-principal);
+            transition: var(--transicao);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sombra);
+        }
+
+        .kpi-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: var(--verde-gradiente);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .kpi-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--verde-principal);
+            margin-bottom: 3px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--texto-claro);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        /* Tabela - Mobile First com scroll horizontal */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            background: var(--branco);
+            box-shadow: var(--sombra-suave);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+            font-size: 12px;
+        }
+
+        .table th {
+            background: var(--verde-gradiente);
+            color: var(--branco);
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--cinza-borda);
+            transition: var(--transicao);
+            white-space: nowrap;
+        }
+
+        .table tbody tr {
+            transition: var(--transicao);
+            cursor: pointer;
+        }
+
+        .table tbody tr:hover {
+            background: var(--verde-claro);
+        }
+
+        /* Badges - Mobile First */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .badge-success {
+            background: rgba(56, 161, 105, 0.15);
+            color: var(--sucesso);
+            border: 1px solid rgba(56, 161, 105, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(214, 158, 46, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(214, 158, 46, 0.3);
+        }
+
+        .badge-info {
+            background: rgba(49, 130, 206, 0.15);
+            color: var(--info);
+            border: 1px solid rgba(49, 130, 206, 0.3);
+        }
+
+        .badge-danger {
+            background: rgba(229, 62, 62, 0.15);
+            color: var(--erro);
+            border: 1px solid rgba(229, 62, 62, 0.3);
+        }
+
+        /* Alertas - Mobile First */
+        .alert {
+            padding: 15px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            animation: slideDown 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid;
+            font-size: 13px;
+        }
+
+        .alert-error {
+            background: rgba(229, 62, 62, 0.1);
+            color: var(--erro);
+            border-left-color: var(--erro);
+        }
+
+        .alert-success {
+            background: rgba(56, 161, 105, 0.1);
+            color: var(--sucesso);
+            border-left-color: var(--sucesso);
+        }
+
+        .alert-info {
+            background: rgba(49, 130, 206, 0.1);
+            color: var(--info);
+            border-left-color: var(--info);
+        }
+
+        .alert-warning {
+            background: rgba(214, 158, 46, 0.1);
+            color: var(--warning);
+            border-left-color: var(--warning);
+        }
+
+        /* Modal - Mobile First */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(9, 61, 44, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--branco);
+            border-radius: 16px;
+            padding: 25px;
+            width: 100%;
+            max-width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--cinza-borda);
+        }
+
+        .modal-header h3 {
+            color: var(--verde-principal);
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--texto-claro);
+            transition: var(--transicao);
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .close-modal:hover {
+            background: var(--cinza-claro);
+            color: var(--erro);
+        }
+
+        /* Formulários - Mobile First */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--texto);
+            font-size: 13px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--cinza-borda);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: var(--transicao);
+            background-color: var(--cinza-claro);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--verde-principal);
+            background-color: var(--branco);
+            box-shadow: 0 0 0 3px rgba(9, 61, 44, 0.1);
+        }
+
+        /* Animações */
+        @keyframes slideDown {
+            from { 
+                opacity: 0; 
+                transform: translateY(-20px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Loading */
+        .btn-loader {
+            display: none;
+        }
+
+        .btn.loading .btn-text {
+            opacity: 0;
+        }
+
+        .btn.loading .btn-loader {
+            display: inline-block;
+        }
+
+        /* Detalhes do Registro - Mobile First */
+        .detalhes-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detalhes-item {
+            background: var(--cinza-claro);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid var(--verde-principal);
+        }
+
+        .detalhes-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--texto-claro);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .detalhes-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--texto);
+        }
+
+        /* Ações da tabela - Mobile First */
+        .acoes-tabela {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn-tabela {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transicao);
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .btn-tabela:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-ver {
+            background: rgba(49, 130, 206, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(49, 130, 206, 0.3);
+        }
+
+        .btn-ver:hover {
+            background: rgba(49, 130, 206, 0.2);
+        }
+
+        .btn-editar {
+            background: rgba(214, 158, 46, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(214, 158, 46, 0.3);
+        }
+
+        .btn-editar:hover {
+            background: rgba(214, 158, 46, 0.2);
+        }
+
+        .btn-excluir {
+            background: rgba(229, 62, 62, 0.1);
+            color: var(--erro);
+            border: 1px solid rgba(229, 62, 62, 0.3);
+        }
+
+        .btn-excluir:hover {
+            background: rgba(229, 62, 62, 0.2);
+        }
+
+        .text-muted {
+            color: var(--texto-claro);
+            font-size: 12px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Links */
+        .link-verde {
+            color: var(--verde-principal);
+            text-decoration: none;
+            transition: var(--transicao);
+            font-weight: 500;
+        }
+
+        .link-verde:hover {
+            color: var(--verde-hover);
+            text-decoration: underline;
+        }
+
+        /* Botão de download */
+        .btn-download {
+            background: rgba(9, 61, 44, 0.1);
+            color: var(--verde-principal);
+            border: 1px solid rgba(9, 61, 44, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: var(--transicao);
+        }
+
+        .btn-download:hover {
+            background: rgba(9, 61, 44, 0.2);
+            transform: translateY(-1px);
+            text-decoration: none;
+            color: var(--verde-principal);
+        }
+
+        /* Estado vazio da tabela */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--texto-claro);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+            color: var(--verde-principal);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--texto);
+        }
+
+        /* Indicador de scroll horizontal */
+        .scroll-indicator {
+            text-align: center;
+            padding: 10px;
+            color: var(--texto-claro);
+            font-size: 12px;
+            display: none;
+        }
+
+        /* Media Queries para telas maiores */
+        @media (min-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+
+            .page-header {
+                padding: 40px 0;
+                margin: -25px -25px 35px -25px;
+                border-radius: 0 0 25px 25px;
+            }
+
+            .header-content {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .page-title h1 {
+                font-size: 32px;
+            }
+
+            .page-title p {
+                font-size: 16px;
+            }
+
+            .btn {
+                width: auto;
+                padding: 14px 28px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+
+            .kpi-card {
+                padding: 25px;
+            }
+
+            .kpi-value {
+                font-size: 24px;
+            }
+
+            .card {
+                padding: 30px;
+                border-radius: 18px;
+            }
+
+            .card-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .card-header h2 {
+                font-size: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .table {
+                font-size: 14px;
+            }
+
+            .table th {
+                font-size: 12px;
+                padding: 15px 10px;
+            }
+
+            .table td {
+                padding: 15px 10px;
+            }
+
+            .badge {
+                font-size: 11px;
+                padding: 5px 12px;
+            }
+
+            .modal-content {
+                max-width: 700px;
+                padding: 30px;
+            }
+
+            .modal-header h3 {
+                font-size: 22px;
+            }
+
+            .detalhes-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                padding: 30px;
+            }
+
+            .page-header {
+                margin: -30px -30px 40px -30px;
+                padding: 50px 0;
+            }
+
+            .page-title h1 {
+                font-size: 42px;
+            }
+
+            .kpi-grid {
+                gap: 25px;
+            }
+
+            .kpi-card {
+                padding: 30px;
+            }
+
+            .kpi-value {
+                font-size: 32px;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 25px;
+            }
+
+            .table {
+                min-width: 1000px;
+            }
+
+            .modal-content {
+                max-width: 800px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .scroll-indicator {
+                display: block;
+            }
+        }
+    </style>
+
+    <!-- Header Premium -->
+    <div class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="page-title">
+                    <h1 style="color: white;">
+                     <i class="fas fa-map-marked-alt"></i> Equipe de Campo – Topografia
+                    </h1>
+                </div>
+                <button class="btn btn-primary" onclick="abrirModalSaida()">
+                    <i class="fas fa-plus"></i> Nova Saída
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Alertas -->
+        <div id="alert" class="alert" style="display: none;"></div>
+
+        <!-- Cards de KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="kpi-value" id="kpi-saidas-hoje">0</div>
+                <div class="kpi-label">Saídas Hoje</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="kpi-value" id="kpi-em-campo">0</div>
+                <div class="kpi-label">Equipes em Campo</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="kpi-value" id="kpi-finalizados-mes">0</div>
+                <div class="kpi-label">Finalizados no Mês</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="fas fa-road"></i>
+                </div>
+                <div class="kpi-value" id="kpi-km-total">0 km</div>
+                <div class="kpi-label">KM Total Rodado</div>
+            </div>
+        </div>
+
+        <!-- Tabela Premium de Registros -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-list"></i> Registros de Campo</h2>
+                <span class="text-muted" id="totalRegistros">Carregando...</span>
+            </div>
+            <div class="scroll-indicator">
+                <i class="fas fa-arrows-left-right"></i> Deslize para ver mais colunas
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Colaborador</th>
+                            <th>Veículo</th>
+                            <th>Cliente</th>
+                            <th>Saída</th>
+                            <th>Retorno</th>
+                            <th>KM S</th>
+                            <th>KM R</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaRegistros">
+                        <!-- Dados carregados via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Registrar Saída -->
+    <div class="modal" id="modalSaida">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-out-alt"></i> Registrar Saída</h3>
+                <button class="close-modal" onclick="fecharModalSaida()">&times;</button>
+            </div>
+            <form id="formSaida" enctype="multipart/form-data">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="colaborador_id"><i class="fas fa-user"></i> Colaborador *</label>
+                        <select class="form-control" id="colaborador_id" name="colaborador_id" required>
+                            <option value="">Selecione o colaborador...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="veiculo_id"><i class="fas fa-car"></i> Veículo *</label>
+                        <select class="form-control" id="veiculo_id" name="veiculo_id" required>
+                            <option value="">Selecione o veículo...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cliente_id"><i class="fas fa-building"></i> Cliente *</label>
+                        <select class="form-control" id="cliente_id" name="cliente_id" required>
+                            <option value="">Selecione o cliente...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="data_saida"><i class="fas fa-calendar"></i> Data Saída *</label>
+                        <input type="date" class="form-control" id="data_saida" name="data_saida" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hora_saida"><i class="fas fa-clock"></i> Hora Saída *</label>
+                        <input type="time" class="form-control" id="hora_saida" name="hora_saida" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="km_saida"><i class="fas fa-tachometer-alt"></i> KM Saída *</label>
+                        <input type="number" class="form-control" id="km_saida" name="km_saida" required min="0" step="0.1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="observacoes"><i class="fas fa-sticky-note"></i> Observações</label>
+                    <textarea class="form-control" id="observacoes" name="observacoes" rows="3" placeholder="Observações adicionais..."></textarea>
+                </div>
+                <!-- CAMPO DE ARQUIVO ADICIONADO -->
+                <div class="form-group">
+                    <label for="anexo_saida"><i class="fas fa-paperclip"></i> Anexo da Saída (Opcional)</label>
+                    <input type="file" class="form-control" id="anexo_saida" name="anexo_saida" accept=".png,.jpg,.jpeg,.pdf">
+                    <small class="text-muted">Apenas arquivos PNG, JPG, JPEG ou PDF</small>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 25px; flex-direction: column;">
+                    <button type="submit" class="btn btn-verde" id="submitBtnSaida">
+                        <span class="btn-text"><i class="fas fa-paper-plane"></i> Registrar Saída</span>
+                        <div class="btn-loader">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="fecharModalSaida()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Registrar Retorno -->
+    <div class="modal" id="modalRetorno">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-in-alt"></i> Registrar Retorno</h3>
+                <button class="close-modal" onclick="fecharModalRetorno()">&times;</button>
+            </div>
+            <form id="formRetorno" enctype="multipart/form-data">
+                <input type="hidden" id="registro_id" name="id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="data_retorno"><i class="fas fa-calendar"></i> Data Retorno *</label>
+                        <input type="date" class="form-control" id="data_retorno" name="data_retorno" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hora_retorno"><i class="fas fa-clock"></i> Hora Retorno *</label>
+                        <input type="time" class="form-control" id="hora_retorno" name="hora_retorno" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="km_retorno"><i class="fas fa-tachometer-alt"></i> KM Retorno *</label>
+                        <input type="number" class="form-control" id="km_retorno" name="km_retorno" required min="0" step="0.1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="observacoes_retorno"><i class="fas fa-sticky-note"></i> Observações do Retorno</label>
+                    <textarea class="form-control" id="observacoes_retorno" name="observacoes_retorno" rows="3" placeholder="Observações do retorno..."></textarea>
+                </div>
+                <!-- CAMPO DE ARQUIVO ADICIONADO -->
+                <div class="form-group">
+                    <label for="anexo_retorno"><i class="fas fa-paperclip"></i> Anexo do Retorno (Opcional)</label>
+                    <input type="file" class="form-control" id="anexo_retorno" name="anexo_retorno" accept=".png,.jpg,.jpeg,.pdf">
+                    <small class="text-muted">Apenas arquivos PNG, JPG, JPEG ou PDF</small>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 25px; flex-direction: column;">
+                    <button type="submit" class="btn btn-verde" id="submitBtnRetorno">
+                        <span class="btn-text"><i class="fas fa-check-circle"></i> Finalizar Registro</span>
+                        <div class="btn-loader">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="fecharModalRetorno()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Visualizar Detalhes -->
+    <div class="modal" id="modalDetalhes">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-eye"></i> Detalhes do Registro</h3>
+                <button class="close-modal" onclick="fecharModalDetalhes()">&times;</button>
+            </div>
+            <div id="detalhesConteudo">
+                <!-- Conteúdo carregado via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Variáveis globais
+    let registros = [];
+    let registroEditando = null;
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Carregando página...');
+        carregarTabela();
+        carregarSelects();
+        configurarFormularios();
+        configurarDataAtual();
+    });
+
+    function configurarFormularios() {
+        document.getElementById('formSaida').addEventListener('submit', enviarSaida);
+        document.getElementById('formRetorno').addEventListener('submit', enviarRetorno);
+    }
+
+    function configurarDataAtual() {
+        const hoje = new Date().toISOString().split('T')[0];
+        document.getElementById('data_saida').value = hoje;
+        document.getElementById('data_retorno').value = hoje;
+        
+        // Configurar hora atual
+        const agora = new Date();
+        const horas = agora.getHours().toString().padStart(2, '0');
+        const minutos = agora.getMinutes().toString().padStart(2, '0');
+        document.getElementById('hora_saida').value = `${horas}:${minutos}`;
+        document.getElementById('hora_retorno').value = `${horas}:${minutos}`;
+    }
+
+    // Carregar dados da tabela
+    async function carregarTabela() {
+        mostrarAlerta('Carregando registros...', 'info');
+        
+        try {
+            const response = await fetch('/api/equipe-campo/');
+            console.log('Status da resposta:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Erro na resposta:', errorText);
+                throw new Error(`Erro ${response.status}: ${errorText}`);
+            }
+
+            registros = await response.json();
+            console.log('Registros carregados:', registros.length);
+            
+            if (!Array.isArray(registros)) {
+                throw new Error('Dados recebidos não são um array');
+            }
+            
+            exibirRegistros();
+            atualizarKPIs();
+            
+            if (registros.length === 0) {
+                mostrarAlerta('Nenhum registro encontrado. Adicione uma nova saída!', 'info');
+            }
+        } catch (error) {
+            console.error('Erro ao carregar registros:', error);
+            mostrarAlerta(`Erro ao carregar registros: ${error.message}`, 'error');
+            exibirEstadoVazio();
+        }
+    }
+
+    // Carregar selects
+    async function carregarSelects() {
+        console.log('Carregando selects...');
+        
+        try {
+            // Carregar colaboradores
+            const colaboradoresResponse = await fetch('/api/equipe-campo/colaboradores');
+            console.log('Colaboradores status:', colaboradoresResponse.status);
+            
+            if (colaboradoresResponse.ok) {
+                const colaboradores = await colaboradoresResponse.json();
+                console.log('Colaboradores carregados:', colaboradores.length);
+                
+                const selectColaborador = document.getElementById('colaborador_id');
+                selectColaborador.innerHTML = '<option value="">Selecione o colaborador...</option>';
+                
+                colaboradores.forEach(colab => {
+                    const option = document.createElement('option');
+                    option.value = colab.id;
+                    option.textContent = colab.nome;
+                    selectColaborador.appendChild(option);
+                });
+            } else {
+                const errorText = await colaboradoresResponse.text();
+                console.error('Erro ao carregar colaboradores:', errorText);
+                mostrarAlerta(`Erro ao carregar colaboradores: ${colaboradoresResponse.status}`, 'warning');
+            }
+
+            // Carregar veículos
+            const veiculosResponse = await fetch('/api/equipe-campo/veiculos');
+            console.log('Veículos status:', veiculosResponse.status);
+            
+            if (veiculosResponse.ok) {
+                const veiculos = await veiculosResponse.json();
+                console.log('Veículos carregados:', veiculos.length);
+                
+                const selectVeiculo = document.getElementById('veiculo_id');
+                selectVeiculo.innerHTML = '<option value="">Selecione o veículo...</option>';
+                
+                veiculos.forEach(veiculo => {
+                    const option = document.createElement('option');
+                    option.value = veiculo.id;
+                    const texto = `${veiculo.modelo || ''} ${veiculo.marca ? `(${veiculo.marca})` : ''} ${veiculo.placa ? `- ${veiculo.placa}` : ''}`.trim();
+                    option.textContent = texto || `Veículo ${veiculo.id}`;
+                    selectVeiculo.appendChild(option);
+                });
+            } else {
+                const errorText = await veiculosResponse.text();
+                console.error('Erro ao carregar veículos:', errorText);
+                mostrarAlerta(`Erro ao carregar veículos: ${veiculosResponse.status}`, 'warning');
+            }
+
+            // Carregar clientes
+            const clientesResponse = await fetch('/api/equipe-campo/clientes');
+            console.log('Clientes status:', clientesResponse.status);
+            
+            if (clientesResponse.ok) {
+                const clientes = await clientesResponse.json();
+                console.log('Clientes carregados:', clientes.length);
+                
+                const selectCliente = document.getElementById('cliente_id');
+                selectCliente.innerHTML = '<option value="">Selecione o cliente...</option>';
+                
+                clientes.forEach(cliente => {
+                    const option = document.createElement('option');
+                    option.value = cliente.id;
+                    option.textContent = cliente.nome || cliente.cpf_cnpj || `Cliente ${cliente.id}`;
+                    selectCliente.appendChild(option);
+                });
+            } else {
+                const errorText = await clientesResponse.text();
+                console.error('Erro ao carregar clientes:', errorText);
+                mostrarAlerta(`Erro ao carregar clientes: ${clientesResponse.status}`, 'warning');
+            }
+
+        } catch (error) {
+            console.error('Erro ao carregar selects:', error);
+            mostrarAlerta(`Erro ao carregar dados: ${error.message}`, 'error');
+        }
+    }
+
+    // Exibir registros na tabela
+    function exibirRegistros() {
+        const tbody = document.getElementById('tabelaRegistros');
+        document.getElementById('totalRegistros').textContent = `${registros.length} registros encontrados`;
+
+        if (registros.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>Nenhum registro encontrado</h3>
+                        <p>Comece registrando uma nova saída de campo.</p>
+                        <button class="btn btn-verde" onclick="abrirModalSaida()" style="margin-top: 15px;">
+                            <i class="fas fa-plus"></i> Registrar Primeira Saída
+                        </button>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = registros.map(reg => `
+            <tr onclick="abrirDetalhes(${reg.id})">
+                <td style="font-weight: 600; color: var(--verde-principal);">#${reg.id}</td>
+                <td>${reg.colaborador_nome || 'N/A'}</td>
+                <td>${reg.veiculo_modelo || 'N/A'} ${reg.veiculo_placa ? `(${reg.veiculo_placa})` : ''}</td>
+                <td>${reg.cliente_nome || 'N/A'}</td>
+                <td>
+                    <div style="font-size: 11px;">${formatarData(reg.data_saida)}</div>
+                    <div style="font-size: 10px; color: var(--texto-claro);">${reg.hora_saida || ''}</div>
+                </td>
+                <td>
+                    ${reg.data_retorno ? `
+                        <div style="font-size: 11px;">${formatarData(reg.data_retorno)}</div>
+                        <div style="font-size: 10px; color: var(--texto-claro);">${reg.hora_retorno || ''}</div>
+                    ` : '<span class="badge badge-warning">Pendente</span>'}
+                </td>
+                <td style="font-weight: 600;">${reg.km_saida || '0'}</td>
+                <td style="font-weight: 600;">${reg.km_retorno || '-'}</td>
+                <td>
+                    <span class="badge ${reg.data_retorno ? 'badge-success' : 'badge-warning'}">
+                        ${reg.data_retorno ? 'Finalizado' : 'Em Campo'}
+                    </span>
+                </td>
+                <td>
+                    <div class="acoes-tabela">
+                        <button class="btn-tabela btn-ver" onclick="event.stopPropagation(); abrirDetalhes(${reg.id})" title="Visualizar">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        ${!reg.data_retorno ? `
+                            <button class="btn-tabela btn-editar" onclick="event.stopPropagation(); abrirModalRetorno(${reg.id})" title="Registrar Retorno">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </button>
+                        ` : ''}
+                        <button class="btn-tabela btn-excluir" onclick="event.stopPropagation(); deletarRegistro(${reg.id})" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function exibirEstadoVazio() {
+        const tbody = document.getElementById('tabelaRegistros');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="10" class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Erro ao carregar registros</h3>
+                    <p>Verifique sua conexão e tente novamente.</p>
+                    <button class="btn btn-verde" onclick="carregarTabela()" style="margin-top: 15px;">
+                        <i class="fas fa-redo"></i> Tentar Novamente
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+
+    // Atualizar KPIs
+    function atualizarKPIs() {
+        const hoje = new Date().toISOString().split('T')[0];
+        const mesAtual = new Date().getMonth();
+        const anoAtual = new Date().getFullYear();
+
+        // Saídas hoje
+        const saidasHoje = registros.filter(reg => reg.data_saida === hoje).length;
+        document.getElementById('kpi-saidas-hoje').textContent = saidasHoje;
+
+        // Equipes em campo
+        const emCampo = registros.filter(reg => !reg.data_retorno).length;
+        document.getElementById('kpi-em-campo').textContent = emCampo;
+
+        // Finalizados no mês
+        const finalizadosMes = registros.filter(reg => {
+            if (!reg.data_retorno) return false;
+            const dataRetorno = new Date(reg.data_retorno);
+            return dataRetorno.getMonth() === mesAtual && dataRetorno.getFullYear() === anoAtual;
+        }).length;
+        document.getElementById('kpi-finalizados-mes').textContent = finalizadosMes;
+
+        // KM total rodado
+        const kmTotal = registros.reduce((total, reg) => {
+            if (reg.km_saida && reg.km_retorno) {
+                return total + (reg.km_retorno - reg.km_saida);
+            }
+            return total;
+        }, 0);
+        document.getElementById('kpi-km-total').textContent = `${kmTotal.toFixed(1)} km`;
+    }
+
+    // Modal functions
+    function abrirModalSaida() {
+        document.getElementById('modalSaida').classList.add('active');
+    }
+
+    function fecharModalSaida() {
+        document.getElementById('modalSaida').classList.remove('active');
+        document.getElementById('formSaida').reset();
+        configurarDataAtual();
+    }
+
+    function abrirModalRetorno(id) {
+        registroEditando = id;
+        const registro = registros.find(r => r.id == id);
+        
+        if (registro) {
+            document.getElementById('registro_id').value = id;
+            
+            // Pré-preenche KM saída como valor mínimo
+            const kmSaidaInput = document.getElementById('km_retorno');
+            kmSaidaInput.min = registro.km_saida || 0;
+            kmSaidaInput.placeholder = `Mínimo: ${registro.km_saida || 0}`;
+        }
+        
+        document.getElementById('modalRetorno').classList.add('active');
+    }
+
+    function fecharModalRetorno() {
+        document.getElementById('modalRetorno').classList.remove('active');
+        document.getElementById('formRetorno').reset();
+        configurarDataAtual();
+        registroEditando = null;
+    }
+
+    // Enviar formulários
+    async function enviarSaida(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const submitBtn = document.getElementById('submitBtnSaida');
+        submitBtn.classList.add('loading');
+
+        try {
+            const response = await fetch('/api/equipe-campo/saida', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                mostrarAlerta('Saída registrada com sucesso!', 'success');
+                fecharModalSaida();
+                carregarTabela();
+            } else {
+                throw new Error(result.error || `Erro ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarAlerta(error.message || 'Erro ao registrar saída', 'error');
+        } finally {
+            submitBtn.classList.remove('loading');
+        }
+    }
+
+    async function enviarRetorno(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const submitBtn = document.getElementById('submitBtnRetorno');
+        submitBtn.classList.add('loading');
+
+        try {
+            const response = await fetch('/api/equipe-campo/retorno', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                mostrarAlerta('Retorno registrado com sucesso!', 'success');
+                fecharModalRetorno();
+                carregarTabela();
+            } else {
+                throw new Error(result.error || `Erro ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarAlerta(error.message || 'Erro ao registrar retorno', 'error');
+        } finally {
+            submitBtn.classList.remove('loading');
+        }
+    }
+
+    async function abrirDetalhes(id) {
+        try {
+            const response = await fetch(`/api/equipe-campo/${id}`);
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || `Erro ${response.status}`);
+            }
+            
+            const registro = await response.json();
+            
+            // Gerar HTML dos anexos
+            let anexosHTML = '';
+            if (registro.anexo_saida) {
+                anexosHTML += `
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Anexo da Saída</div>
+                        <div class="detalhes-value">
+                            <a href="/api/equipe-campo/download_anexo/${registro.id}/saida" class="btn-download" target="_blank">
+                                <i class="fas fa-download"></i> Baixar Anexo
+                            </a>
+                        </div>
+                    </div>`;
+            }
+            
+            if (registro.anexo_retorno) {
+                anexosHTML += `
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Anexo do Retorno</div>
+                        <div class="detalhes-value">
+                            <a href="/api/equipe-campo/download_anexo/${registro.id}/retorno" class="btn-download" target="_blank">
+                                <i class="fas fa-download"></i> Baixar Anexo
+                            </a>
+                        </div>
+                    </div>`;
+            }
+            
+            document.getElementById('detalhesConteudo').innerHTML = `
+                <div class="detalhes-grid">
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">ID</div>
+                        <div class="detalhes-value">#${registro.id}</div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Colaborador</div>
+                        <div class="detalhes-value">${registro.colaborador_nome || 'N/A'}</div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Veículo</div>
+                        <div class="detalhes-value">${registro.veiculo_modelo || 'N/A'} ${registro.veiculo_placa ? `(${registro.veiculo_placa})` : ''}</div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Cliente</div>
+                        <div class="detalhes-value">${registro.cliente_nome || 'N/A'}</div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Data/Hora Saída</div>
+                        <div class="detalhes-value">${formatarData(registro.data_saida)} ${registro.hora_saida || ''}</div>
+                    </div>
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">KM Saída</div>
+                        <div class="detalhes-value">${registro.km_saida || '0'}</div>
+                    </div>
+                    ${registro.data_retorno ? `
+                        <div class="detalhes-item">
+                            <div class="detalhes-label">Data/Hora Retorno</div>
+                            <div class="detalhes-value">${formatarData(registro.data_retorno)} ${registro.hora_retorno || ''}</div>
+                        </div>
+                        <div class="detalhes-item">
+                            <div class="detalhes-label">KM Retorno</div>
+                            <div class="detalhes-value">${registro.km_retorno || '0'}</div>
+                        </div>
+                        <div class="detalhes-item">
+                            <div class="detalhes-label">KM Percorrido</div>
+                            <div class="detalhes-value">${((registro.km_retorno || 0) - (registro.km_saida || 0)).toFixed(1)} km</div>
+                        </div>
+                    ` : ''}
+                    <div class="detalhes-item">
+                        <div class="detalhes-label">Status</div>
+                        <div class="detalhes-value">
+                            <span class="badge ${registro.data_retorno ? 'badge-success' : 'badge-warning'}">
+                                ${registro.data_retorno ? 'Finalizado' : 'Em Campo'}
+                            </span>
+                        </div>
+                    </div>
+                    ${anexosHTML}
+                </div>
+                ${registro.observacoes ? `
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <div class="form-control" style="background: var(--cinza-claro); height: auto; min-height: 60px; white-space: pre-wrap;">${registro.observacoes}</div>
+                    </div>
+                ` : ''}
+                ${registro.observacoes_retorno ? `
+                    <div class="form-group">
+                        <label>Observações do Retorno</label>
+                        <div class="form-control" style="background: var(--cinza-claro); height: auto; min-height: 60px; white-space: pre-wrap;">${registro.observacoes_retorno}</div>
+                    </div>
+                ` : ''}
+                <div style="display: flex; gap: 12px; margin-top: 25px; flex-direction: column;">
+                    ${!registro.data_retorno ? `
+                        <button class="btn btn-verde" onclick="abrirModalRetorno(${registro.id}); fecharModalDetalhes();">
+                            <i class="fas fa-sign-in-alt"></i> Registrar Retorno
+                        </button>
+                    ` : ''}
+                    <button class="btn btn-outline" onclick="fecharModalDetalhes()">
+                        <i class="fas fa-times"></i> Fechar
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('modalDetalhes').classList.add('active');
+        } catch (error) {
+            console.error('Erro ao carregar detalhes:', error);
+            mostrarAlerta(`Erro ao carregar detalhes: ${error.message}`, 'error');
+        }
+    }
+
+    function fecharModalDetalhes() {
+        document.getElementById('modalDetalhes').classList.remove('active');
+    }
+
+    async function deletarRegistro(id) {
+        if (!confirm('Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/equipe-campo/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                mostrarAlerta('Registro excluído com sucesso!', 'success');
+                carregarTabela();
+            } else {
+                const error = await response.json();
+                throw new Error(error.error || `Erro ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarAlerta(error.message || 'Erro ao excluir registro', 'error');
+        }
+    }
+
+    // Funções utilitárias
+    function formatarData(dataString) {
+        if (!dataString) return 'N/A';
+        const data = new Date(dataString);
+        return data.toLocaleDateString('pt-BR');
+    }
+
+    function mostrarAlerta(mensagem, tipo = 'info') {
+        const alert = document.getElementById('alert');
+        let icon = 'info-circle';
+        if (tipo === 'error') icon = 'exclamation-triangle';
+        if (tipo === 'success') icon = 'check-circle';
+        if (tipo === 'warning') icon = 'exclamation-circle';
+
+        alert.innerHTML = `<i class="fas fa-${icon}"></i> ${mensagem}`;
+        alert.className = `alert alert-${tipo}`;
+        alert.style.display = 'flex';
+
+        // Auto-esconder após 5 segundos (exceto para erros)
+        const tempo = tipo === 'error' ? 8000 : 5000;
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, tempo);
+    }
+
+    // Função para testar conexões (debug)
+    async function testarConexoes() {
+        console.log('Testando conexões...');
+        try {
+            const testes = await fetch('/api/equipe-campo/teste-tabelas');
+            const resultado = await testes.json();
+            console.log('Resultado dos testes:', resultado);
+            mostrarAlerta('Teste de conexão realizado. Verifique o console.', 'info');
+        } catch (error) {
+            console.error('Erro no teste:', error);
+            mostrarAlerta('Erro no teste de conexão', 'error');
+        }
+    }
+</script>
+
+<button onclick="testarConexoes()" style="position: fixed; bottom: 20px; right: 20px; z-index: 999; background: var(--verde-principal); color: white; border: none; padding: 10px 15px; border-radius: 50%; box-shadow: var(--sombra); cursor: pointer; font-size: 12px;">
+    <i class="fas fa-bug"></i>
+</button>
+{% endblock %}

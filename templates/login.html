@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+<link rel="manifest" href="{{ url_for('static', filename='img/site.webmanifest') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema Patagonia</title>
+    <style>
+        :root {
+            --patagonia-primary: #006D2C;
+            --patagonia-primary-dark: #005a24;
+            --patagonia-primary-light: #008533;
+            --patagonia-gray-dark: #4B4F54;
+            --patagonia-gray: #D9D9D9;
+            --patagonia-black: #1A1A1A;
+            --status-ok: #006D2C;
+            --status-warning: #F1C40F;
+            --status-critical: #E74C3C;
+            --status-off: #7F8C8D;
+            --text-color: #4B4F54;
+            --light-bg: #f8f9fa;
+            --border-color: #D9D9D9;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .login-left {
+            flex: 1;
+            background: linear-gradient(135deg, var(--patagonia-primary), var(--patagonia-primary-light));
+            color: white;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-left::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            top: -50px;
+            left: -50px;
+        }
+
+        .login-left::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            bottom: -50px;
+            right: -50px;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--patagonia-primary);
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .login-left h1 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-left p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .features-list {
+            margin-top: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 12px;
+        }
+
+        .login-right {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-color: white;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-header h2 {
+            color: var(--patagonia-gray-dark);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .login-header p {
+            color: var(--patagonia-gray-dark);
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--patagonia-gray-dark);
+        }
+
+        .input-with-icon {
+            position: relative;
+            display: block;
+        }
+
+        .input-with-icon i:first-of-type {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--patagonia-gray-dark);
+            z-index: 1;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+            box-sizing: border-box;
+        }
+
+        /* ESPECÍFICO PARA O INPUT DE SENHA */
+        .password-field .form-control {
+            padding-right: 45px; /* Espaço para o botão do olho */
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--patagonia-gray-dark);
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            z-index: 2;
+        }
+
+        .password-toggle:hover {
+            color: var(--patagonia-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--patagonia-primary);
+            box-shadow: 0 0 0 3px rgba(0, 109, 44, 0.2);
+            background-color: white;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--patagonia-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            background-color: var(--patagonia-primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* SEÇÃO BATTER PONTO */
+        .ponto-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid var(--border-color);
+            text-align: center;
+        }
+
+        .ponto-section h3 {
+            color: var(--patagonia-gray-dark);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .btn-ponto {
+            background: linear-gradient(135deg, #ff6b35, #ff8e35);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .btn-ponto:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+            background: linear-gradient(135deg, #ff8e35, #ff6b35);
+        }
+
+        .btn-ponto:active {
+            transform: translateY(0);
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--patagonia-gray-dark);
+            opacity: 0.8;
+        }
+
+        .login-footer a {
+            color: var(--patagonia-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--status-critical);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .alert-success {
+            background-color: rgba(0, 109, 44, 0.1);
+            color: var(--status-ok);
+            border: 1px solid rgba(0, 109, 44, 0.2);
+        }
+
+        .btn-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+            
+            .login-left, .login-right {
+                padding: 30px 25px;
+            }
+            
+            .login-left {
+                text-align: center;
+                padding-bottom: 40px;
+            }
+
+            .logo-container {
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            .login-left h1 {
+                font-size: 1.8rem;
+            }
+
+            .login-left p {
+                font-size: 1rem;
+            }
+
+            .features-list {
+                margin-top: 20px;
+            }
+
+            .login-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .ponto-section {
+                margin-top: 25px;
+                padding-top: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .login-container {
+                border-radius: 8px;
+            }
+
+            .login-left, .login-right {
+                padding: 25px 20px;
+            }
+
+            .logo-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .logo-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .logo-text {
+                font-size: 1.5rem;
+            }
+
+            .login-left h1 {
+                font-size: 1.6rem;
+            }
+
+            .form-control {
+                padding: 12px 12px 12px 40px;
+            }
+
+            .password-field .form-control {
+                padding-right: 40px;
+            }
+
+            .btn, .btn-ponto {
+                padding: 12px;
+            }
+
+            .ponto-section h3 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-left">
+            <div class="logo-container">
+                <div class="logo-icon">A</div>
+                <div class="logo-text">Patagonia Sistemas</div>
+            </div>
+            <h1>Bem-vindo de volta</h1>
+            <p>Faça login para acessar sua conta e continuar de onde parou. Mantenha suas informações seguras e aproveite uma experiência personalizada.</p>
+            
+            <div class="features-list">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <span>Autenticação segura</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                    <span>Performance otimizada</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-cogs"></i></div>
+                    <span>Controle total do sistema</span>
+                </div>
+            </div>
+        </div>
+        <div class="login-right">
+            <div class="login-header">
+                <h2>Fazer Login</h2>
+                <p>Entre com suas credenciais para acessar o sistema</p>
+            </div>
+            
+            <div id="alert" class="alert"></div>
+            
+            <!-- FORMULÁRIO DE LOGIN -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="usuario">Usuário</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Digite seu usuário" required>
+                    </div>
+                </div>
+                
+                <div class="form-group password-field">
+                    <label for="senha">Senha</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" class="form-control" id="senha" name="senha" placeholder="Digite sua senha" required>
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" id="loginBtn">
+                    <span id="btnText">Entrar</span>
+                    <div id="btnLoader" class="btn-loader" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </button>
+            </form>
+
+            <!-- SEÇÃO COMPLETAMENTE SEPARADA PARA BATTER PONTO -->
+            <div class="ponto-section">
+                <h3>Registro de Ponto</h3>
+                <p style="margin-bottom: 15px; color: var(--patagonia-gray-dark);">Clique abaixo para registrar seu ponto</p>
+                <button class="btn-ponto" onclick="irParaPonto()">
+                    <i class="fas fa-clock"></i>
+                    Bater Ponto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Função para redirecionar para a página de bater ponto
+    function irParaPonto() {
+        console.log('Redirecionando para página de ponto...');
+        window.location.href = '/ponto/bater';
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('senha');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const usuario = document.getElementById('usuario').value;
+            const senha = document.getElementById('senha').value;
+            const alert = document.getElementById('alert');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            const loginBtn = document.getElementById('loginBtn');
+
+            // Loading state
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'block';
+            loginBtn.disabled = true;
+
+            alert.style.display = 'none';
+
+            // ✅ ENDPOINT CORRIGIDO: /login em vez de /auth/login
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usuario, senha })
+            })
+            .then(res => res.json().then(data => ({ status: res.status, body: data })))
+            .then(result => {
+                if (result.status >= 400) {
+                    throw new Error(result.body.error);
+                }
+
+                alert.textContent = result.body.message || 'Login realizado com sucesso!';
+                alert.className = 'alert alert-success';
+                alert.style.display = 'block';
+
+                setTimeout(() => {
+                    // ✅ REDIRECIONAMENTO CORRIGIDO: / em vez de /dashboard
+                    window.location.href = '/dashboard';
+                }, 900);
+            })
+            .catch(err => {
+                alert.textContent = err.message || 'Erro ao fazer login. Verifique suas credenciais.';
+                alert.className = 'alert alert-error';
+                alert.style.display = 'block';
+
+                btnText.style.display = 'block';
+                btnLoader.style.display = 'none';
+                loginBtn.disabled = false;
+            });
+        });
+
+        // Adicionar evento de clique alternativo para o botão de ponto
+        const pontoBtn = document.querySelector('.btn-ponto');
+        pontoBtn.addEventListener('click', irParaPonto);
+    });
+    </script>
+</body>
+</html>

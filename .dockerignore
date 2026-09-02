@@ -1,0 +1,17 @@
+# Ignore local uploads and environment files from docker build context
+uploads/
+.venv/
+__pycache__/
+.git
+*.pyc
+.pytest_cache/
+pytest-cache-files-*
+secret.txt
+Dockerfile
+.dockerignore
+docker-compose.yml
+.env
+.git
+.gitignore
+__pycache__/
+*.pyc
