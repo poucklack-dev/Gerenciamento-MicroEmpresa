@@ -1,5 +1,5 @@
 # ============================================================
-#  PATAGONIA — Ponto Inteligente v3.0 + Localização
+#  Aurora Gestão — registro simples de jornada
 #  Reconhecimento Facial + CPF + Jornada Inteligente + Geolocalização
 # ============================================================
 

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block conteudo %}
     <!-- Pre-login: Verificação de cargo -->
-    <title>Colaboradores • Sistema Patagonia</title>
+<title>Colaboradores · Aurora Gestão</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1253,7 +1253,7 @@
                 <div id="tab-cursos" class="tab-content">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="curso_topografia_validade"><i class="fas fa-ruler-combined"></i> Topografia - Validade</label>
+                            <label for="curso_topografia_validade"><i class="fas fa-certificate"></i> Certificação técnica - Validade</label>
                             <input type="date" class="form-control" id="curso_topografia_validade" name="curso_topografia_validade">
                         </div>
                         <div class="form-group">
@@ -3009,7 +3009,7 @@
             
             doc.setFontSize(11);
             doc.setTextColor(100, 100, 100);
-            doc.text(`Sistema Patagonia - Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, margin, yPos);
+            doc.text(`Aurora Gestão - Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, margin, yPos);
             yPos += 15;
             
             for (let i = 0; i < colaboradores.length; i++) {
@@ -3195,7 +3195,7 @@
                     doc.setTextColor(0, 0, 0);
                     
                     const cursos = [
-                        colab.curso_topografia_validade && `Topografia: ${new Date(colab.curso_topografia_validade).toLocaleDateString('pt-BR')}`,
+                        colab.curso_topografia_validade && `Certificação técnica: ${new Date(colab.curso_topografia_validade).toLocaleDateString('pt-BR')}`,
                         colab.curso_estacao_total_validade && `Estação Total: ${new Date(colab.curso_estacao_total_validade).toLocaleDateString('pt-BR')}`,
                         colab.curso_gnss_validade && `GNSS: ${new Date(colab.curso_gnss_validade).toLocaleDateString('pt-BR')}`,
                         colab.curso_drone_validade && `Drone: ${new Date(colab.curso_drone_validade).toLocaleDateString('pt-BR')}`,
@@ -3304,7 +3304,7 @@
                 doc.setFontSize(8);
                 doc.setTextColor(150, 150, 150);
                 doc.text(`Página ${i} de ${totalPages}`, margin, pageHeight - 10);
-                doc.text('Sistema Patagonia - Gestão de Colaboradores', margin + maxWidth - 60, pageHeight - 10);
+                doc.text('Aurora Gestão - Colaboradores', margin + maxWidth - 60, pageHeight - 10);
             }
             
             const nomeArquivo = `colaboradores_${new Date().toISOString().slice(0,10)}.pdf`;
@@ -3562,7 +3562,7 @@
             doc.setTextColor(0, 0, 0);
             
             const cursos = [
-                colaborador.curso_topografia_validade && `Topografia: ${new Date(colaborador.curso_topografia_validade).toLocaleDateString('pt-BR')}`,
+                colaborador.curso_topografia_validade && `Certificação técnica: ${new Date(colaborador.curso_topografia_validade).toLocaleDateString('pt-BR')}`,
                 colaborador.curso_estacao_total_validade && `Estação Total: ${new Date(colaborador.curso_estacao_total_validade).toLocaleDateString('pt-BR')}`,
                 colaborador.curso_gnss_validade && `GNSS: ${new Date(colaborador.curso_gnss_validade).toLocaleDateString('pt-BR')}`,
                 colaborador.curso_drone_validade && `Drone: ${new Date(colaborador.curso_drone_validade).toLocaleDateString('pt-BR')}`,
@@ -3722,15 +3722,10 @@
     async function carregarCargos() {
         try {
             const cargos = [
-                'Auxiliar de Topografia','Ajudante de Campo','Topógrafo','Técnico em Topografia',
-                'Técnico em Geomática','Operador de Estação Total','Operador GNSS',
-                'Piloto de Drone (VANT/RPA)','Piloto ANAC (RPA)','Assistente de Campo',
-                'Encarregado de Campo','Desenhista Técnico','Desenhista CAD','Projetista',
-                'Analista de Geoprocessamento','Analista SIG (GIS)','Analista de Geodésia',
-                'Técnico SIG','Encarregado de Topografia','Supervisor de Topografia',
-                'Coordenador de Topografia','Gerente de Topografia',
-                'Assistente Administrativo','Analista Administrativo',
-                'Almoxarife','RH / DP','Financeiro', 'Gestor'
+                'Auxiliar Administrativo','Assistente Administrativo','Analista Administrativo',
+                'Auxiliar Financeiro','Analista Financeiro','Financeiro','Comercial',
+                'Atendimento','Operações','Logística','Almoxarife','RH / DP',
+                'Técnico','Supervisor','Coordenador','Gerente','Gestor','Administrador'
             ];
             
             const cargoSelect = document.getElementById('cargo');

@@ -1,5 +1,5 @@
 # ============================================================
-#  PATAGONIA • Módulo Unificado de Fornecedores v2025
+#  Módulo administrativo de fornecedores
 #  CRUD • Upload • Contratos • Pesquisa
 # ============================================================
 

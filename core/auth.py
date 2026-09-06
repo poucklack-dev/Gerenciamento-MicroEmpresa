@@ -7,6 +7,8 @@ from werkzeug.security import generate_password_hash
 ADMIN_ROLES = frozenset({
     "admin",
     "gestor",
+    "administrador",
+    # Mantidos apenas para compatibilidade com registros antigos.
     "gerente de topografia",
     "coordenador de topografia",
     "supervisor de topografia",

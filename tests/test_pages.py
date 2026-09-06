@@ -16,7 +16,8 @@ import pytest
         "/documentos",
         "/fornecedores",
         "/perfil",
-        "/banco_de_horas",
+            "/banco_de_horas",
+            "/empresa",
     ],
 )
 def test_administrative_pages_render_for_session_user(client, path):

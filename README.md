@@ -1,85 +1,76 @@
-# Patagonia Topografia — Gestão Empresarial
+# Aurora Gestão
 
-Sistema web para centralizar rotinas administrativas, operacionais e financeiras de uma empresa de topografia. O projeto demonstra desenvolvimento full stack com Flask, PostgreSQL, interface responsiva, controle de acesso, uploads e testes automatizados.
+Plataforma web de gestão empresarial desenvolvida para centralizar processos administrativos e financeiros de micro e pequenas empresas.
 
-## Screenshots
+O projeto funciona como um ERP/backoffice leve: ajuda proprietários e gestores a acompanhar receitas, despesas, resultado, contas pendentes, clientes, fornecedores, contratos, colaboradores e documentos sem tentar substituir um sistema contábil, fiscal, CRM ou RH completo.
 
-As imagens do projeto devem ser adicionadas em `docs/images/`, sempre sem dados pessoais ou empresariais reais.
+## Visão do produto
 
-| Tela | Arquivo sugerido |
-| --- | --- |
-| Login | `docs/images/login.png` |
-| Dashboard | `docs/images/dashboard.png` |
-| Cadastros | `docs/images/cadastros.png` |
-| Relatórios | `docs/images/relatorios.png` |
+- dashboard executivo orientado a dinheiro e pendências;
+- visão financeira, contas a pagar e contas a receber;
+- cadastros relacionais de clientes, fornecedores e contratos;
+- administração de colaboradores e banco de horas;
+- central de documentos e vencimentos;
+- frota e deslocamentos como recurso complementar;
+- configuração da identidade da empresa;
+- interface compacta e responsiva para rotinas administrativas.
 
-## Sobre
+Funcionalidades herdadas do projeto original foram reposicionadas: quilometragem está em **Frota e deslocamentos**, certificações fazem parte de **Colaboradores/Documentos** e atividades externas deixaram de competir com o núcleo administrativo.
 
-A aplicação organiza clientes, colaboradores, documentos, contratos, equipes externas, jornada de trabalho e movimentações financeiras. O código foi estruturado por domínios em blueprints Flask e utiliza PostgreSQL com consultas parametrizadas.
+## Stack
 
-## Funcionalidades
-
-- autenticação por usuário e senha;
-- administração de usuários com controle de permissão no backend;
-- dashboard com indicadores operacionais e financeiros;
-- gestão de clientes, contatos e serviços;
-- cadastro de colaboradores, NRs, EPIs e habilidades;
-- registro de ponto, geolocalização e banco de horas;
-- reconhecimento facial para o fluxo de ponto;
-- controle de equipes e veículos em campo;
-- contratos, contas a pagar e contas a receber;
-- documentos, comprovantes e anexos;
-- fornecedores, quilometragem e custos de veículos.
-
-## Tecnologias
-
-- Python 3.11 e Flask;
+- Python 3.11, Flask e Jinja;
 - PostgreSQL e psycopg2;
-- Jinja, HTML, CSS e JavaScript;
+- HTML, CSS e JavaScript;
 - Flask-Login, Flask-Limiter e Flask-Talisman;
-- OpenCV para o recurso de reconhecimento facial;
-- Waitress como servidor HTTP no container;
-- Docker e Docker Compose;
+- armazenamento local protegido para anexos;
+- Docker Compose;
 - Pytest e GitHub Actions.
 
 ## Arquitetura
 
-`app.py` cria a aplicação, configura extensões e registra os blueprints. `backend/` agrupa rotas e regras por domínio. `core/` concentra autenticação, banco, rate limiting e armazenamento. A interface usa templates Jinja em `templates/` e ativos em `static/`.
-
-O projeto mantém SQL direto por refletir sua arquitetura atual. `schema_patagonia.sql` é a única fonte versionada da estrutura do banco e não possui dados reais.
-
-## Estrutura do projeto
-
 ```text
-backend/                rotas e regras dos módulos
-core/                   serviços compartilhados
-docs/images/            screenshots sem dados reais
-static/                 imagens e ativos públicos
-templates/              telas Jinja
+backend/                blueprints e regras por domínio
+core/                   autenticação, banco, storage e serviços compartilhados
+infra/migrations/       evoluções incrementais e não destrutivas do banco
+static/css/             design system e estilos por tela
+static/js/              comportamento reutilizável da interface
+templates/              páginas Jinja
 tests/                  testes automatizados
-.github/workflows/      integração contínua
-app.py                  configuração da aplicação
-run_dev.py              inicialização local
-schema_patagonia.sql    schema oficial do PostgreSQL
+schema.sql              schema completo para um banco novo
 ```
 
-## Segurança
+`app.py` configura a aplicação e registra os blueprints. O projeto mantém SQL parametrizado e tipos `NUMERIC` para valores monetários. A migration `001_empresa.sql` introduz a configuração central da empresa sem apagar registros existentes.
 
-- senhas armazenadas com hash PBKDF2;
-- cookies `HttpOnly` e `SameSite=Lax`, com `Secure` em produção;
-- `SECRET_KEY` obrigatória em produção;
-- consultas SQL parametrizadas nos fluxos principais;
-- rate limiting na autenticação;
-- autorização administrativa centralizada no backend;
-- bloqueio de escrita com origem externa;
-- limites de requisição e proteção contra traversal em arquivos;
-- uploads, fotos, `.env`, logs e dumps locais ignorados pelo Git.
+## Executar com Docker
 
-Nunca utilize dados, imagens ou credenciais reais para demonstrar este projeto.
+1. Copie `.env.example` para `.env`.
+2. Defina valores locais para `SECRET_KEY` e `DB_PASS`.
+3. Inicie:
 
-## Instalação local
+```powershell
+docker compose up --build
+```
 
-Requisitos: Python 3.11 e PostgreSQL.
+Acesse `http://localhost:8080`.
+
+Em banco já existente, aplique as migrations em ordem. Para a migration atual:
+
+```powershell
+Get-Content -Raw infra/migrations/001_empresa.sql | docker compose exec -T db psql -U patagonia -d patagonia
+```
+
+## Demonstração opcional
+
+O seed é idempotente, exige ativação explícita e usa somente pessoas e empresas fictícias. Ele cria a empresa **Aurora Serviços Empresariais**, usuário administrativo, clientes, fornecedores, colaboradores, contratos, documentos e movimentações financeiras demonstrativas.
+
+```powershell
+docker compose exec -e DEMO_SEED=1 -e DEMO_ADMIN_PASSWORD="escolha-uma-senha-segura" web python seed_demo.py
+```
+
+O usuário padrão do seed é `admin_demo`. Nenhuma senha é versionada.
+
+## Desenvolvimento sem Docker
 
 ```powershell
 python -m venv .venv
@@ -89,36 +80,17 @@ Copy-Item .env.example .env
 python run_dev.py
 ```
 
-Antes de iniciar, ajuste o `.env` e aplique `schema_patagonia.sql` em um banco vazio. Em Linux ou macOS, utilize o comando de ativação correspondente ao seu shell.
+## Segurança
 
-## Docker
+- hash de senha PBKDF2 e rate limiting no login;
+- autorização administrativa validada no backend;
+- consultas parametrizadas;
+- cookies `HttpOnly` e `SameSite=Lax`;
+- limite de requisição e validação de upload;
+- proteção contra path traversal e extensões executáveis;
+- segredos, uploads e dados locais ignorados pelo Git.
 
-1. Copie `.env.example` para `.env`.
-2. Substitua `SECRET_KEY` e `DB_PASS` por valores locais seguros.
-3. Execute:
-
-```powershell
-docker compose up --build
-```
-
-A aplicação ficará disponível em `http://localhost:8080`. Na primeira criação do volume, o PostgreSQL aplica automaticamente o schema oficial. O projeto não cria conta administrativa com senha padrão.
-
-Para criar uma conta administrativa de demonstração opcional, informe a senha somente no terminal:
-
-```powershell
-$env:DEMO_SEED="1"
-$env:DEMO_ADMIN_PASSWORD="escolha-uma-senha-segura"
-docker compose exec web python seed_demo.py
-Remove-Item Env:DEMO_SEED, Env:DEMO_ADMIN_PASSWORD
-```
-
-O seed utiliza apenas dados fictícios, é idempotente e nunca executa automaticamente.
-
-## Configuração
-
-As variáveis documentadas estão em `.env.example`. As principais são `ENV`, `SECRET_KEY`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS` e `LOCAL_STORAGE_PATH`. O projeto utiliza somente PostgreSQL e armazenamento de arquivos locais.
-
-As rotas diagnósticas permanecem desabilitadas por padrão.
+Use apenas dados fictícios ao demonstrar este repositório.
 
 ## Testes
 
@@ -126,20 +98,17 @@ As rotas diagnósticas permanecem desabilitadas por padrão.
 python -m pytest -q
 ```
 
-O workflow em `.github/workflows/tests.yml` executa a suíte em pushes para `main` e pull requests.
+O workflow em `.github/workflows/tests.yml` executa a suíte em pushes e pull requests.
 
-## Roadmap
+## Screenshots
 
-- introduzir migrations incrementais para futuras alterações do banco;
-- ampliar testes de integração com PostgreSQL;
-- adicionar screenshots anonimizados das telas principais;
-- evoluir gradualmente a validação de uploads por conteúdo.
+Screenshots anonimizados podem ser adicionados em `docs/images/` para demonstrar login, dashboard, financeiro e cadastros.
 
 ## Licença
 
-Distribuído sob a Licença MIT. Consulte [LICENSE](LICENSE).
+Distribuído sob a [Licença MIT](LICENSE).
 
-## Autor
+## Desenvolvedor
 
 **Emanuel Sousa Vasconcellos Lima**
 

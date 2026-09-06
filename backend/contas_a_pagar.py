@@ -23,8 +23,7 @@ CATEGORIAS = [
     "Combustível", "Troca de Óleo / Filtros", "Manutenção Preventiva", "Manutenção Corretiva",
     "Peças Mecânicas", "Pneus / Alinhamento", "Documentação de Veículos (IPVA / Licenciamento)",
     "Seguro de Veículos", "Rastreamento / Telemetria", "Calibração de Equipamentos",
-    "Manutenção de Equipamentos", "Locação de Equipamentos", "Locação de Drone",
-    "Acessórios Topográficos", "Softwares de Topografia", "Renovação de Licenças",
+    "Manutenção de Equipamentos", "Locação de Equipamentos", "Softwares e Licenças",
     "EPIs", "Reposição de EPIs", "Uniformes", "Treinamentos (NRs)", "ASO / Exames Ocupacionais",
     "Notebooks / Tablets", "Telefonia / Internet Móvel", "Servidores / Nuvem",
     "Certificado Digital", "Manutenção de TI", "Salários", "Encargos", "Benefícios",
@@ -101,7 +100,7 @@ def listar_categorias():
             ],
             "🔧 Equipamentos e Tecnologia": [
                 "Calibração de Equipamentos", "Manutenção de Equipamentos", "Locação de Equipamentos",
-                "Locação de Drone", "Acessórios Topográficos", "Softwares de Topografia", "Renovação de Licenças"
+                "Softwares e Licenças"
             ],
             "👥 Recursos Humanos": [
                 "EPIs", "Reposição de EPIs", "Uniformes", "Treinamentos (NRs)", "ASO / Exames Ocupacionais"

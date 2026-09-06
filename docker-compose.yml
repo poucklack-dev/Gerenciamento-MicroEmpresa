@@ -32,7 +32,7 @@ services:
     container_name: patagonia_db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-      - ./schema_patagonia.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     environment:
       POSTGRES_DB: ${DB_NAME:-patagonia}
       POSTGRES_USER: ${DB_USER:-patagonia}

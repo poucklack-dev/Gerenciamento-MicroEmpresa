@@ -39,15 +39,10 @@ def validar_rg(rg):
     return bool(re.fullmatch(r"\d{5,12}", rg or ""))
 
 CARGOS = {
-    'Auxiliar de Topografia','Ajudante de Campo','Topógrafo','Técnico em Topografia',
-    'Técnico em Geomática','Operador de Estação Total','Operador GNSS',
-    'Piloto de Drone (VANT/RPA)','Piloto ANAC (RPA)','Assistente de Campo',
-    'Encarregado de Campo','Desenhista Técnico','Desenhista CAD','Projetista',
-    'Analista de Geoprocessamento','Analista SIG (GIS)','Analista de Geodésia',
-    'Técnico SIG','Encarregado de Topografia','Supervisor de Topografia',
-    'Coordenador de Topografia','Gerente de Topografia',
-    'Assistente Administrativo','Analista Administrativo',
-    'Almoxarife','RH / DP','Financeiro', 'Gestor'
+    'Auxiliar Administrativo', 'Assistente Administrativo', 'Analista Administrativo',
+    'Auxiliar Financeiro', 'Analista Financeiro', 'Financeiro', 'Comercial',
+    'Atendimento', 'Operações', 'Logística', 'Almoxarife', 'RH / DP',
+    'Técnico', 'Supervisor', 'Coordenador', 'Gerente', 'Gestor', 'Administrador'
 }
 
 def validar_cargo(c): return c in CARGOS

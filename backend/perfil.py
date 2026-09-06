@@ -1,4 +1,4 @@
-# perfil.py — PATAGONIA • Backend Premium de Perfil de Usuário
+# Perfil de usuário
 # ==============================================================
 
 from flask import Blueprint, render_template, request, jsonify, current_app

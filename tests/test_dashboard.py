@@ -28,4 +28,4 @@ def test_dashboard_accessible_for_logged_in_user(client):
     response = client.get('/dashboard')
     assert response.status_code == 200
     # Check for a piece of content that is unique to the dashboard page
-    assert "Dashboard de Gestão".encode("utf-8") in response.data
+    assert "Visão geral da empresa".encode("utf-8") in response.data

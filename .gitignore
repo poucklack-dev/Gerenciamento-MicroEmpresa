@@ -115,4 +115,5 @@ ENV
 # DB dumps
 *.sql
 *.dump
-!schema_patagonia.sql
+!schema.sql
+!infra/migrations/*.sql

@@ -332,7 +332,7 @@ def get_nrs_alerts(cursor, hoje: date, daqui_7_dias: date) -> List[Dict]:
                 n.codigo as nr_codigo,
                 n.nome as nr_nome,
                 nc.data_validade,
-                DATE_PART('day', CURRENT_DATE - nc.data_validade)::integer as dias_vencido
+                (CURRENT_DATE - nc.data_validade)::integer as dias_vencido
             FROM nrs_colaboradores nc
             JOIN colaboradores c ON c.id = nc.colaborador_id
             JOIN nrs n ON n.id = nc.nr_id
@@ -368,7 +368,7 @@ def get_nrs_alerts(cursor, hoje: date, daqui_7_dias: date) -> List[Dict]:
                 n.codigo as nr_codigo,
                 n.nome as nr_nome,
                 nc.data_validade,
-                DATE_PART('day', nc.data_validade - CURRENT_DATE)::integer as dias_para_vencer
+                (nc.data_validade - CURRENT_DATE)::integer as dias_para_vencer
             FROM nrs_colaboradores nc
             JOIN colaboradores c ON c.id = nc.colaborador_id
             JOIN nrs n ON n.id = nc.nr_id
@@ -869,13 +869,7 @@ def get_nrs_vencimento_stats(cursor) -> Dict:
                     WHEN data_validade <= CURRENT_DATE + INTERVAL '30 days' THEN 'A vencer (30 dias)'
                     ELSE 'Em dia'
                 END
-            ORDER BY 
-                CASE 
-                    WHEN status = 'Vencidas' THEN 1
-                    WHEN status = 'A vencer (7 dias)' THEN 2
-                    WHEN status = 'A vencer (30 dias)' THEN 3
-                    ELSE 4
-                END;
+            ORDER BY MIN(data_validade);
         """)
         
         labels = []
@@ -900,6 +894,71 @@ def get_nrs_vencimento_stats(cursor) -> Dict:
 # ============================================================
 # ROTAS PRINCIPAIS
 # ============================================================
+
+@bp_home.get("/dashboard/executivo")
+@login_required
+def dashboard_executivo():
+    """Resumo financeiro compacto para o proprietário da empresa."""
+    periodo = request.args.get("periodo", "month")
+    if periodo == "month":
+        inicio = date.today().replace(day=1)
+    else:
+        try:
+            dias = min(max(int(periodo), 1), 366)
+        except ValueError:
+            dias = 30
+        inicio = date.today() - timedelta(days=dias - 1)
+
+    conn = get_conn()
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            SELECT
+              COALESCE((SELECT SUM(valor) FROM contas_receber
+                        WHERE LOWER(COALESCE(status, '')) IN ('recebido','pago')
+                          AND COALESCE(vencimento, criado_em::date) >= %s), 0),
+              COALESCE((SELECT SUM(valor) FROM contas_pagar
+                        WHERE LOWER(COALESCE(status, '')) = 'pago'
+                          AND COALESCE(vencimento, criado_em::date) >= %s), 0),
+              COALESCE((SELECT SUM(valor) FROM contas_receber
+                        WHERE LOWER(COALESCE(status, '')) NOT IN ('recebido','pago','cancelado')), 0),
+              COALESCE((SELECT SUM(valor) FROM contas_pagar
+                        WHERE LOWER(COALESCE(status, '')) NOT IN ('pago','cancelado')), 0),
+              (SELECT COUNT(*) FROM contas_receber
+               WHERE LOWER(COALESCE(status, '')) NOT IN ('recebido','pago','cancelado')),
+              (SELECT COUNT(*) FROM contas_receber
+               WHERE vencimento < CURRENT_DATE AND LOWER(COALESCE(status, '')) NOT IN ('recebido','pago','cancelado'))
+              + (SELECT COUNT(*) FROM contas_pagar
+                 WHERE vencimento < CURRENT_DATE AND LOWER(COALESCE(status, '')) NOT IN ('pago','cancelado')),
+              (SELECT COUNT(*) FROM clientes WHERE LOWER(COALESCE(status, 'ativo')) = 'ativo'),
+              (SELECT COUNT(*) FROM contratos WHERE LOWER(COALESCE(status, 'ativo')) = 'ativo')
+        """, (inicio, inicio))
+        receitas, despesas, a_receber, a_pagar, pendentes, vencidas, clientes, contratos = cur.fetchone()
+        cur.execute("""
+            WITH meses AS (
+              SELECT generate_series(date_trunc('month', CURRENT_DATE) - interval '5 months',
+                                     date_trunc('month', CURRENT_DATE), interval '1 month')::date mes
+            ), receitas AS (
+              SELECT date_trunc('month', COALESCE(vencimento, criado_em::date))::date mes, SUM(valor) total
+              FROM contas_receber WHERE LOWER(COALESCE(status, '')) IN ('recebido','pago') GROUP BY 1
+            ), despesas AS (
+              SELECT date_trunc('month', COALESCE(vencimento, criado_em::date))::date mes, SUM(valor) total
+              FROM contas_pagar WHERE LOWER(COALESCE(status, '')) = 'pago' GROUP BY 1
+            )
+            SELECT TO_CHAR(m.mes, 'MM/YYYY'), COALESCE(r.total,0), COALESCE(d.total,0)
+            FROM meses m LEFT JOIN receitas r USING(mes) LEFT JOIN despesas d USING(mes) ORDER BY m.mes
+        """)
+        evolucao = [{"mes": row[0][:2], "receitas": float(row[1]), "despesas": float(row[2])} for row in cur.fetchall()]
+        return jsonify({"status": "success", "data": {
+            "receitas": float(receitas), "despesas": float(despesas),
+            "resultado": float(receitas - despesas), "a_receber": float(a_receber),
+            "a_pagar": float(a_pagar), "recebimentos_pendentes": pendentes,
+            "contas_vencidas": vencidas, "clientes_ativos": clientes,
+            "contratos_ativos": contratos, "evolucao": evolucao,
+        }})
+    finally:
+        cur.close()
+        conn.close()
 
 @bp_home.get("/dashboard/overview")
 @login_required
@@ -1146,7 +1205,7 @@ def get_nrs_proximas():
                 n.codigo as nr_codigo,
                 n.nome as nr_nome,
                 nc.data_validade,
-                DATE_PART('day', nc.data_validade - CURRENT_DATE)::integer as dias_para_vencer
+                (nc.data_validade - CURRENT_DATE)::integer as dias_para_vencer
             FROM nrs_colaboradores nc
             JOIN colaboradores c ON c.id = nc.colaborador_id
             JOIN nrs n ON n.id = nc.nr_id
@@ -1235,4 +1294,3 @@ def get_relatorio_vencimentos():
     except Exception as e:
         logger.error(f"Erro ao gerar relatório: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
-

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block conteudo %}
 {% if session.get('usuarios') and session['usuarios'].get('cargo') in ['admin', 'Administrador', 'gestor'] %}
-    <title>PATAGONIA FINANCE • DASHBOARD EXECUTIVO 360°</title>
+    <title>Visão financeira · Aurora Gestão</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -966,7 +966,7 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <div class="header-text">
-                        <h1>PATAGONIA FINANCE • DASHBOARD EXECUTIVO 360°</h1>
+                        <h1>Visão financeira</h1>
                         <p class="subtitle">VISÃO 360° • ANÁLISE ESTRATÉGICA • CONTROLE FINANCEIRO</p>
                     </div>
                 </div>
@@ -1402,7 +1402,7 @@
                 SISTEMA ONLINE • DASHBOARD 360° • ÚLTIMA ATUALIZAÇÃO: <span id="lastUpdate">--:--:--</span>
             </p>
             <p style="margin-top: 5px; font-family: 'Orbitron'; font-size: 11px; color: var(--primary-green);">
-                PATAGONIA TOPOGRAFIA • FINANCEIRO 360° © 2025
+                AURORA GESTÃO • RELATÓRIO FINANCEIRO
             </p>
         </div>
     </div>
@@ -3489,7 +3489,7 @@ async function gerarRelatorioCompleto() {
         doc.rect(0, 0, 210, 40, 'F');
         doc.setTextColor(0, 255, 156);
         doc.setFontSize(20);
-        doc.text('PATAGONIA FINANCE 360°', 20, 20);
+        doc.text('AURORA GESTÃO - RELATÓRIO FINANCEIRO', 20, 20);
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(12);
         doc.text('Relatório Financeiro Executivo Completo', 20, 30);
@@ -3598,7 +3598,7 @@ async function exportarParaExcel() {
         const gastos = dashboardData.gastos_detalhados || [];
         const veiculos = dashboardData.veiculos || {};
         
-        let csv = 'PATAGONIA FINANCE - DASHBOARD 360°\n';
+        let csv = 'AURORA GESTÃO - RELATÓRIO FINANCEIRO\n';
         csv += `Período: ${document.getElementById('dataInicio')?.value || ''} a ${document.getElementById('dataFim')?.value || ''}\n`;
         csv += `Gerado em: ${new Date().toLocaleString('pt-BR')}\n\n`;
         

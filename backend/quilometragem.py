@@ -1,6 +1,6 @@
 # ========================================================================
 #   SISTEMA DE GESTÃO DE CUSTOS VEICULARES - BACKEND COMPLETO CORRIGIDO
-#   Versão compatível com o banco de dados real da Patagonia Topografia
+#   Módulo de frota e deslocamentos do ERP
 # ========================================================================
 
 from flask import Blueprint, request, jsonify, send_file, current_app

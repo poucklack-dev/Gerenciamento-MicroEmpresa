@@ -1,6 +1,6 @@
 # clientes.py - VERSÃO SEM JWT
 # ============================================================
-#  PATAGONIA • Backend de Clientes
+#  Módulo de clientes
 # ============================================================
 
 from flask import Blueprint, request, jsonify, render_template
