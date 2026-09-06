@@ -25,6 +25,8 @@ body {
   background: #f3f5f4 !important;
   color: var(--text-primary) !important;
   font-family: Inter, system-ui, sans-serif !important;
+  font-variant-numeric: proportional-nums !important;
+  font-feature-settings: "zero" 0, "tnum" 0 !important;
 }
 
 .grid-bg { display: none !important; }
@@ -106,6 +108,9 @@ body {
 .btn-warning { background: #fff !important; color: #805814 !important; border: 1px solid #d9bd8d !important; }
 .btn-secondary { background: #fff !important; color: var(--text-secondary) !important; border: 1px solid #cbd5cf !important; }
 .btn:hover { transform: none !important; filter: brightness(.97); }
+.btn.is-loading i { animation: finance-spin .7s linear infinite; }
+.btn:disabled { opacity: .68; cursor: wait; }
+@keyframes finance-spin { to { transform: rotate(360deg); } }
 
 .alertas-container { margin-bottom: 12px !important; }
 .alerta-card {
@@ -128,7 +133,7 @@ body {
   margin-bottom: 12px !important;
 }
 .kpi-card {
-  min-height: 126px !important;
+  min-height: 96px !important;
   padding: 14px !important;
   background: #fff !important;
   border: 1px solid var(--card-border) !important;
@@ -138,14 +143,14 @@ body {
 .kpi-card::before { height: 3px !important; background: var(--primary-green) !important; }
 .kpi-card:hover { transform: none !important; border-color: #b9c8c0 !important; }
 .kpi-title { color: var(--text-secondary) !important; font: 600 10px Inter, sans-serif !important; letter-spacing: .04em !important; }
-.kpi-value { margin: 12px 0 8px !important; color: var(--text-primary) !important; font: 650 23px/1.1 Inter, sans-serif !important; letter-spacing: -.03em !important; }
+.kpi-value { margin: 10px 0 6px !important; color: var(--text-primary) !important; font: 650 22px/1.1 Inter, sans-serif !important; letter-spacing: -.03em !important; font-variant-numeric: proportional-nums !important; font-feature-settings: "zero" 0, "tnum" 0 !important; }
 .kpi-badge { padding: 3px 6px !important; border: 0 !important; font-size: 8px !important; }
 .badge-success { background: #e8f2ed !important; color: #28624f !important; }
 .badge-warning { background: #fbf0dd !important; color: #8a5b0c !important; }
 .badge-danger { background: #f9e8e6 !important; color: #983b34 !important; }
 .badge-info { background: #e8f0f7 !important; color: #285a87 !important; }
 .kpi-comparison { font-size: 10px !important; }
-.kpi-insight { margin-top: 8px !important; padding-top: 7px !important; border-top: 1px solid #edf0ee !important; color: var(--text-muted) !important; font-size: 9px !important; }
+.kpi-insight { display: none !important; }
 
 .charts-container {
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr) !important;
@@ -168,7 +173,7 @@ body {
 .chart-title i { color: var(--primary-green) !important; }
 .chart-btn { width: 28px !important; height: 28px !important; padding: 0 !important; background: #fff !important; border: 1px solid #d5ddd8 !important; color: var(--text-muted) !important; }
 .chart-btn.active { background: #e9f1ed !important; color: var(--primary-green) !important; border-color: #bdd0c7 !important; }
-.chart-container { height: 250px !important; padding-top: 10px !important; }
+.chart-container { height: 218px !important; padding-top: 8px !important; }
 
 .data-tables-container { gap: 10px !important; margin-bottom: 12px !important; }
 .data-table { padding: 0 14px 8px !important; overflow: hidden; }
@@ -185,6 +190,16 @@ body {
 .indicator-card:hover { transform: none !important; border-color: #b9c8c0 !important; }
 .indicator-value { margin: 9px 0 5px !important; color: var(--text-primary) !important; font: 650 20px Inter, sans-serif !important; }
 .indicator-label { color: var(--text-muted) !important; font-size: 9px !important; }
+
+/* A tela principal mostra somente o resumo decisório. O restante fica nos modais. */
+.dashboard-container > .data-tables-container,
+.dashboard-container > .indicators-grid,
+.dashboard-container > .indicators-grid + .charts-container,
+.dashboard-container > .dashboard-footer {
+  display: none !important;
+}
+
+.loading-overlay { display: none !important; }
 
 .modal { background: rgba(23,32,28,.42) !important; backdrop-filter: none !important; }
 .modal-content { background: #fff !important; color: var(--text-primary) !important; border: 1px solid var(--card-border) !important; box-shadow: 0 16px 40px rgba(20,35,29,.18) !important; }
