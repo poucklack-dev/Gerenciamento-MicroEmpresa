@@ -205,7 +205,7 @@ def atualizar_contrato(id):
 
         if file and file.filename:
             storage = get_storage()
-            # remove previous via storage (works for local and gcs)
+            # Remove o arquivo anterior pelo serviço de armazenamento local.
             if arquivo_atual:
                 try:
                     storage.delete(arquivo_atual)
@@ -266,7 +266,7 @@ def excluir_contrato(id):
             try:
                 storage.delete(row[0])
             except Exception as e:
-                print(f"Failed to delete file on GCS/local: {e}") # Log error
+                current_app.logger.warning("Falha ao excluir arquivo local antigo: %s", e)
 
 
         cur.execute("DELETE FROM contratos WHERE id=%s", (id,))

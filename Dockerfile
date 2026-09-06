@@ -47,6 +47,7 @@ COPY core/ ./core/
 COPY templates/ ./templates/
 COPY static/ ./static/
 COPY run_dev.py .
+COPY seed_demo.py .
 COPY app.py .
 COPY config.py .
 

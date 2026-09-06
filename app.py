@@ -2,7 +2,6 @@
 import os
 from flask import Flask, jsonify, request, session
 from flask_login import LoginManager, current_user
-from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_talisman import Talisman
 
 from core.database import get_conn, close_conn
@@ -10,8 +9,6 @@ from core.user import User
 from core.auth import is_admin_role
 from core.limiter import limiter  # Import central limiter instance
 from config import get_config_class, get_env_name
-
-# Server-side session imports are done conditionally below (only if REDIS_URL present)
 
 # ============================================================
 #  APP Initialization
@@ -23,17 +20,11 @@ app = Flask(__name__,
 app.config.from_object(get_config_class())
 app.url_map.strict_slashes = False
 
-# Forwarded headers are trusted only when deployment explicitly enables a proxy.
-if os.environ.get("TRUST_PROXY", "").strip().lower() in {"1", "true", "yes"}:
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
-
 # ============================================================
 #  RATE LIMITING (FLASK-LIMITER)
 # ============================================================
-# Initialize rate limiter. Uses Redis if REDIS_URL is set, otherwise memory.
-# This is placed after ProxyFix so that it can correctly get the remote address.
-redis_url = app.config.get('REDIS_URL') or os.environ.get('REDIS_URL')
-app.config.setdefault("RATELIMIT_STORAGE_URI", redis_url if redis_url else "memory://")
+# In-memory limiting is sufficient for this single-instance portfolio project.
+app.config.setdefault("RATELIMIT_STORAGE_URI", "memory://")
 app.config.setdefault("RATELIMIT_STRATEGY", "fixed-window")
 app.config.setdefault("RATELIMIT_DEFAULT", os.environ.get("RATELIMIT_DEFAULT", "200 per day; 50 per hour"))
 
@@ -106,40 +97,11 @@ if env_name in {"prod", "production"} and not app.config.get("SECRET_KEY"):
         "SECRET_KEY environment variable is required in production and is not set. Application will not start."
     )
 
-# ----------------------
-# Server-side session (optional Redis)
-# If REDIS_URL is provided in environment/config, initialize Flask-Session
-# ----------------------
-if redis_url:
-    try:
-        import redis as redis_lib
-        from flask_session import Session as FlaskSession
-
-        # Create Redis client and attach to Flask-Session
-        redis_client = redis_lib.from_url(redis_url)
-        app.config['SESSION_TYPE'] = 'redis'
-        app.config['SESSION_REDIS'] = redis_client
-        app.config.setdefault('SESSION_PERMANENT', app.config.get('SESSION_PERMANENT', False))
-        app.config.setdefault('SESSION_USE_SIGNER', app.config.get('SESSION_USE_SIGNER', True))
-
-        sess = FlaskSession()
-        sess.init_app(app)
-        app.logger.info('Server-side sessions enabled (Redis)')
-    except Exception as e:
-        # Fail fast in production if Redis is explicitly required
-        if env_name in {"prod", "production"}:
-            raise RuntimeError(f'Failed to initialize Redis session store: {e}')
-        else:
-            app.logger.warning(f'Could not initialize Redis session store, falling back to cookie sessions: {e}')
-
-
 # ============================================================
 #  LOGIN MANAGER
 # ============================================================
 login_manager = LoginManager()
 login_manager.init_app(app)
-# Avoid spurious logouts when a reverse proxy changes the apparent client IP.
-# Setting to None avoids aggressive logout; monitor this for security needs.
 login_manager.session_protection = None
 login_manager.login_view = 'login.login'
 
@@ -153,9 +115,6 @@ def protect_administrative_api():
     """
     if not request.path.startswith("/api/"):
         return None
-
-    if request.path.startswith("/api/diag/"):
-        return None  # The diagnostic blueprint performs its own admin check.
 
     session_user = session.get("usuarios") or {}
     if session_user.get("id") or getattr(current_user, "is_authenticated", False):
@@ -250,7 +209,6 @@ from backend.quilometragem import custos_bp
 from backend.usuario import usuarios_bp
 from backend.banco_de_horas import banco_horas_bp
 from backend.pages import pages_bp
-from backend.diag import diag_bp
 from backend.media import media_bp
 
 app.register_blueprint(pages_bp)
@@ -273,7 +231,6 @@ app.register_blueprint(bp_ponto)
 app.register_blueprint(custos_bp)
 app.register_blueprint(usuarios_bp)
 app.register_blueprint(banco_horas_bp)
-app.register_blueprint(diag_bp)
 app.register_blueprint(media_bp)
 
 # Handle large uploads gracefully and return JSON

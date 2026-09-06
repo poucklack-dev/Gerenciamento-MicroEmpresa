@@ -103,11 +103,22 @@ docker compose up --build
 
 A aplicação ficará disponível em `http://localhost:8080`. Na primeira criação do volume, o PostgreSQL aplica automaticamente o schema oficial. O projeto não cria conta administrativa com senha padrão.
 
+Para criar uma conta administrativa de demonstração opcional, informe a senha somente no terminal:
+
+```powershell
+$env:DEMO_SEED="1"
+$env:DEMO_ADMIN_PASSWORD="escolha-uma-senha-segura"
+docker compose exec web python seed_demo.py
+Remove-Item Env:DEMO_SEED, Env:DEMO_ADMIN_PASSWORD
+```
+
+O seed utiliza apenas dados fictícios, é idempotente e nunca executa automaticamente.
+
 ## Configuração
 
-As variáveis documentadas estão em `.env.example`. As principais são `ENV`, `SECRET_KEY`, `DATABASE_URL` ou `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASS`. O armazenamento local usa `LOCAL_STORAGE_PATH`; GCS continua disponível opcionalmente por `STORAGE_DRIVER=gcs` e `GCS_BUCKET`.
+As variáveis documentadas estão em `.env.example`. As principais são `ENV`, `SECRET_KEY`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS` e `LOCAL_STORAGE_PATH`. O projeto utiliza somente PostgreSQL e armazenamento de arquivos locais.
 
-`TRUST_PROXY` deve permanecer desligada, exceto quando a aplicação estiver atrás de um proxy reverso confiável. As rotas diagnósticas permanecem desabilitadas por padrão.
+As rotas diagnósticas permanecem desabilitadas por padrão.
 
 ## Testes
 

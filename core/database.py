@@ -8,23 +8,6 @@ _G_KEY = "_patagonia_db_conn"
 
 
 def _connect():
-    database_url = os.getenv("DATABASE_URL")
-    if database_url:
-        conn_kwargs = {}
-
-        sslmode = os.getenv("DB_SSLMODE")
-        if sslmode:
-            conn_kwargs["sslmode"] = sslmode
-
-        connect_timeout = os.getenv("DB_CONNECT_TIMEOUT")
-        if connect_timeout:
-            try:
-                conn_kwargs["connect_timeout"] = int(connect_timeout)
-            except ValueError:
-                pass
-
-        return psycopg2.connect(database_url, **conn_kwargs)
-
     conn_kwargs = {
         "dbname": os.getenv("DB_NAME"),
         "user": os.getenv("DB_USER"),
@@ -33,10 +16,6 @@ def _connect():
         "port": os.getenv("DB_PORT", "5432"),
         "client_encoding": "UTF8",
     }
-
-    sslmode = os.getenv("DB_SSLMODE")
-    if sslmode:
-        conn_kwargs["sslmode"] = sslmode
 
     connect_timeout = os.getenv("DB_CONNECT_TIMEOUT")
     if connect_timeout:

@@ -27,14 +27,6 @@ class BaseConfig:
     # Global maximum request size (10 MB by default)
     MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", 10 * 1024 * 1024))
 
-    # Redis (optional) for server-side sessions. If not set, app will fall back to cookie sessions.
-    REDIS_URL = os.environ.get("REDIS_URL")
-
-    # Session options (used when Redis is configured)
-    SESSION_PERMANENT = False
-    SESSION_USE_SIGNER = True
-
-
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_hex(32)

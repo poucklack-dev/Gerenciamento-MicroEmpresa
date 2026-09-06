@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import mimetypes
 import os
-from io import BytesIO
 
 from flask import Blueprint, abort, redirect, request, send_file, session, url_for
 from flask_login import current_user
 
-from core.storage import GCSStorage, LocalStorage, get_storage
+from core.storage import get_storage
 
 
 media_bp = Blueprint("media", __name__)
@@ -45,35 +44,17 @@ def get_media(key: str):
 
     storage = get_storage()
 
-    if isinstance(storage, LocalStorage):
-        root = os.path.abspath(storage.upload_folder)
-        path = os.path.abspath(os.path.join(root, key))
-        if os.path.commonpath([path, root]) != root:
-            abort(400)
-        if not os.path.exists(path):
-            abort(404)
+    try:
+        path = storage._get_path(key)
+    except ValueError:
+        abort(400)
+    if not os.path.exists(path):
+        abort(404)
 
-        content_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
-        return send_file(
-            path,
-            mimetype=content_type,
-            as_attachment=_should_download(content_type),
-            download_name=os.path.basename(path),
-        )
-
-    if isinstance(storage, GCSStorage):
-        blob = storage.bucket.blob(key)
-        if not blob.exists():
-            abort(404)
-
-        data = blob.download_as_bytes(timeout=60)
-        content_type = blob.content_type or mimetypes.guess_type(key)[0] or "application/octet-stream"
-        return send_file(
-            BytesIO(data),
-            mimetype=content_type,
-            as_attachment=_should_download(content_type),
-            download_name=os.path.basename(key),
-        )
-
-    abort(500)
-
+    content_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
+    return send_file(
+        path,
+        mimetype=content_type,
+        as_attachment=_should_download(content_type),
+        download_name=os.path.basename(path),
+    )

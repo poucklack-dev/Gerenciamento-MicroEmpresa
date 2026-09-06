@@ -5,18 +5,17 @@ from core.database import get_conn
 
 @patch('core.database.psycopg2.connect')
 @patch('core.database.os.getenv')
-def test_get_conn_uses_env_vars_for_cloud_sql(mock_getenv, mock_psycopg2_connect):
+def test_get_conn_uses_local_postgres_env_vars(mock_getenv, mock_psycopg2_connect):
     """
-    GIVEN a set of environment variables for a Cloud SQL connection
+    GIVEN a set of environment variables for a PostgreSQL connection
     WHEN get_conn() is called
-    THEN it should call psycopg2.connect with the correct parameters for a Unix socket.
+    THEN it should call psycopg2.connect with the local PostgreSQL parameters.
     """
-    # Define the mock return values for os.getenv for a Cloud SQL scenario
     mock_env_vars = {
         "DB_NAME": "test_db",
         "DB_USER": "test_user",
         "DB_PASS": "test_pass",
-        "DB_HOST": "/cloudsql/test-project:us-central1:test-instance",
+        "DB_HOST": "localhost",
         "DB_PORT": "5432"
     }
     # The side_effect allows mock_getenv to return different values for different keys
@@ -33,7 +32,7 @@ def test_get_conn_uses_env_vars_for_cloud_sql(mock_getenv, mock_psycopg2_connect
         dbname="test_db",
         user="test_user",
         password="test_pass",
-        host="/cloudsql/test-project:us-central1:test-instance",
+        host="localhost",
         port="5432",
         client_encoding="UTF8"
     )
