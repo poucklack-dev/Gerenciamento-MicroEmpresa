@@ -133,7 +133,7 @@ body {
   margin-bottom: 12px !important;
 }
 .kpi-card {
-  min-height: 96px !important;
+  min-height: 142px !important;
   padding: 14px !important;
   background: #fff !important;
   border: 1px solid var(--card-border) !important;
@@ -150,7 +150,16 @@ body {
 .badge-danger { background: #f9e8e6 !important; color: #983b34 !important; }
 .badge-info { background: #e8f0f7 !important; color: #285a87 !important; }
 .kpi-comparison { font-size: 10px !important; }
-.kpi-insight { display: none !important; }
+.kpi-insight { display: block !important; margin-top: 7px !important; color: var(--text-muted) !important; font-size: 9px !important; }
+.card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  color: var(--primary-green);
+  font-size: 9px;
+  font-weight: 700;
+}
 
 .charts-container {
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr) !important;
@@ -186,24 +195,37 @@ body {
 .progress-fill { background: var(--primary-green) !important; }
 
 .indicators-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 10px !important; margin-bottom: 12px !important; }
-.indicator-card { min-height: 112px !important; padding: 13px !important; }
+.indicator-card { min-height: 132px !important; padding: 13px !important; }
 .indicator-card:hover { transform: none !important; border-color: #b9c8c0 !important; }
 .indicator-value { margin: 9px 0 5px !important; color: var(--text-primary) !important; font: 650 20px Inter, sans-serif !important; }
 .indicator-label { color: var(--text-muted) !important; font-size: 9px !important; }
 
-/* A tela principal mostra somente o resumo decisório. O restante fica nos modais. */
-.dashboard-container > .data-tables-container,
-.dashboard-container > .indicators-grid,
-.dashboard-container > .indicators-grid + .charts-container,
-.dashboard-container > .dashboard-footer {
-  display: none !important;
-}
-
 .loading-overlay { display: none !important; }
 
-.modal { background: rgba(23,32,28,.42) !important; backdrop-filter: none !important; }
-.modal-content { background: #fff !important; color: var(--text-primary) !important; border: 1px solid var(--card-border) !important; box-shadow: 0 16px 40px rgba(20,35,29,.18) !important; }
-.modal-header { background: #f7f9f8 !important; border-bottom: 1px solid var(--card-border) !important; }
+.modal {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 24px !important;
+  background: rgba(17, 25, 21, .72) !important;
+  backdrop-filter: blur(2px) !important;
+  z-index: 5000 !important;
+  overflow: auto !important;
+}
+.modal.active { display: flex !important; align-items: center; justify-content: center; }
+.modal-content {
+  width: min(1040px, 100%) !important;
+  max-width: 1040px !important;
+  max-height: calc(100vh - 48px) !important;
+  margin: auto !important;
+  background: #fff !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: 0 24px 70px rgba(10,20,15,.28) !important;
+  overflow: auto !important;
+}
+.modal-header { position: sticky; top: 0; z-index: 2; background: #f7f9f8 !important; border-bottom: 1px solid var(--card-border) !important; }
 .modal-title, .section-title, .data-value { color: var(--text-primary) !important; }
 .modal-section { background: #f8faf9 !important; border: 1px solid var(--card-border) !important; }
 .dashboard-footer { color: var(--text-muted) !important; border-top: 1px solid var(--card-border) !important; }
