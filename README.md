@@ -84,3 +84,11 @@ Os testes de rotas que dependem do PostgreSQL exigem um banco compatível ou moc
 ## Screenshots
 
 Adicione imagens sem dados pessoais em `docs/screenshots/` e referencie-as aqui antes da publicação.
+
+## Desenvolvedor
+
+Emanuel Sousa Vasconcellos Lima
+
+## Licença
+
+Este projeto é distribuído sob a Licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
