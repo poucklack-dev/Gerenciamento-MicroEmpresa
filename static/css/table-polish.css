@@ -1,0 +1,141 @@
+/* Tabelas do ERP: alinhamento estável, leitura compacta e rolagem previsível. */
+.content-area table {
+  table-layout: auto;
+  border-collapse: separate !important;
+  border-spacing: 0;
+  color: var(--text);
+}
+
+.content-area thead th {
+  vertical-align: middle;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.content-area tbody td,
+.content-area tfoot td {
+  vertical-align: middle;
+  line-height: 1.35;
+}
+
+.content-area tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+
+.content-area td:has(.badge),
+.content-area td:has([class*="status-"]) {
+  white-space: nowrap;
+}
+
+.content-area .table-responsive,
+.content-area .table-container,
+.content-area .table-scroll {
+  overflow-x: auto;
+  scrollbar-gutter: stable;
+}
+
+/* Fechamento mensal: cada tipo de informação recebe uma coluna fixa. */
+.table-panel .table-scroll {
+  max-width: 100%;
+}
+
+.table-panel table {
+  width: 100%;
+  min-width: 1160px !important;
+  table-layout: fixed;
+}
+
+.table-panel th,
+.table-panel td {
+  padding-inline: 12px !important;
+}
+
+.table-panel th:first-child,
+.table-panel td:first-child {
+  width: 44px;
+  padding-inline: 6px !important;
+  text-align: center;
+}
+
+.table-panel th:nth-child(2),
+.table-panel td:nth-child(2) { width: 210px; }
+.table-panel th:nth-child(3),
+.table-panel td:nth-child(3) { width: 130px; }
+.table-panel th:nth-child(4),
+.table-panel td:nth-child(4) { width: 105px; }
+.table-panel th:nth-child(5),
+.table-panel td:nth-child(5) { width: 120px; }
+.table-panel th:nth-child(6),
+.table-panel td:nth-child(6) { width: 100px; }
+.table-panel th:nth-child(7),
+.table-panel td:nth-child(7),
+.table-panel th:nth-child(8),
+.table-panel td:nth-child(8) { width: 88px; }
+.table-panel th:nth-child(9),
+.table-panel td:nth-child(9) { width: 100px; }
+.table-panel th:nth-child(10),
+.table-panel td:nth-child(10) { width: 128px; }
+.table-panel th:last-child,
+.table-panel td:last-child {
+  width: 52px;
+  padding-inline: 6px !important;
+  text-align: center;
+}
+
+.table-panel th:nth-child(n+4):nth-child(-n+8),
+.table-panel td:nth-child(n+4):nth-child(-n+8) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.table-panel tbody td {
+  height: 54px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-panel tbody tr:hover td {
+  background: #f7faf8 !important;
+}
+
+.table-panel .person-link {
+  display: block;
+  width: 100%;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.table-panel .person-link strong,
+.table-panel .person-link small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-table {
+  min-width: 680px;
+  table-layout: fixed !important;
+}
+
+.detail-table th:nth-child(1), .detail-table td:nth-child(1) { width: 92px; }
+.detail-table th:nth-child(2), .detail-table td:nth-child(2),
+.detail-table th:nth-child(3), .detail-table td:nth-child(3) { width: 68px; text-align: center; }
+.detail-table th:nth-child(4), .detail-table td:nth-child(4),
+.detail-table th:nth-child(5), .detail-table td:nth-child(5) { width: 92px; text-align: right; }
+.detail-table th:nth-child(6), .detail-table td:nth-child(6) { width: 118px; }
+.detail-table td:last-child { white-space: normal; overflow-wrap: anywhere; }
+
+@media (max-width: 700px) {
+  .table-panel th,
+  .table-panel td { padding-inline: 9px !important; }
+  .table-panel table { min-width: 1080px !important; }
+}
