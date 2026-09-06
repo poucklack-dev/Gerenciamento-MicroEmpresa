@@ -2,10 +2,11 @@
 # ==============================================================
 
 from flask import Blueprint, render_template, request, jsonify, current_app
-from flask_login import current_user
-from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import current_user, login_required
+from werkzeug.security import check_password_hash
 from core.database import get_conn
-from core.storage import get_storage
+from core.storage import get_storage, validate_image_upload
+from core.auth import hash_senha
 
 perfil_bp = Blueprint("perfil", __name__, url_prefix="/perfil")
 
@@ -84,16 +85,19 @@ def get_usuario_completo(user_id):
 
 
 @perfil_bp.get("/dados")
+@login_required
 def dados_perfil():
     return jsonify(get_usuario_completo(current_user.id))
 
 
 @perfil_bp.get("/")
+@login_required
 def pagina_perfil():
     return render_template("perfil.html")
 
 
 @perfil_bp.post("/atualizar")
+@login_required
 def atualizar_perfil():
     nome = request.form.get("nome")
     email = request.form.get("email")
@@ -107,6 +111,8 @@ def atualizar_perfil():
         if "foto" in request.files:
             file = request.files["foto"]
             if file.filename:
+                if not validate_image_upload(file, allowed_formats=("JPEG", "PNG", "GIF")):
+                    return jsonify({"success": False, "message": "A foto deve ser uma imagem JPG, PNG ou GIF válida."}), 400
                 foto_path = storage.save(file, subdir="faces")
 
         conn = get_conn()
@@ -131,12 +137,13 @@ def atualizar_perfil():
 
     except Exception as e:
         current_app.logger.exception("Erro ao atualizar perfil")
-        return jsonify({"success": False, "message": str(e)}), 500
+        return jsonify({"success": False, "message": "Não foi possível atualizar o perfil."}), 500
 
 
 @perfil_bp.post("/alterar-senha")
+@login_required
 def alterar_senha():
-    dados = request.get_json()
+    dados = request.get_json(silent=True) or {}
     senha_atual = dados.get("senha_atual")
     nova_senha = dados.get("nova_senha")
 
@@ -149,7 +156,10 @@ def alterar_senha():
     if not check_password_hash(senha_hash, senha_atual):
         return jsonify({"success": False, "message": "Senha atual incorreta."}), 400
 
-    novo_hash = generate_password_hash(nova_senha, method="pbkdf2:sha256")
+    try:
+        novo_hash = hash_senha(nova_senha)
+    except ValueError as exc:
+        return jsonify({"success": False, "message": str(exc)}), 400
 
     cur.execute("UPDATE usuarios SET senha_hash = %s WHERE id = %s", (novo_hash, current_user.id))
     conn.commit()

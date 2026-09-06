@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash
 from flask_login import login_user, logout_user
 
 from core.database import get_conn
+from core.auth import is_admin_role
 from core.user import User
 from core.limiter import limiter  # Import the central limiter instance
 
@@ -18,7 +19,7 @@ login_bp = Blueprint('login', __name__)
 @limiter.limit("15 per minute", error_message="Muitas tentativas de login. Tente novamente em um minuto.")
 def login():
     if request.method == 'POST':
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         usuario = data.get('usuario')
         senha = data.get('senha')
 
@@ -111,7 +112,7 @@ def check_session():
                 "usuario": user_session.get("usuario", ""),
                 "cargo": user_session.get("cargo", ""),
                 "email": user_session.get("email", ""),
-                "is_admin": "admin" in str(user_session.get("cargo", "")).lower(),
+            "is_admin": is_admin_role(user_session.get("cargo")),
             }
         })
 

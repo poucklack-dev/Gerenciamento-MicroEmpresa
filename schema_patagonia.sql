@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS public.usuarios (
     id BIGSERIAL PRIMARY KEY,
     nome TEXT,
-    usuario TEXT,
+    usuario TEXT UNIQUE NOT NULL,
     senha_hash TEXT,
     cargo TEXT,
     email TEXT,
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS public.colaboradores (
 
 CREATE TABLE IF NOT EXISTS public.nrs (
     id BIGSERIAL PRIMARY KEY,
-    codigo TEXT,
+    codigo TEXT UNIQUE NOT NULL,
     nome TEXT,
     descricao TEXT
 );
@@ -127,7 +127,7 @@ CREATE INDEX IF NOT EXISTS idx_nrs_colaboradores_validade
 
 CREATE TABLE IF NOT EXISTS public.epis (
     id BIGSERIAL PRIMARY KEY,
-    nome TEXT
+    nome TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS public.epis_colaboradores (
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS public.epis_colaboradores (
 
 CREATE TABLE IF NOT EXISTS public.habilidades (
     id BIGSERIAL PRIMARY KEY,
-    nome TEXT
+    nome TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS public.habilidades_colaboradores (
@@ -199,14 +199,14 @@ CREATE TABLE IF NOT EXISTS public.documentos (
     observacoes TEXT,
     status TEXT,
     tamanho_arquivo BIGINT,
-    usuario_id BIGINT,
+    usuario_id BIGINT REFERENCES public.usuarios(id) ON DELETE SET NULL,
     criado_em TIMESTAMP DEFAULT NOW(),
     atualizado_em TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS public.contratos (
     id BIGSERIAL PRIMARY KEY,
-    codigo_contrato TEXT,
+    codigo_contrato TEXT UNIQUE NOT NULL,
     nome_empresa TEXT,
     descricao_servico TEXT,
     valor_orcado NUMERIC(14,2),
@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS public.contas_pagar (
     status TEXT,
     comprovante TEXT,
     comprovante_nome TEXT,
-    contrato_id BIGINT,
+    contrato_id BIGINT REFERENCES public.contratos(id) ON DELETE SET NULL,
     criado_em TIMESTAMP DEFAULT NOW()
 );
 
@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS public.fornecedores (
     id BIGSERIAL PRIMARY KEY,
     nome_fantasia TEXT,
     razao_social TEXT,
-    cnpj TEXT,
+    cnpj TEXT UNIQUE,
     inscricao_estadual TEXT,
     inscricao_municipal TEXT,
     telefone TEXT,
@@ -283,9 +283,9 @@ CREATE TABLE IF NOT EXISTS public.fornecedores (
 
 CREATE TABLE IF NOT EXISTS public.equipe_campo (
     id BIGSERIAL PRIMARY KEY,
-    colaborador_id BIGINT,
+    colaborador_id BIGINT REFERENCES public.colaboradores(id) ON DELETE SET NULL,
     veiculo_id BIGINT,
-    cliente_id BIGINT,
+    cliente_id BIGINT REFERENCES public.clientes(id) ON DELETE SET NULL,
     data_saida DATE,
     hora_saida TIME,
     km_saida NUMERIC(12,2),
@@ -304,7 +304,7 @@ CREATE TABLE IF NOT EXISTS public.equipe_campo (
 
 CREATE TABLE IF NOT EXISTS public.ponto (
     id BIGSERIAL PRIMARY KEY,
-    colaborador_id BIGINT,
+    colaborador_id BIGINT REFERENCES public.colaboradores(id) ON DELETE SET NULL,
     data_registro DATE,
     hora_entrada TIMESTAMP,
     hora_saida TIMESTAMP,
@@ -324,7 +324,7 @@ CREATE TABLE IF NOT EXISTS public.ponto (
 
 CREATE TABLE IF NOT EXISTS public.veiculos (
     id BIGSERIAL PRIMARY KEY,
-    placa TEXT,
+    placa TEXT UNIQUE NOT NULL,
     modelo TEXT,
     marca TEXT,
     ano INT,
@@ -337,8 +337,8 @@ CREATE TABLE IF NOT EXISTS public.veiculos (
 
 CREATE TABLE IF NOT EXISTS public.custos_veiculos (
     id BIGSERIAL PRIMARY KEY,
-    veiculo_id BIGINT,
-    contrato_id BIGINT,
+    veiculo_id BIGINT REFERENCES public.veiculos(id) ON DELETE CASCADE,
+    contrato_id BIGINT REFERENCES public.contratos(id) ON DELETE SET NULL,
     tipo_custo TEXT,
     descricao TEXT,
     data DATE,
@@ -355,7 +355,7 @@ CREATE TABLE IF NOT EXISTS public.custos_veiculos (
 
 CREATE TABLE IF NOT EXISTS public.abastecimentos (
     id BIGSERIAL PRIMARY KEY,
-    veiculo_id BIGINT,
+    veiculo_id BIGINT REFERENCES public.veiculos(id) ON DELETE CASCADE,
     data DATE,
     litros NUMERIC(12,3),
     valor_total NUMERIC(14,2),
@@ -366,7 +366,7 @@ CREATE TABLE IF NOT EXISTS public.abastecimentos (
 
 CREATE TABLE IF NOT EXISTS public.quilometragem (
     id BIGSERIAL PRIMARY KEY,
-    veiculo_id BIGINT,
+    veiculo_id BIGINT REFERENCES public.veiculos(id) ON DELETE CASCADE,
     data_registro DATE,
     km_inicial NUMERIC(12,2),
     km_final NUMERIC(12,2),
@@ -387,7 +387,7 @@ CREATE TABLE IF NOT EXISTS public.fluxo_caixa (
 
 CREATE TABLE IF NOT EXISTS public.gastos_contrato (
     id BIGSERIAL PRIMARY KEY,
-    contrato_id BIGINT,
+    contrato_id BIGINT REFERENCES public.contratos(id) ON DELETE CASCADE,
     data_gasto DATE,
     valor NUMERIC(14,2),
     descricao TEXT,
@@ -398,8 +398,8 @@ CREATE TABLE IF NOT EXISTS public.gastos_contrato (
 
 CREATE TABLE IF NOT EXISTS public.servicos (
     id BIGSERIAL PRIMARY KEY,
-    cliente_id BIGINT,
-    equipe_id BIGINT,
+    cliente_id BIGINT REFERENCES public.clientes(id) ON DELETE CASCADE,
+    equipe_id BIGINT REFERENCES public.equipe_campo(id) ON DELETE SET NULL,
     descricao TEXT,
     data DATE,
     valor NUMERIC(14,2),
@@ -411,8 +411,18 @@ CREATE TABLE IF NOT EXISTS public.servicos (
 
 CREATE TABLE IF NOT EXISTS public.logs_sistema (
     id BIGSERIAL PRIMARY KEY,
-    usuario_id BIGINT,
+    usuario_id BIGINT REFERENCES public.usuarios(id) ON DELETE SET NULL,
     acao TEXT,
     detalhes TEXT,
     criado_em TIMESTAMP DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_clientes_nome ON public.clientes(nome);
+CREATE INDEX IF NOT EXISTS idx_colaboradores_status ON public.colaboradores(status);
+CREATE INDEX IF NOT EXISTS idx_contratos_status ON public.contratos(status);
+CREATE INDEX IF NOT EXISTS idx_contas_pagar_vencimento ON public.contas_pagar(vencimento);
+CREATE INDEX IF NOT EXISTS idx_contas_pagar_status ON public.contas_pagar(status);
+CREATE INDEX IF NOT EXISTS idx_contas_receber_vencimento ON public.contas_receber(vencimento);
+CREATE INDEX IF NOT EXISTS idx_documentos_validade ON public.documentos(validade);
+CREATE INDEX IF NOT EXISTS idx_ponto_colaborador_data ON public.ponto(colaborador_id, data_registro);
+CREATE INDEX IF NOT EXISTS idx_logs_sistema_usuario ON public.logs_sistema(usuario_id, criado_em DESC);

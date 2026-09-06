@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, send_file, current_app
 from core.database import get_conn
-from core.storage import get_storage
+from core.storage import get_storage, validate_image_upload
+from core.auth import admin_required
 from werkzeug.utils import secure_filename
 import io
 
@@ -27,6 +28,7 @@ def save_face(file):
 # ============================================================
 
 @bp_faces.post("/<int:colaborador_id>")
+@admin_required
 def salvar_foto_facial(colaborador_id):
     try:
         if "foto" not in request.files:
@@ -37,7 +39,7 @@ def salvar_foto_facial(colaborador_id):
         if file.filename == "":
             return jsonify({"erro": "Arquivo inválido"}), 400
 
-        if not allowed(file.filename):
+        if not allowed(file.filename) or not validate_image_upload(file):
             return jsonify({"erro": "Formato não permitido (use JPG, PNG)"}), 400
 
         conn = get_conn()
@@ -77,7 +79,7 @@ def salvar_foto_facial(colaborador_id):
         })
     except Exception as e:
         current_app.logger.exception("Erro ao salvar foto facial")
-        return jsonify({"erro": str(e)}), 500
+        return jsonify({"erro": "Não foi possível salvar a foto facial."}), 500
 
 
 # ============================================================
@@ -111,6 +113,7 @@ def download_face(colaborador_id):
 # ============================================================
 
 @bp_faces.delete("/<int:colaborador_id>")
+@admin_required
 def deletar_foto_facial(colaborador_id):
     conn = get_conn()
     cur = conn.cursor()

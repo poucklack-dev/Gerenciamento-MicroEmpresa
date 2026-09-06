@@ -12,15 +12,21 @@ services:
       ENV: development
       STORAGE_DRIVER: local
       LOCAL_STORAGE_PATH: /tmp/uploads
-      SECRET_KEY: dev-secret-key-change-me
+      SECRET_KEY: ${SECRET_KEY:?Defina SECRET_KEY no arquivo .env}
       ENABLE_DEBUG_ROUTES: "0"
       DB_HOST: db
       DB_PORT: "5432"
-      DB_NAME: patagonia
-      DB_USER: patagonia
-      DB_PASS: patagonia
+      DB_NAME: ${DB_NAME:-patagonia}
+      DB_USER: ${DB_USER:-patagonia}
+      DB_PASS: ${DB_PASS:?Defina DB_PASS no arquivo .env}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
     image: postgres:15-alpine
@@ -29,9 +35,14 @@ services:
       - postgres_data:/var/lib/postgresql/data/
       - ./schema_patagonia.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     environment:
-      POSTGRES_DB: patagonia
-      POSTGRES_USER: patagonia
-      POSTGRES_PASSWORD: patagonia
+      POSTGRES_DB: ${DB_NAME:-patagonia}
+      POSTGRES_USER: ${DB_USER:-patagonia}
+      POSTGRES_PASSWORD: ${DB_PASS:?Defina DB_PASS no arquivo .env}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   postgres_data:

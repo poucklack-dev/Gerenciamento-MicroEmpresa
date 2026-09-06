@@ -1,4 +1,5 @@
 import os
+import secrets
 
 
 def get_env_name():
@@ -23,8 +24,8 @@ class BaseConfig:
     # Prefer https when generating external URLs (override in dev/test)
     PREFERRED_URL_SCHEME = "https"
 
-    # Global maximum request size (50 MB by default)
-    MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", 50 * 1024 * 1024))
+    # Global maximum request size (10 MB by default)
+    MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", 10 * 1024 * 1024))
 
     # Redis (optional) for server-side sessions. If not set, app will fall back to cookie sessions.
     REDIS_URL = os.environ.get("REDIS_URL")
@@ -36,7 +37,7 @@ class BaseConfig:
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key-change-me"
+    SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
     SESSION_COOKIE_SECURE = False
     REMEMBER_COOKIE_SECURE = False
     PREFERRED_URL_SCHEME = "http"

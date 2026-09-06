@@ -8,6 +8,28 @@ from werkzeug.utils import secure_filename
 from google.cloud import storage as gcs
 
 logger = logging.getLogger(__name__)
+BLOCKED_EXTENSIONS = {
+    "bat", "cmd", "com", "exe", "html", "htm", "js", "msi", "php",
+    "ps1", "py", "sh", "svg",
+}
+
+
+def validate_image_upload(file, allowed_formats=("JPEG", "PNG")) -> bool:
+    """Validate an uploaded image by decoding its content, not only its suffix."""
+    if not file or not getattr(file, "filename", ""):
+        return False
+    try:
+        from PIL import Image, UnidentifiedImageError
+    except ImportError:
+        return False
+    try:
+        image = Image.open(file.stream)
+        image.verify()
+        return image.format in allowed_formats
+    except (UnidentifiedImageError, OSError, ValueError):
+        return False
+    finally:
+        file.stream.seek(0)
 
 class LocalStorage:
     def __init__(self, upload_folder='uploads'):
@@ -16,7 +38,11 @@ class LocalStorage:
             os.makedirs(self.upload_folder)
 
     def _get_path(self, key):
-        return os.path.join(self.upload_folder, key)
+        root = os.path.abspath(self.upload_folder)
+        path = os.path.abspath(os.path.join(root, key))
+        if os.path.commonpath([root, path]) != root:
+            raise ValueError("Invalid storage key")
+        return path
 
     def save(self, file, subdir):
         self._validate_subdir(subdir)
@@ -63,6 +89,11 @@ class LocalStorage:
 
     def _secure_filename(self, filename):
         filename = secure_filename(filename)
+        if not filename:
+            raise ValueError("Invalid filename")
+        extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+        if extension in BLOCKED_EXTENSIONS:
+            raise ValueError("File type not allowed")
         if '..' in filename or '/' in filename or '\\' in filename:
             raise ValueError("Invalid filename")
         # Add a unique prefix to avoid filename collisions
@@ -131,6 +162,11 @@ class GCSStorage:
 
     def _secure_filename(self, filename):
         filename = secure_filename(filename)
+        if not filename:
+            raise ValueError("Invalid filename")
+        extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+        if extension in BLOCKED_EXTENSIONS:
+            raise ValueError("File type not allowed")
         if '..' in filename or '/' in filename or '\\' in filename:
             raise ValueError("Invalid filename")
         return f"{uuid4().hex}_{filename}"

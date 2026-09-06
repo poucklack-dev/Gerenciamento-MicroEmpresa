@@ -1,39 +1,16 @@
 from flask import Blueprint, request, jsonify, send_from_directory, redirect, current_app, send_file
 from core.database import get_conn
+from core.auth import admin_required as require_admin
 from core.storage import get_storage
 import os
 from werkzeug.utils import secure_filename
 import uuid
 from datetime import datetime, date
 from decimal import Decimal
-from functools import wraps
-from flask_login import current_user
 import io
 
 bp_pagar = Blueprint("contas_pagar", __name__, url_prefix="/api/contas_pagar")
 
-# ============================================================
-# DECORADOR DE AUTENTICAÇÃO
-# ============================================================
-def require_admin(f):
-    """
-    Decorator seguro para exigir permissões de admin/gestor.
-    Protege rotas sensíveis contra acesso não autorizado.
-    """
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if not current_user.is_authenticated:
-            return jsonify({"erro": "Acesso negado. Faça login."}), 401
-        
-        cargo = getattr(current_user, 'cargo', '')
-        # Lista de cargos com permissão administrativa (sincronizada com usuario.py)
-        cargos_permitidos = ['Gestor', 'admin', 'Gerente de Topografia', 'Coordenador de Topografia', 'Supervisor de Topografia']
-        
-        if str(cargo).strip() not in cargos_permitidos:
-            return jsonify({"erro": "Acesso negado. Permissão insuficiente."}), 403
-            
-        return f(*args, **kwargs)
-    return wrapper
 # ============================================================
 # CONFIGURAÇÃO DE UPLOADS
 # ============================================================
@@ -97,8 +74,8 @@ def serialize_pagar(row):
             "criado_em": row[10].isoformat() if row[10] and isinstance(row[10], (date, datetime)) else str(row[10]) if row[10] else None,
             "comprovante_url": storage.get_url(row[7]) if row[7] else None
         }
-    except Exception as e:
-        print(f"Erro ao serializar linha: {e}, row: {row}")
+    except Exception:
+        current_app.logger.exception("Erro ao serializar conta a pagar")
         return None
 
 # ============================================================

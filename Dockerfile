@@ -26,7 +26,7 @@ FROM python:3.11-slim AS final
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV ENV=development
+ENV ENV=production
 
 WORKDIR /app
 
@@ -56,4 +56,4 @@ USER patagonia_user
 
 EXPOSE 8080
 
-CMD ["python", "run_dev.py"]
+CMD ["waitress-serve", "--host=0.0.0.0", "--port=8080", "app:app"]

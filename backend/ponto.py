@@ -48,7 +48,7 @@ def buscar_colaborador_por_cpf(cpf):
         if len(cpf_numeros) != 11:
             return None
         if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
-            print(f"🔍 Buscando colaborador pelo CPF final {cpf_numeros[-4:]}")
+            current_app.logger.debug("Buscando colaborador por CPF")
 
         cur.execute("""
             SELECT id, nome, email, cpf
@@ -335,7 +335,7 @@ class SmartFacialSystem:
             _, buffer = cv2.imencode('.jpg', face_img)
             self.storage.save_bytes(buffer.tobytes(), subdir='faces', filename=f"{cpf_fmt}.jpg")
             if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
-                print(f"📷 Foto do rosto de {cpf_fmt} salva no storage.")
+                current_app.logger.info("Foto facial salva no storage")
         except Exception as e:
             if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
                 print(f"❌ Erro ao salvar foto do rosto no storage: {e}")
@@ -513,7 +513,7 @@ def cadastrar_com_cpf():
 
     except Exception as e:
         if os.environ.get('PATAGONIA_BOOT_LOGS') == '1':
-            print(f"❌ Erro ao cadastrar com CPF: {str(e)}")
+            current_app.logger.exception("Erro ao cadastrar ponto com CPF")
         current_app.logger.exception("Erro ao cadastrar biometria facial")
         return jsonify({"success": False, "error": "Não foi possível salvar a biometria facial."}), 500
 

@@ -7,6 +7,7 @@ from flask_talisman import Talisman
 
 from core.database import get_conn, close_conn
 from core.user import User
+from core.auth import is_admin_role
 from core.limiter import limiter  # Import central limiter instance
 from config import get_config_class, get_env_name
 
@@ -22,8 +23,9 @@ app = Flask(__name__,
 app.config.from_object(get_config_class())
 app.url_map.strict_slashes = False
 
-# Trust forwarding headers when the app is served behind a reverse proxy.
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+# Forwarded headers are trusted only when deployment explicitly enables a proxy.
+if os.environ.get("TRUST_PROXY", "").strip().lower() in {"1", "true", "yes"}:
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # ============================================================
 #  RATE LIMITING (FLASK-LIMITER)
@@ -41,6 +43,8 @@ limiter.init_app(app)
 # ============================================================
 #  SECURITY HEADERS (FLASK-TALISMAN)
 # ============================================================
+env_name = get_env_name()
+
 # Define a robust Content Security Policy
 csp = {
     'default-src': '\'self\'',
@@ -86,6 +90,7 @@ csp = {
 Talisman(
     app,
     content_security_policy=csp,
+    force_https=env_name in {"prod", "production"},
     force_https_permanent=True, # Use HSTS
     frame_options='DENY',
     frame_options_allow_from=None,
@@ -94,8 +99,6 @@ Talisman(
     referrer_policy='no-referrer-when-downgrade'
 )
 
-
-env_name = get_env_name()
 
 # Ensure SECRET_KEY is present in production — fail fast with clear error
 if env_name in {"prod", "production"} and not app.config.get("SECRET_KEY"):
@@ -161,13 +164,22 @@ def protect_administrative_api():
             if not debug_enabled:
                 return jsonify({"success": False, "erro": "Recurso não encontrado."}), 404
             cargo = session_user.get("cargo") or getattr(current_user, "cargo", "")
-            if "admin" not in str(cargo).lower() and str(cargo).strip() not in {
-                "Gestor", "Gerente de Topografia", "Coordenador de Topografia", "Supervisor de Topografia"
-            }:
+            if not is_admin_role(cargo):
                 return jsonify({"success": False, "erro": "Acesso negado."}), 403
         return None
 
     return jsonify({"success": False, "erro": "Autenticação necessária."}), 401
+
+
+@app.before_request
+def reject_cross_origin_writes():
+    """Reject browser writes originating from a different site."""
+    if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
+        return None
+    origin = request.headers.get("Origin")
+    if origin and origin.rstrip("/") != request.host_url.rstrip("/"):
+        return jsonify({"success": False, "erro": "Origem da requisição não permitida."}), 403
+    return None
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -264,10 +276,6 @@ app.register_blueprint(banco_horas_bp)
 app.register_blueprint(diag_bp)
 app.register_blueprint(media_bp)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-
-
 # Handle large uploads gracefully and return JSON
 from werkzeug.exceptions import RequestEntityTooLarge
 
@@ -280,9 +288,10 @@ def handle_file_too_large(e):
     }), 413)
 
 
+@app.get("/health")
 @app.get("/healthz")
 def healthz():
-    return jsonify({"ok": True}), 200
+    return jsonify({"status": "ok"}), 200
 
 
 @app.get("/readyz")

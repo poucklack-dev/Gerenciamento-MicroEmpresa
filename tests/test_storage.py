@@ -2,6 +2,7 @@ from io import BytesIO
 
 from core.storage import LocalStorage
 from werkzeug.datastructures import FileStorage
+import pytest
 
 
 def test_local_storage_supports_stable_binary_keys(tmp_path):
@@ -23,3 +24,18 @@ def test_local_storage_regular_upload_keeps_unique_name(tmp_path):
     assert key.startswith("documentos/")
     assert key.endswith("_arquivo.pdf")
     assert storage.open(key) == b"document"
+
+
+def test_local_storage_rejects_executable_upload(tmp_path):
+    storage = LocalStorage(str(tmp_path))
+    upload = FileStorage(stream=BytesIO(b"code"), filename="payload.exe")
+
+    with pytest.raises(ValueError, match="not allowed"):
+        storage.save(upload, "documentos")
+
+
+def test_local_storage_rejects_path_traversal_key(tmp_path):
+    storage = LocalStorage(str(tmp_path))
+
+    with pytest.raises(ValueError, match="storage key"):
+        storage.open("../secret.txt")

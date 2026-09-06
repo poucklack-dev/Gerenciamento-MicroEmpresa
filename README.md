@@ -1,75 +1,113 @@
 # Patagonia Topografia — Gestão Empresarial
 
+Sistema web para centralizar rotinas administrativas, operacionais e financeiras de uma empresa de topografia. O projeto demonstra desenvolvimento full stack com Flask, PostgreSQL, interface responsiva, controle de acesso, uploads e testes automatizados.
+
+## Screenshots
+
+As imagens do projeto devem ser adicionadas em `docs/images/`, sempre sem dados pessoais ou empresariais reais.
+
+| Tela | Arquivo sugerido |
+| --- | --- |
+| Login | `docs/images/login.png` |
+| Dashboard | `docs/images/dashboard.png` |
+| Cadastros | `docs/images/cadastros.png` |
+| Relatórios | `docs/images/relatorios.png` |
+
 ## Sobre
 
-Aplicação web interna para centralizar rotinas administrativas e operacionais da Patagonia Topografia. O sistema reúne cadastros, documentos, contratos, equipes externas, jornada de trabalho e informações financeiras em uma interface única.
+A aplicação organiza clientes, colaboradores, documentos, contratos, equipes externas, jornada de trabalho e movimentações financeiras. O código foi estruturado por domínios em blueprints Flask e utiliza PostgreSQL com consultas parametrizadas.
 
 ## Funcionalidades
 
-- autenticação por usuário e senha, sessão e perfis administrativos;
-- dashboard com indicadores, gráficos, alertas e vencimentos;
-- clientes, contatos e serviços vinculados;
-- colaboradores, NRs, EPIs, habilidades e dependências cadastrais;
-- ponto por CPF/reconhecimento facial, geolocalização e banco de horas;
-- saídas e retornos de equipes em campo, veículos, clientes e anexos;
-- contratos, valores, histórico e arquivos;
-- contas a pagar e a receber, categorias, comprovantes e baixas;
-- visão financeira consolidada, custos de veículos e despesas;
-- documentos, categorias, vencimentos e uploads;
-- fornecedores e vínculos com contratos;
-- perfil e administração de usuários.
+- autenticação por usuário e senha;
+- administração de usuários com controle de permissão no backend;
+- dashboard com indicadores operacionais e financeiros;
+- gestão de clientes, contatos e serviços;
+- cadastro de colaboradores, NRs, EPIs e habilidades;
+- registro de ponto, geolocalização e banco de horas;
+- reconhecimento facial para o fluxo de ponto;
+- controle de equipes e veículos em campo;
+- contratos, contas a pagar e contas a receber;
+- documentos, comprovantes e anexos;
+- fornecedores, quilometragem e custos de veículos.
 
 ## Tecnologias
 
-Python 3.11, Flask, Jinja, PostgreSQL, JavaScript, HTML e CSS. A aplicação usa Flask-Login, Flask-Limiter e Flask-Talisman; uploads podem usar o filesystem local ou Google Cloud Storage. Redis é opcional para sessões no servidor e Docker facilita a execução do projeto em um ambiente isolado.
+- Python 3.11 e Flask;
+- PostgreSQL e psycopg2;
+- Jinja, HTML, CSS e JavaScript;
+- Flask-Login, Flask-Limiter e Flask-Talisman;
+- OpenCV para o recurso de reconhecimento facial;
+- Waitress como servidor HTTP no container;
+- Docker e Docker Compose;
+- Pytest e GitHub Actions.
 
 ## Arquitetura
 
-`app.py` configura a aplicação Flask e registra os blueprints. `backend/` contém páginas e APIs por domínio, `core/` reúne banco, autenticação, limites e armazenamento, `templates/` contém as telas Jinja e `static/` os ativos públicos. O acesso a dados usa SQL PostgreSQL diretamente via `psycopg2`.
+`app.py` cria a aplicação, configura extensões e registra os blueprints. `backend/` agrupa rotas e regras por domínio. `core/` concentra autenticação, banco, rate limiting e armazenamento. A interface usa templates Jinja em `templates/` e ativos em `static/`.
 
-## Estrutura de pastas
+O projeto mantém SQL direto por refletir sua arquitetura atual. `schema_patagonia.sql` é a única fonte versionada da estrutura do banco e não possui dados reais.
+
+## Estrutura do projeto
 
 ```text
-backend/       blueprints e regras dos módulos
-core/          serviços compartilhados
-templates/     layout global e telas Jinja
-static/        imagens, manifesto e service worker
-tests/         testes automatizados
-infra/         configuração de implantação
-uploads/       arquivos locais (não versionados)
+backend/                rotas e regras dos módulos
+core/                   serviços compartilhados
+docs/images/            screenshots sem dados reais
+static/                 imagens e ativos públicos
+templates/              telas Jinja
+tests/                  testes automatizados
+.github/workflows/      integração contínua
+app.py                  configuração da aplicação
+run_dev.py              inicialização local
+schema_patagonia.sql    schema oficial do PostgreSQL
 ```
 
-## Instalação
+## Segurança
 
-1. Instale Python 3.11 e PostgreSQL.
-2. Crie e ative um ambiente virtual.
-3. Execute `pip install -r requirements.txt`.
-4. Copie `.env.example` para `.env` e ajuste os valores.
-5. Inicialize o PostgreSQL com o arquivo `schema_patagonia.sql`. Ao usar Docker Compose, isso acontece automaticamente na primeira criação do volume do banco.
+- senhas armazenadas com hash PBKDF2;
+- cookies `HttpOnly` e `SameSite=Lax`, com `Secure` em produção;
+- `SECRET_KEY` obrigatória em produção;
+- consultas SQL parametrizadas nos fluxos principais;
+- rate limiting na autenticação;
+- autorização administrativa centralizada no backend;
+- bloqueio de escrita com origem externa;
+- limites de requisição e proteção contra traversal em arquivos;
+- uploads, fotos, `.env`, logs e dumps locais ignorados pelo Git.
 
-## Configuração
+Nunca utilize dados, imagens ou credenciais reais para demonstrar este projeto.
 
-As opções principais são `ENV`, `SECRET_KEY`, `DATABASE_URL` ou as variáveis `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASS`. Para arquivos, configure `STORAGE_DRIVER=local` e `LOCAL_STORAGE_PATH`, ou `STORAGE_DRIVER=gcs`, `GCS_BUCKET` e `UPLOADS_PREFIX`. `REDIS_URL` habilita sessões no servidor. Rotas diagnósticas só devem ser habilitadas temporariamente com `ENABLE_DEBUG_ROUTES=1`.
+## Instalação local
 
-Nunca publique o arquivo `.env`, dumps com dados reais, uploads, fotos ou credenciais de serviço.
-
-## Banco de dados
-
-`schema_patagonia.sql` é a fonte oficial da estrutura do banco e não contém dados reais. O Docker Compose aplica esse arquivo somente quando cria um volume novo do PostgreSQL. O projeto ainda não utiliza uma ferramenta formal de migrations.
-
-## Execução
-
-Desenvolvimento:
+Requisitos: Python 3.11 e PostgreSQL.
 
 ```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Copy-Item .env.example .env
 python run_dev.py
 ```
 
-Com Docker, configure as variáveis necessárias e execute:
+Antes de iniciar, ajuste o `.env` e aplique `schema_patagonia.sql` em um banco vazio. Em Linux ou macOS, utilize o comando de ativação correspondente ao seu shell.
+
+## Docker
+
+1. Copie `.env.example` para `.env`.
+2. Substitua `SECRET_KEY` e `DB_PASS` por valores locais seguros.
+3. Execute:
 
 ```powershell
 docker compose up --build
 ```
+
+A aplicação ficará disponível em `http://localhost:8080`. Na primeira criação do volume, o PostgreSQL aplica automaticamente o schema oficial. O projeto não cria conta administrativa com senha padrão.
+
+## Configuração
+
+As variáveis documentadas estão em `.env.example`. As principais são `ENV`, `SECRET_KEY`, `DATABASE_URL` ou `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASS`. O armazenamento local usa `LOCAL_STORAGE_PATH`; GCS continua disponível opcionalmente por `STORAGE_DRIVER=gcs` e `GCS_BUCKET`.
+
+`TRUST_PROXY` deve permanecer desligada, exceto quando a aplicação estiver atrás de um proxy reverso confiável. As rotas diagnósticas permanecem desabilitadas por padrão.
 
 ## Testes
 
@@ -77,16 +115,21 @@ docker compose up --build
 python -m pytest -q
 ```
 
-Os testes de rotas que dependem do PostgreSQL exigem um banco compatível ou mocks explícitos.
+O workflow em `.github/workflows/tests.yml` executa a suíte em pushes para `main` e pull requests.
 
-## Screenshots
+## Roadmap
 
-Adicione imagens sem dados pessoais em `docs/screenshots/` e referencie-as aqui antes da publicação.
-
-## Desenvolvedor
-
-Emanuel Sousa Vasconcellos Lima
+- introduzir migrations incrementais para futuras alterações do banco;
+- ampliar testes de integração com PostgreSQL;
+- adicionar screenshots anonimizados das telas principais;
+- evoluir gradualmente a validação de uploads por conteúdo.
 
 ## Licença
 
-Este projeto é distribuído sob a Licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
+Distribuído sob a Licença MIT. Consulte [LICENSE](LICENSE).
+
+## Autor
+
+**Emanuel Sousa Vasconcellos Lima**
+
+Desenvolvedor com foco em aplicações web, análise de dados, automação e sistemas de gestão.

@@ -1,9 +1,12 @@
+import logging
+
 from flask import Blueprint, request, jsonify, session
 from core.database import get_conn
-from core.auth import hash_senha
+from core.auth import hash_senha, is_admin_role
 from flask_login import current_user
 
 usuarios_bp = Blueprint("usuarios", __name__, url_prefix="/api/usuarios")
+logger = logging.getLogger(__name__)
 
 # ========================================================
 #  CARGOS QUE SÃO CONSIDERADOS ADMINISTRADORES
@@ -25,19 +28,19 @@ def verificar_admin():
         # Primeiro tenta pelo Flask-Login
         if current_user.is_authenticated:
             cargo = getattr(current_user, 'cargo', '')
-            if cargo and str(cargo).strip() in CARGOS_ADMIN:
+            if is_admin_role(cargo):
                 return True
         
         # Se não funcionou, tenta pela sessão (fallback)
         if session and 'usuarios' in session:
             cargo_sessao = session['usuarios'].get('cargo', '')
-            if cargo_sessao and str(cargo_sessao).strip() in CARGOS_ADMIN:
+            if is_admin_role(cargo_sessao):
                 return True
         
         return False
         
-    except Exception as e:
-        print(f"Erro ao verificar admin: {e}")
+    except Exception:
+        logger.exception("Erro ao verificar permissão administrativa")
         return False
 
 # ========================================================
@@ -115,9 +118,7 @@ def listar_usuarios():
     """Lista todos os usuários do sistema."""
     # Verificar se o usuário é admin pelo cargo
     if not verificar_admin():
-        print(f"USUÁRIO NÃO É ADMIN! Cargo atual: {getattr(current_user, 'cargo', '')}")
-        if session and 'usuarios' in session:
-            print(f"Cargo na sessão: {session['usuarios'].get('cargo')}")
+        logger.warning("Tentativa de listar usuários sem permissão administrativa")
         return jsonify({"error": "Acesso negado. Somente administradores."}), 403
     
     conn = get_conn()
@@ -157,8 +158,9 @@ def listar_usuarios():
         
         return jsonify(usuarios)
         
-    except Exception as e:
-        return jsonify({"error": f"Erro ao listar usuários: {str(e)}"}), 500
+    except Exception:
+        logger.exception("Erro ao listar usuários")
+        return jsonify({"error": "Não foi possível listar os usuários."}), 500
     finally:
         cur.close()
         conn.close()
@@ -171,10 +173,10 @@ def criar_usuario():
     """Cria um novo usuário no sistema."""
     # Verificar se o usuário é admin pelo cargo
     if not verificar_admin():
-        print(f"USUÁRIO NÃO É ADMIN! Tentativa de criar usuário por cargo: {getattr(current_user, 'cargo', '')}")
+        logger.warning("Tentativa de criar usuário sem permissão administrativa")
         return jsonify({"error": "Acesso negado. Somente administradores."}), 403
     
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     # Validação dos campos obrigatórios
     campos_obrigatorios = ['nome', 'usuario', 'senha', 'cargo']
@@ -185,6 +187,8 @@ def criar_usuario():
     # Verificar se as senhas coincidem (se houver confirmação)
     if 'confirmar_senha' in data and data['senha'] != data['confirmar_senha']:
         return jsonify({"error": "As senhas não coincidem."}), 400
+    if len(data['senha']) < 8:
+        return jsonify({"error": "A senha deve ter pelo menos 8 caracteres."}), 400
     
     conn = get_conn()
     cur = conn.cursor()
@@ -223,9 +227,10 @@ def criar_usuario():
             "id": novo_id
         }), 201
         
-    except Exception as e:
+    except Exception:
         conn.rollback()
-        return jsonify({"error": f"Erro ao criar usuário: {str(e)}"}), 500
+        logger.exception("Erro ao criar usuário")
+        return jsonify({"error": "Não foi possível criar o usuário."}), 500
     finally:
         cur.close()
         conn.close()
@@ -238,10 +243,10 @@ def editar_usuario(user_id):
     """Edita um usuário existente."""
     # Verificar se o usuário é admin pelo cargo
     if not verificar_admin():
-        print(f"USUÁRIO NÃO É ADMIN! Tentativa de editar usuário por cargo: {getattr(current_user, 'cargo', '')}")
+        logger.warning("Tentativa de editar usuário sem permissão administrativa")
         return jsonify({"error": "Acesso negado. Somente administradores."}), 403
     
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     # Validação dos campos obrigatórios
     campos_obrigatorios = ['nome', 'usuario', 'cargo']
@@ -277,6 +282,8 @@ def editar_usuario(user_id):
         
         # Se houver nova senha, adicionar à atualização
         if 'senha' in data and data['senha']:
+            if len(data['senha']) < 8:
+                return jsonify({"error": "A senha deve ter pelo menos 8 caracteres."}), 400
             senha_hash = hash_senha(data['senha'])
             campos_update.append("senha_hash = %s")
             valores.append(senha_hash)
@@ -313,9 +320,10 @@ def editar_usuario(user_id):
             }
         })
         
-    except Exception as e:
+    except Exception:
         conn.rollback()
-        return jsonify({"error": f"Erro ao atualizar usuário: {str(e)}"}), 500
+        logger.exception("Erro ao atualizar usuário")
+        return jsonify({"error": "Não foi possível atualizar o usuário."}), 500
     finally:
         cur.close()
         conn.close()
@@ -328,10 +336,10 @@ def alterar_status(user_id):
     """Altera o status de um usuário (ativo/inativo)."""
     # Verificar se o usuário é admin pelo cargo
     if not verificar_admin():
-        print(f"USUÁRIO NÃO É ADMIN! Tentativa de alterar status por cargo: {getattr(current_user, 'cargo', '')}")
+        logger.warning("Tentativa de alterar status sem permissão administrativa")
         return jsonify({"error": "Acesso negado. Somente administradores."}), 403
     
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     novo_status = data.get("status")
     
     if novo_status not in ["ativo", "inativo"]:
@@ -362,9 +370,10 @@ def alterar_status(user_id):
             "message": f"Status do usuário alterado para '{novo_status}' com sucesso!"
         })
         
-    except Exception as e:
+    except Exception:
         conn.rollback()
-        return jsonify({"error": f"Erro ao alterar status: {str(e)}"}), 500
+        logger.exception("Erro ao alterar status de usuário")
+        return jsonify({"error": "Não foi possível alterar o status do usuário."}), 500
     finally:
         cur.close()
         conn.close()
@@ -392,8 +401,8 @@ def verificar_permissao():
             usuario_sessao = session['usuarios'].get('usuario', '')
         
         # Verificar se é admin usando ambas as fontes
-        is_admin_flask = cargo_flask and str(cargo_flask).strip() in CARGOS_ADMIN
-        is_admin_sessao = cargo_sessao and str(cargo_sessao).strip() in CARGOS_ADMIN
+        is_admin_flask = is_admin_role(cargo_flask)
+        is_admin_sessao = is_admin_role(cargo_sessao)
         
         is_admin = is_admin_flask or is_admin_sessao
         
@@ -425,7 +434,7 @@ def buscar_usuario(user_id):
     """Busca um usuário específico."""
     # Verificar se o usuário é admin pelo cargo
     if not verificar_admin():
-        print(f"USUÁRIO NÃO É ADMIN! Tentativa de buscar usuário por cargo: {getattr(current_user, 'cargo', '')}")
+        logger.warning("Tentativa de buscar usuário sem permissão administrativa")
         return jsonify({"error": "Acesso negado. Somente administradores."}), 403
     
     conn = get_conn()
@@ -466,8 +475,9 @@ def buscar_usuario(user_id):
             "atualizado_em": usuario[9].isoformat() if usuario[9] else None
         })
         
-    except Exception as e:
-        return jsonify({"error": f"Erro ao buscar usuário: {str(e)}"}), 500
+    except Exception:
+        logger.exception("Erro ao buscar usuário")
+        return jsonify({"error": "Não foi possível buscar o usuário."}), 500
     finally:
         cur.close()
         conn.close()

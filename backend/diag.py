@@ -1,9 +1,9 @@
 from flask import Blueprint, abort, jsonify, session
 import os
 import logging
-import traceback
 import time
 from core.storage import get_storage, GCSStorage
+from core.auth import is_admin_role
 from flask_login import current_user
 
 diag_bp = Blueprint('diag', __name__, url_prefix='/api/diag')
@@ -14,8 +14,8 @@ def _debug_routes_enabled() -> bool:
 
 def _is_admin() -> bool:
     user_session = session.get("usuarios") or {}
-    cargo = str(user_session.get("cargo", "")).lower()
-    if user_session.get("id") and "admin" in cargo:
+    cargo = user_session.get("cargo", "")
+    if user_session.get("id") and is_admin_role(cargo):
         return True
     return bool(getattr(current_user, "is_authenticated", False) and getattr(current_user, "is_admin", False))
 
@@ -65,7 +65,6 @@ def diag_gcs():
         logger.exception("GCS Diag failed")
         return jsonify({
             "ok": False,
-            "error": str(e),
-            "trace": traceback.format_exc(),
+            "error": "Falha ao executar diagnóstico de armazenamento.",
             "details": result
         }), 500

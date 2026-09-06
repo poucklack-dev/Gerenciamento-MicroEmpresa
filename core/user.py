@@ -1,5 +1,6 @@
 from flask_login import UserMixin
 from core.database import get_conn
+from core.auth import is_admin_role
 
 class User(UserMixin):
     def __init__(self, user_id):
@@ -13,9 +14,7 @@ class User(UserMixin):
         Método especial para criar um User a partir de uma linha do banco
         Usado no login onde já temos todos os dados
         """
-        user = cls(db_row[0])  # Cria o User normalmente (vai carregar do banco)
-        
-        # MAS... sobrescrevemos com os dados que já temos (mais rápido)
+        user = cls.__new__(cls)
         user.id = db_row[0]
         user.usuario = db_row[1]
         user.senha_hash = db_row[2]
@@ -32,7 +31,7 @@ class User(UserMixin):
             user.cpf = db_row[8]
         
         # Calcula se é admin
-        user.is_admin = 'admin' in str(user.cargo).lower() if user.cargo else False
+        user.is_admin = is_admin_role(user.cargo)
         
         return user
     
@@ -61,7 +60,7 @@ class User(UserMixin):
             self.senha_hash = user_data[8]
             
             # Calcula se é admin baseado no cargo
-            self.is_admin = 'admin' in str(self.cargo).lower() if self.cargo else False
+            self.is_admin = is_admin_role(self.cargo)
         else:
             # Se não encontrar, define valores padrão
             self.usuario = None
