@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Aurora Gestão">
+  <rect width="64" height="64" rx="15" fill="#163f32"/>
+  <path d="M13 43.5 27.1 16h9.8L51 43.5H40.7l-3-6.3H26.1l-3 6.3H13Zm16.5-14h4.8L32 24.4l-2.5 5.1Z" fill="#fff"/>
+  <path d="M19 47.5h26" fill="none" stroke="#e8b949" stroke-width="4" stroke-linecap="round"/>
+  <path d="M23 13.5c2.6-3.1 5.6-4.7 9-4.7s6.4 1.6 9 4.7" fill="none" stroke="#e8b949" stroke-width="3" stroke-linecap="round"/>
+</svg>
