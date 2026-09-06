@@ -155,6 +155,7 @@ def verificar_colaborador_existe(colaborador_id):
 def serialize_colaborador(r):
     return {
         "id": r["id"], "nome": r["nome"], "cargo": r["cargo"], "funcao": r["funcao"], "status": r["status"],
+        "setor": r["setor"], "chefe_direto_id": r["chefe_direto_id"],
         "email": r["email"], "telefone": r["telefone"], "cnh": r["cnh"], "validade_cnh": r["validade_cnh"],
         "endereco": r["endereco"], "salario": float(r["salario"]) if r["salario"] else None,
         "data_admissao": r["data_admissao"], "data_demissao": r["data_demissao"], "foto": r["foto"],
@@ -983,7 +984,7 @@ def criar_colaborador():
             return jsonify({"erro": "cargo inválido"}), 400
 
         campos = [
-            "nome","cargo","funcao","status","email","telefone","cnh","validade_cnh","endereco","salario",
+            "nome","cargo","funcao","setor","chefe_direto_id","status","email","telefone","cnh","validade_cnh","endereco","salario",
             "data_admissao","data_demissao","foto","cpf","data_nascimento","rg","orgao_emissor","pis_pasep",
             "ctps_numero","ctps_serie","estado_civil","nome_mae","nome_pai","titulo_eleitor",
             "comprovante_residencia","comprovante_escolaridade","banco","agencia","conta",
@@ -1031,7 +1032,7 @@ def editar_colaborador(id):
 
         # Whitelist de campos que podem ser atualizados para evitar Mass Assignment
         campos_permitidos = {
-            "nome", "cargo", "funcao", "status", "email", "telefone", "cnh", "validade_cnh", "endereco", "salario",
+            "nome", "cargo", "funcao", "setor", "chefe_direto_id", "status", "email", "telefone", "cnh", "validade_cnh", "endereco", "salario",
             "data_admissao", "data_demissao", "foto", "cpf", "data_nascimento", "rg", "orgao_emissor", "pis_pasep",
             "ctps_numero", "ctps_serie", "estado_civil", "nome_mae", "nome_pai", "titulo_eleitor",
             "comprovante_residencia", "comprovante_escolaridade", "banco", "agencia", "conta",
@@ -1075,6 +1076,11 @@ def editar_colaborador(id):
                 continue
 
             campo_banco = mapeamento_campos.get(k, k)
+            if k == "chefe_direto_id":
+                if v in (None, ""):
+                    v = None
+                elif int(v) == id:
+                    return jsonify({"erro": "O colaborador não pode ser seu próprio chefe direto"}), 400
             
             if k.endswith('_data') and v:
                 if not validar_data(v):

@@ -40,7 +40,9 @@ tests/                  testes automatizados
 schema.sql              schema completo para um banco novo
 ```
 
-`app.py` configura a aplicação e registra os blueprints. O projeto mantém SQL parametrizado e tipos `NUMERIC` para valores monetários. A migration `001_empresa.sql` introduz a configuração central da empresa sem apagar registros existentes.
+`app.py` configura a aplicação e registra os blueprints. O projeto mantém SQL parametrizado e tipos `NUMERIC` para valores monetários. As migrations são incrementais: `001_empresa.sql` introduz a configuração central da empresa e `002_banco_horas.sql` adiciona setor, chefe direto e a consolidação mensal do banco de horas sem apagar registros existentes.
+
+O Banco de Horas trabalha internamente em minutos, aceita carga mensal calculada ou direta, separa lançamentos detalhados de totais manuais, permite ajustes individuais, anulação auditável por período e exporta um `.xlsx` com resumo, detalhamento e configuração.
 
 ## Executar com Docker
 
@@ -54,10 +56,11 @@ docker compose up --build
 
 Acesse `http://localhost:8080`.
 
-Em banco já existente, aplique as migrations em ordem. Para a migration atual:
+Em banco já existente, aplique as migrations em ordem:
 
 ```powershell
 Get-Content -Raw infra/migrations/001_empresa.sql | docker compose exec -T db psql -U patagonia -d patagonia
+Get-Content -Raw infra/migrations/002_banco_horas.sql | docker compose exec -T db psql -U patagonia -d patagonia
 ```
 
 ## Demonstração opcional

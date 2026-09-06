@@ -1022,6 +1022,16 @@
                             <input type="text" class="form-control" id="funcao" name="funcao" placeholder="Função específica...">
                         </div>
                         <div class="form-group">
+                            <label for="setor"><i class="fas fa-sitemap"></i> Setor</label>
+                            <input type="text" class="form-control" id="setor" name="setor" placeholder="Ex.: Financeiro, Comercial">
+                        </div>
+                        <div class="form-group">
+                            <label for="chefe_direto_id"><i class="fas fa-user-tie"></i> Chefe direto</label>
+                            <select class="form-control" id="chefe_direto_id" name="chefe_direto_id">
+                                <option value="">Sem chefe direto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="statusModal"><i class="fas fa-user-check"></i> Status *</label>
                             <select class="form-control" id="statusModal" name="status" required>
                                 <option value="ativo">Ativo</option>
@@ -3872,6 +3882,7 @@
         if (formColaborador) formColaborador.reset();
         
         document.getElementById('colaboradorId').value = '';
+        preencherChefesDiretos();
         
         if (previewFoto) {
             previewFoto.style.display = 'none';
@@ -4053,6 +4064,7 @@
             
             const data = await response.json();
             todosColaboradores = data;
+            preencherChefesDiretos();
             
             colaboradoresPorCPF = {};
             data.forEach(colab => {
@@ -4067,6 +4079,19 @@
             console.error('Erro ao carregar colaboradores:', error);
             mostrarAlerta('Erro ao carregar lista de colaboradores', 'error');
         }
+    }
+
+    function preencherChefesDiretos(selecionado = '') {
+        const select = document.getElementById('chefe_direto_id');
+        if (!select) return;
+        const atual = String(selecionado || select.value || '');
+        const editandoId = String(document.getElementById('colaboradorId')?.value || '');
+        select.innerHTML = '<option value="">Sem chefe direto</option>';
+        todosColaboradores
+            .filter(c => String(c.id) !== editandoId && c.status === 'ativo')
+            .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+            .forEach(c => select.add(new Option(`${c.nome}${c.setor ? ` — ${c.setor}` : ''}`, c.id)));
+        select.value = atual;
     }
 
     async function carregarEPIs() {
@@ -4501,6 +4526,7 @@
             if (formColaborador) formColaborador.reset();
             
             document.getElementById('colaboradorId').value = colaborador.id;
+            preencherChefesDiretos(colaborador.chefe_direto_id);
             
             // Preencher todos os campos do formulário
             Object.keys(colaborador).forEach(key => {
