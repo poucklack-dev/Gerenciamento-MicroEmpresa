@@ -21,7 +21,7 @@ Aplicação web interna para centralizar rotinas administrativas e operacionais 
 
 ## Tecnologias
 
-Python 3.11, Flask, Jinja, PostgreSQL, JavaScript, HTML e CSS. A aplicação usa Flask-Login, Flask-Limiter e Flask-Talisman; uploads podem usar o filesystem local ou Google Cloud Storage. Redis é opcional para sessões no servidor. Gunicorn e Docker suportam a execução em produção. O procedimento específico para Google Cloud Run está em `README_DEPLOY_UPDATED.md`.
+Python 3.11, Flask, Jinja, PostgreSQL, JavaScript, HTML e CSS. A aplicação usa Flask-Login, Flask-Limiter e Flask-Talisman; uploads podem usar o filesystem local ou Google Cloud Storage. Redis é opcional para sessões no servidor e Docker facilita a execução do projeto em um ambiente isolado.
 
 ## Arquitetura
 
@@ -45,7 +45,7 @@ uploads/       arquivos locais (não versionados)
 2. Crie e ative um ambiente virtual.
 3. Execute `pip install -r requirements.txt`.
 4. Copie `.env.example` para `.env` e ajuste os valores.
-5. Inicialize um banco compatível com o schema utilizado pela aplicação. O arquivo `patagonia_dump.sql` representa o conjunto mais completo de tabelas legado; revise-o antes de importar em um ambiente com dados.
+5. Inicialize o PostgreSQL com o arquivo `schema_patagonia.sql`. Ao usar Docker Compose, isso acontece automaticamente na primeira criação do volume do banco.
 
 ## Configuração
 
@@ -55,7 +55,7 @@ Nunca publique o arquivo `.env`, dumps com dados reais, uploads, fotos ou creden
 
 ## Banco de dados
 
-O projeto não possui uma ferramenta formal de migrations. Os SQLs existentes não são equivalentes: `01_schema.sql` é uma base reduzida e `patagonia_dump.sql` contém entidades adicionais usadas pelo código. Faça backup e valide o destino antes de qualquer importação; não aplique os arquivos indiscriminadamente sobre produção.
+`schema_patagonia.sql` é a fonte oficial da estrutura do banco e não contém dados reais. O Docker Compose aplica esse arquivo somente quando cria um volume novo do PostgreSQL. O projeto ainda não utiliza uma ferramenta formal de migrations.
 
 ## Execução
 
@@ -65,13 +65,11 @@ Desenvolvimento:
 python run_dev.py
 ```
 
-Produção local:
+Com Docker, configure as variáveis necessárias e execute:
 
 ```powershell
-gunicorn -c gunicorn.conf.py wsgi:app
+docker compose up --build
 ```
-
-Com Docker, configure as variáveis necessárias e execute `docker compose up --build`.
 
 ## Testes
 

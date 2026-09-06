@@ -1,11 +1,8 @@
-version: '3.8'
-
 services:
   web:
     build: .
     container_name: patagonia_web
-    # O comando agora está no Dockerfile, então não é mais necessário aqui
-    # Monta o código-fonte para desenvolvimento e o arquivo de credenciais
+    # Monta o código-fonte e os uploads para desenvolvimento local.
     volumes:
       - ./:/app
       - ./uploads:/tmp/uploads
@@ -30,6 +27,7 @@ services:
     container_name: patagonia_db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      - ./schema_patagonia.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     environment:
       POSTGRES_DB: patagonia
       POSTGRES_USER: patagonia

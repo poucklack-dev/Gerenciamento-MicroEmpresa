@@ -285,8 +285,8 @@ class SmartFacialSystem:
         return descriptor / norm
 
     def reconhecer_face(self, image_bytes):
-        # Gunicorn mantém uma instância por worker. Recarregar garante que um
-        # cadastro feito em outro worker fique disponível imediatamente.
+        # Recarregar garante que cadastros feitos por outro processo fiquem
+        # disponíveis imediatamente.
         self.load_encodings()
         face_img, erro = self.processar_imagem(image_bytes)
         if erro:

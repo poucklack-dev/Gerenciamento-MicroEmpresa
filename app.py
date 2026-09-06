@@ -22,7 +22,7 @@ app = Flask(__name__,
 app.config.from_object(get_config_class())
 app.url_map.strict_slashes = False
 
-# Apply ProxyFix (trust single proxy as Cloud Run sits behind a proxy)
+# Trust forwarding headers when the app is served behind a reverse proxy.
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # ============================================================
@@ -135,7 +135,7 @@ if redis_url:
 # ============================================================
 login_manager = LoginManager()
 login_manager.init_app(app)
-# Relax session protection to reduce spurious logouts behind Cloud Run (IP may change)
+# Avoid spurious logouts when a reverse proxy changes the apparent client IP.
 # Setting to None avoids aggressive logout; monitor this for security needs.
 login_manager.session_protection = None
 login_manager.login_view = 'login.login'

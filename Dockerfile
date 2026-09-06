@@ -1,5 +1,5 @@
 # ============================================================
-#  PATAGONIA — PRODUCTION DOCKERFILE (MULTI-STAGE)
+#  PATAGONIA — DOCKERFILE
 # ============================================================
 
 # --- Build Stage ---
@@ -26,8 +26,7 @@ FROM python:3.11-slim AS final
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV FLASK_APP=wsgi:app
-ENV FLASK_ENV=production
+ENV ENV=development
 
 WORKDIR /app
 
@@ -47,16 +46,14 @@ COPY backend/ ./backend/
 COPY core/ ./core/
 COPY templates/ ./templates/
 COPY static/ ./static/
-COPY wsgi.py .
+COPY run_dev.py .
 COPY app.py .
 COPY config.py .
-COPY gunicorn.conf.py .
 
 RUN groupadd -g 1001 patagonia_user \
  && useradd --system --uid 1001 --gid 1001 --create-home --shell /usr/sbin/nologin patagonia_user
-# Do not create local uploads directory in production images (storage is GCS-only).
 USER patagonia_user
 
 EXPOSE 8080
 
-CMD ["gunicorn", "-c", "gunicorn.conf.py", "wsgi:app"]
+CMD ["python", "run_dev.py"]
