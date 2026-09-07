@@ -1,11 +1,11 @@
 /* Visão financeira — linguagem visual analítica inspirada em ERP e Power BI. */
 :root {
-  --primary-green: #2f6b5b;
+  --primary-green: #167052;
   --dark-green: #234d42;
-  --emerald-green: #477f71;
-  --accent-yellow: #c08a2b;
-  --alert-red: #b5473f;
-  --info-blue: #356b9a;
+  --emerald-green: #27856a;
+  --accent-yellow: #d98616;
+  --alert-red: #c2413a;
+  --info-blue: #2f6fbd;
   --dark-bg: #f3f5f4;
   --darker-bg: #e9eeeb;
   --card-bg: #fff;
@@ -15,7 +15,7 @@
   --text-muted: #7b8982;
   --success: #36745f;
   --warning: #a46f19;
-  --danger: #b5473f;
+  --danger: #c2413a;
   --shadow-lg: 0 2px 8px rgba(19, 45, 35, .06);
   --shadow-md: 0 1px 3px rgba(19, 45, 35, .06);
 }
@@ -104,7 +104,7 @@ body {
   box-shadow: none !important;
 }
 .btn-primary { background: var(--primary-green) !important; color: #fff !important; }
-.btn-info { background: #356b9a !important; color: #fff !important; }
+.btn-info { background: #2f6fbd !important; color: #fff !important; }
 .btn-warning { background: #fff !important; color: #805814 !important; border: 1px solid #d9bd8d !important; }
 .btn-secondary { background: #fff !important; color: var(--text-secondary) !important; border: 1px solid #cbd5cf !important; }
 .btn:hover { transform: none !important; filter: brightness(.97); }

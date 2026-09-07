@@ -11,21 +11,21 @@
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <style>
         :root {
-            --primary-green: #2f6b5b;
+            --primary-green: #167052;
             --dark-green: #0b2f24;
-            --emerald-green: #477f71;
-            --accent-yellow: #c08a2b;
+            --emerald-green: #27856a;
+            --accent-yellow: #d98616;
             --alert-red: #ff4d4d;
             --info-blue: #3b82f6;
             --dark-bg: #0a0f1a;
             --darker-bg: #050a14;
             --card-bg: rgba(11, 20, 30, 0.95);
-            --card-border: rgba(47, 107, 91, 0.15);
+            --card-border: rgba(22, 112, 82, 0.15);
             --text-primary: #ffffff;
             --text-secondary: #9ca3af;
             --text-muted: #6b7280;
-            --success: #2f6b5b;
-            --warning: #c08a2b;
+            --success: #167052;
+            --warning: #d98616;
             --danger: #ff4d4d;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -60,8 +60,8 @@
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(rgba(47, 107, 91, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(47, 107, 91, 0.02) 1px, transparent 1px);
+                linear-gradient(rgba(22, 112, 82, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(22, 112, 82, 0.02) 1px, transparent 1px);
             background-size: 60px 60px;
             z-index: -1;
             pointer-events: none;
@@ -83,7 +83,7 @@
             padding: 25px 30px;
             margin-bottom: 25px;
             box-shadow: var(--shadow-lg);
-            border-top: 1px solid rgba(47, 107, 91, 0.3);
+            border-top: 1px solid rgba(22, 112, 82, 0.3);
         }
 
         .header-content {
@@ -103,14 +103,14 @@
         .logo-icon {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, var(--dark-green), rgba(47, 107, 91, 0.1));
+            background: linear-gradient(135deg, var(--dark-green), rgba(22, 112, 82, 0.1));
             border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--primary-green);
             font-size: 22px;
-            border: 1px solid rgba(47, 107, 91, 0.2);
+            border: 1px solid rgba(22, 112, 82, 0.2);
         }
 
         .header-text h1 {
@@ -134,10 +134,10 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            background: rgba(47, 107, 91, 0.05);
+            background: rgba(22, 112, 82, 0.05);
             padding: 10px 20px;
             border-radius: var(--radius-md);
-            border: 1px solid rgba(47, 107, 91, 0.1);
+            border: 1px solid rgba(22, 112, 82, 0.1);
         }
 
         .filter-group {
@@ -148,7 +148,7 @@
 
         .date-input {
             background: rgba(20, 30, 40, 0.9);
-            border: 1px solid rgba(47, 107, 91, 0.2);
+            border: 1px solid rgba(22, 112, 82, 0.2);
             border-radius: var(--radius-sm);
             padding: 8px 12px;
             color: var(--text-primary);
@@ -161,7 +161,7 @@
         .date-input:focus {
             outline: none;
             border-color: var(--primary-green);
-            box-shadow: 0 0 0 2px rgba(47, 107, 91, 0.1);
+            box-shadow: 0 0 0 2px rgba(22, 112, 82, 0.1);
         }
 
         /* BOTÕES EXECUTIVOS */
@@ -189,7 +189,7 @@
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(47, 107, 91, 0.3);
+            box-shadow: 0 4px 15px rgba(22, 112, 82, 0.3);
         }
 
         .btn-secondary {
@@ -220,8 +220,8 @@
         }
 
         .alerta-card {
-            background: rgba(181, 71, 63, 0.05);
-            border: 1px solid rgba(181, 71, 63, 0.2);
+            background: rgba(194, 65, 58, 0.05);
+            border: 1px solid rgba(194, 65, 58, 0.2);
             border-radius: var(--radius-md);
             padding: 15px 20px;
             margin-bottom: 10px;
@@ -234,7 +234,7 @@
 
         .alerta-card:hover {
             transform: translateX(5px);
-            border-color: rgba(181, 71, 63, 0.4);
+            border-color: rgba(194, 65, 58, 0.4);
         }
 
         .alerta-card.warning {
@@ -247,12 +247,12 @@
         }
 
         .alerta-card.info {
-            background: rgba(47, 107, 91, 0.05);
-            border-color: rgba(47, 107, 91, 0.2);
+            background: rgba(22, 112, 82, 0.05);
+            border-color: rgba(22, 112, 82, 0.2);
         }
 
         .alerta-card.info:hover {
-            border-color: rgba(47, 107, 91, 0.4);
+            border-color: rgba(22, 112, 82, 0.4);
         }
 
         .alerta-icon {
@@ -266,7 +266,7 @@
         }
 
         .alerta-card.critico .alerta-icon {
-            background: rgba(181, 71, 63, 0.2);
+            background: rgba(194, 65, 58, 0.2);
             color: var(--alert-red);
         }
 
@@ -276,7 +276,7 @@
         }
 
         .alerta-card.info .alerta-icon {
-            background: rgba(47, 107, 91, 0.2);
+            background: rgba(22, 112, 82, 0.2);
             color: var(--primary-green);
         }
 
@@ -301,7 +301,7 @@
         }
 
         .kpi-card:hover {
-            border-color: rgba(47, 107, 91, 0.3);
+            border-color: rgba(22, 112, 82, 0.3);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             transform: translateY(-2px);
         }
@@ -347,9 +347,9 @@
         }
 
         .badge-success {
-            background: rgba(47, 107, 91, 0.1);
+            background: rgba(22, 112, 82, 0.1);
             color: var(--primary-green);
-            border: 1px solid rgba(47, 107, 91, 0.3);
+            border: 1px solid rgba(22, 112, 82, 0.3);
         }
 
         .badge-warning {
@@ -359,15 +359,15 @@
         }
 
         .badge-danger {
-            background: rgba(181, 71, 63, 0.1);
+            background: rgba(194, 65, 58, 0.1);
             color: var(--alert-red);
-            border: 1px solid rgba(181, 71, 63, 0.3);
+            border: 1px solid rgba(194, 65, 58, 0.3);
         }
 
         .badge-info {
-            background: rgba(53, 107, 154, 0.1);
+            background: rgba(47, 111, 189, 0.1);
             color: var(--info-blue);
-            border: 1px solid rgba(53, 107, 154, 0.3);
+            border: 1px solid rgba(47, 111, 189, 0.3);
         }
 
         .kpi-value {
@@ -434,7 +434,7 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 1px solid rgba(47, 107, 91, 0.1);
+            border-bottom: 1px solid rgba(22, 112, 82, 0.1);
         }
 
         .chart-title {
@@ -458,8 +458,8 @@
             width: 30px;
             height: 30px;
             border-radius: var(--radius-sm);
-            background: rgba(47, 107, 91, 0.1);
-            border: 1px solid rgba(47, 107, 91, 0.2);
+            background: rgba(22, 112, 82, 0.1);
+            border: 1px solid rgba(22, 112, 82, 0.2);
             color: var(--primary-green);
             display: flex;
             align-items: center;
@@ -470,7 +470,7 @@
         }
 
         .chart-btn:hover {
-            background: rgba(47, 107, 91, 0.2);
+            background: rgba(22, 112, 82, 0.2);
             border-color: var(--primary-green);
         }
 
@@ -514,7 +514,7 @@
         }
 
         .modern-table th {
-            background: rgba(47, 107, 91, 0.05);
+            background: rgba(22, 112, 82, 0.05);
             padding: 12px 15px;
             text-align: left;
             font-family: Inter, system-ui, sans-serif;
@@ -523,7 +523,7 @@
             letter-spacing: 1px;
             color: var(--primary-green);
             font-weight: 600;
-            border-bottom: 1px solid rgba(47, 107, 91, 0.2);
+            border-bottom: 1px solid rgba(22, 112, 82, 0.2);
         }
 
         .modern-table td {
@@ -538,7 +538,7 @@
         }
 
         .modern-table tr:hover {
-            background: rgba(47, 107, 91, 0.03);
+            background: rgba(22, 112, 82, 0.03);
         }
 
         .value-cell {
@@ -588,7 +588,7 @@
         }
 
         .indicator-card:hover {
-            border-color: rgba(47, 107, 91, 0.3);
+            border-color: rgba(22, 112, 82, 0.3);
             transform: translateY(-2px);
         }
 
@@ -670,7 +670,7 @@
         }
 
         .modal-header {
-            background: rgba(47, 107, 91, 0.05);
+            background: rgba(22, 112, 82, 0.05);
             border-bottom: 1px solid var(--card-border);
             padding: 20px 30px;
             display: flex;
@@ -691,8 +691,8 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: rgba(181, 71, 63, 0.1);
-            border: 1px solid rgba(181, 71, 63, 0.2);
+            background: rgba(194, 65, 58, 0.1);
+            border: 1px solid rgba(194, 65, 58, 0.2);
             color: var(--alert-red);
             display: flex;
             align-items: center;
@@ -702,7 +702,7 @@
         }
 
         .modal-close:hover {
-            background: rgba(181, 71, 63, 0.2);
+            background: rgba(194, 65, 58, 0.2);
             transform: rotate(90deg);
         }
 
@@ -719,7 +719,7 @@
 
         .modal-section {
             background: rgba(20, 30, 40, 0.5);
-            border: 1px solid rgba(47, 107, 91, 0.1);
+            border: 1px solid rgba(22, 112, 82, 0.1);
             border-radius: var(--radius-md);
             padding: 20px;
         }
@@ -730,7 +730,7 @@
             color: var(--primary-green);
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(47, 107, 91, 0.2);
+            border-bottom: 1px solid rgba(22, 112, 82, 0.2);
         }
 
         .data-row {
@@ -774,7 +774,7 @@
 
         .notification {
             background: var(--card-bg);
-            border: 1px solid rgba(47, 107, 91, 0.2);
+            border: 1px solid rgba(22, 112, 82, 0.2);
             border-left: 4px solid var(--primary-green);
             border-radius: var(--radius-md);
             padding: 15px;
@@ -845,7 +845,7 @@
             padding: 20px;
             color: var(--text-secondary);
             font-size: 12px;
-            border-top: 1px solid rgba(47, 107, 91, 0.1);
+            border-top: 1px solid rgba(22, 112, 82, 0.1);
             margin-top: 30px;
         }
 
@@ -910,17 +910,17 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(47, 107, 91, 0.05);
+            background: rgba(22, 112, 82, 0.05);
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(47, 107, 91, 0.3);
+            background: rgba(22, 112, 82, 0.3);
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(47, 107, 91, 0.5);
+            background: rgba(22, 112, 82, 0.5);
         }
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/financial-dashboard.css') }}">
@@ -968,7 +968,7 @@
                     </div>
                     <div class="header-text">
                         <h1>Visão financeira</h1>
-                        <p class="subtitle">VISÃO 360° • ANÁLISE ESTRATÉGICA • CONTROLE FINANCEIRO</p>
+                        <p class="subtitle">Receitas, despesas, caixa e custos do negócio</p>
                     </div>
                 </div>
                 
@@ -1003,7 +1003,7 @@
                     <i class="fas fa-info-circle"></i>
                 </div>
                 <div>
-                    <strong>CARREGANDO ANÁLISE FINANCEIRA 360°...</strong>
+                    <strong>Atualizando indicadores financeiros...</strong>
                     <p style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
                         Analisando dados em tempo real
                     </p>
@@ -1411,7 +1411,7 @@
         <div class="dashboard-footer">
             <p>
                 <span class="indicator-status status-healthy"></span>
-                SISTEMA ONLINE • DASHBOARD 360° • ÚLTIMA ATUALIZAÇÃO: <span id="lastUpdate">--:--:--</span>
+                DADOS GERENCIAIS • ÚLTIMA ATUALIZAÇÃO: <span id="lastUpdate">--:--:--</span>
             </p>
             <p style="margin-top: 5px; font-family: 'Inter'; font-size: 11px; color: var(--primary-green);">
                 AURORA GESTÃO • RELATÓRIO FINANCEIRO
@@ -1483,7 +1483,11 @@ async function carregarDashboard360() {
         
         console.log('Carregando dashboard de:', url);
         
-        const response = await fetch(url);
+        const competenciaFolha = (dataInicio || new Date().toISOString()).slice(0, 7);
+        const [response, payrollResponse] = await Promise.all([
+            fetch(url),
+            fetch(`/api/rh/folha-pagamento?competencia=${competenciaFolha}`)
+        ]);
         
         if (!response.ok) {
             const errorText = await response.text().catch(() => 'Erro desconhecido');
@@ -1492,6 +1496,7 @@ async function carregarDashboard360() {
         }
         
         const data = await response.json();
+        data.folha_pagamento = payrollResponse.ok ? await payrollResponse.json() : null;
         
         // Verificar se é um erro
         if (data.status === 'error' || data.erro) {
@@ -1653,7 +1658,8 @@ function atualizarDashboardCompleto(data) {
             abastecimentos: { lista: [], resumo: {} },
             top_custos: [],
             alertas: []
-        }
+        },
+        folha_pagamento: data.folha_pagamento || { total_salarios: 0, colaboradores_ativos: 0, salario_medio: 0, sem_salario_informado: 0, setores: [], colaboradores: [] }
     };
     
     // Garantir que todos os valores numéricos existam
@@ -1678,7 +1684,7 @@ function atualizarDashboardCompleto(data) {
     atualizarKPIs(safeData.resumo_360);
     atualizarGraficosCompletos(safeData);
     atualizarTabelasCompletas(safeData);
-    atualizarIndicadores(safeData.resumo_360, safeData.contratos_kpi, safeData.veiculos);
+    atualizarIndicadores(safeData.resumo_360, safeData.contratos_kpi, safeData.veiculos, safeData.folha_pagamento);
 }
 
 function atualizarAlertas(alertas) {
@@ -1904,8 +1910,8 @@ function renderizarGraficoGastosMes(gastosMes) {
                 datasets: [{
                     label: 'Gastos Totais (R$)',
                     data: valores,
-                    backgroundColor: 'rgba(47, 107, 91, 0.1)',
-                    borderColor: 'rgb(47, 107, 91)',
+                    backgroundColor: 'rgba(22, 112, 82, 0.1)',
+                    borderColor: 'rgb(22, 112, 82)',
                     borderWidth: 2,
                     tension: 0.3,
                     fill: true
@@ -1917,7 +1923,7 @@ function renderizarGraficoGastosMes(gastosMes) {
         console.error('Erro ao criar gráfico de gastos mensais:', error);
         // Mensagem de erro no canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'rgba(181, 71, 63, 0.3)';
+        ctx.fillStyle = 'rgba(194, 65, 58, 0.3)';
         ctx.font = '14px "Inter"';
         ctx.textAlign = 'center';
         ctx.fillText('Erro ao renderizar gráfico', canvas.width / 2, canvas.height / 2);
@@ -2001,7 +2007,7 @@ function renderizarGraficoComposicaoCustos(despesasCategoria) {
     } catch (error) {
         console.error('Erro ao criar gráfico de composição de custos:', error);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'rgba(181, 71, 63, 0.3)';
+        ctx.fillStyle = 'rgba(194, 65, 58, 0.3)';
         ctx.font = '14px "Inter"';
         ctx.textAlign = 'center';
         ctx.fillText('Erro ao renderizar gráfico', canvas.width / 2, canvas.height / 2);
@@ -2043,18 +2049,18 @@ function renderizarGraficoCustosVeiculos(veiculosData) {
                 datasets: [{
                     data: valores,
                     backgroundColor: [
-                        'rgba(181, 71, 63, 0.8)',  // Vermelho - Combustível
-                        'rgba(53, 107, 154, 0.8)',   // Azul - Manutenção
-                        'rgba(192, 138, 43, 0.8)',   // Amarelo - Documentação
-                        'rgba(71, 127, 113, 0.8)',   // Verde - Seguro
-                        'rgba(112, 94, 138, 0.8)'   // Roxo - Outros
+                        'rgba(194, 65, 58, 0.8)',  // Vermelho - Combustível
+                        'rgba(47, 111, 189, 0.8)',   // Azul - Manutenção
+                        'rgba(217, 134, 22, 0.8)',   // Amarelo - Documentação
+                        'rgba(39, 133, 106, 0.8)',   // Verde - Seguro
+                        'rgba(111, 78, 160, 0.8)'   // Roxo - Outros
                     ],
                     borderColor: [
-                        'rgb(181, 71, 63)',
-                        'rgb(53, 107, 154)',
-                        'rgb(192, 138, 43)',
-                        'rgb(71, 127, 113)',
-                        'rgb(112, 94, 138)'
+                        'rgb(194, 65, 58)',
+                        'rgb(47, 111, 189)',
+                        'rgb(217, 134, 22)',
+                        'rgb(39, 133, 106)',
+                        'rgb(111, 78, 160)'
                     ],
                     borderWidth: 2
                 }]
@@ -2081,11 +2087,11 @@ function renderizarGraficoCustosVeiculos(veiculosData) {
 
 function gerarCoresCategoria(labels) {
     const coresBase = [
-        'rgba(47, 107, 91, 0.8)',    // Verde
+        'rgba(22, 112, 82, 0.8)',    // Verde
         'rgba(163, 255, 18, 0.8)',   // Verde amarelado
-        'rgba(53, 107, 154, 0.8)',   // Azul
+        'rgba(47, 111, 189, 0.8)',   // Azul
         'rgba(147, 51, 234, 0.8)',   // Roxo
-        'rgba(192, 138, 43, 0.8)',   // Amarelo
+        'rgba(217, 134, 22, 0.8)',   // Amarelo
         'rgba(239, 68, 68, 0.8)',    // Vermelho
         'rgba(16, 185, 129, 0.8)',   // Verde água
         'rgba(139, 92, 246, 0.8)',   // Lilás
@@ -2096,16 +2102,16 @@ function gerarCoresCategoria(labels) {
     // Mapear cores por grupos de categorias
     const gruposCores = {
         'Alimentação': 'rgba(239, 68, 68, 0.8)',      // Vermelho
-        'Combustível': 'rgba(181, 71, 63, 0.8)',     // Vermelho claro
+        'Combustível': 'rgba(194, 65, 58, 0.8)',     // Vermelho claro
         'Diárias': 'rgba(16, 185, 129, 0.8)',         // Verde água
         'Hospedagem': 'rgba(139, 92, 246, 0.8)',      // Lilás
-        'Transporte': 'rgba(53, 107, 154, 0.8)',      // Azul
-        'Manutenção': 'rgba(53, 107, 154, 0.8)',      // Azul claro
-        'Salários': 'rgba(47, 107, 91, 0.8)',         // Verde
+        'Transporte': 'rgba(47, 111, 189, 0.8)',      // Azul
+        'Manutenção': 'rgba(47, 111, 189, 0.8)',      // Azul claro
+        'Salários': 'rgba(22, 112, 82, 0.8)',         // Verde
         'EPIs': 'rgba(163, 255, 18, 0.8)',            // Verde amarelado
         'Aluguel': 'rgba(147, 51, 234, 0.8)',         // Roxo
         'Impostos': 'rgba(6, 182, 212, 0.8)',         // Ciano
-        'Veículos': 'rgba(192, 138, 43, 0.8)'         // Amarelo
+        'Veículos': 'rgba(217, 134, 22, 0.8)'         // Amarelo
     };
     
     return labels.map((label, index) => {
@@ -2139,14 +2145,14 @@ function renderizarGraficoFluxoCaixa(fluxoCaixa) {
                         fluxoCaixa.saldo || 0
                     ],
                     backgroundColor: [
-                        'rgba(47, 107, 91, 0.8)',
-                        'rgba(181, 71, 63, 0.8)',
-                        'rgba(53, 107, 154, 0.8)'
+                        'rgba(22, 112, 82, 0.8)',
+                        'rgba(194, 65, 58, 0.8)',
+                        'rgba(47, 111, 189, 0.8)'
                     ],
                     borderColor: [
-                        'rgb(47, 107, 91)',
-                        'rgb(181, 71, 63)',
-                        'rgb(53, 107, 154)'
+                        'rgb(22, 112, 82)',
+                        'rgb(194, 65, 58)',
+                        'rgb(47, 111, 189)'
                     ],
                     borderWidth: 1
                 }]
@@ -2178,14 +2184,14 @@ function renderizarGraficoContasPagar(contasPagar) {
                 datasets: [{
                     data: data,
                     backgroundColor: [
-                        'rgba(192, 138, 43, 0.8)',
-                        'rgba(47, 107, 91, 0.8)',
-                        'rgba(181, 71, 63, 0.8)'
+                        'rgba(217, 134, 22, 0.8)',
+                        'rgba(22, 112, 82, 0.8)',
+                        'rgba(194, 65, 58, 0.8)'
                     ],
                     borderColor: [
-                        'rgb(192, 138, 43)',
-                        'rgb(47, 107, 91)',
-                        'rgb(181, 71, 63)'
+                        'rgb(217, 134, 22)',
+                        'rgb(22, 112, 82)',
+                        'rgb(194, 65, 58)'
                     ],
                     borderWidth: 2
                 }]
@@ -2215,7 +2221,7 @@ function getChartOptions(tipo) {
                 backgroundColor: 'rgba(255, 255, 255, 0.98)',
                 titleColor: 'rgba(255, 255, 255, 0.9)',
                 bodyColor: 'rgba(255, 255, 255, 0.7)',
-                borderColor: 'rgba(47, 107, 91, 0.3)',
+                borderColor: 'rgba(22, 112, 82, 0.3)',
                 borderWidth: 1
             }
         }
@@ -2602,7 +2608,7 @@ function atualizarTabelaVeiculos(veiculosData) {
         // Adicionar total
         const resumo = veiculosData.resumo || {};
         tabela.innerHTML += `
-            <tr style="background: rgba(47, 107, 91, 0.05);">
+            <tr style="background: rgba(22, 112, 82, 0.05);">
                 <td colspan="3" style="text-align: right; font-weight: bold; color: var(--primary-green);">
                     TOTAL (${veiculos.length} veículos):
                 </td>
@@ -2882,7 +2888,7 @@ function atualizarTabelaPerformance(performance) {
     }
 }
 
-function atualizarIndicadores(resumo, kpi, veiculosData) {
+function atualizarIndicadores(resumo, kpi, veiculosData, folhaPagamento) {
     // Atualizar indicadores
     const indicadorDependencia = document.getElementById('indicadorDependencia');
     const indicadorSalarios = document.getElementById('indicadorSalarios');
@@ -2897,8 +2903,9 @@ function atualizarIndicadores(resumo, kpi, veiculosData) {
     }
     
     if (indicadorSalarios) {
-        // Peso de salários (não temos dados específicos, usar 30% como placeholder)
-        indicadorSalarios.textContent = `30%`;
+        const baseDespesas = resumo.despesas_total || 0;
+        const pesoFolha = baseDespesas > 0 ? ((folhaPagamento?.total_salarios || 0) / baseDespesas) * 100 : 0;
+        indicadorSalarios.textContent = `${pesoFolha.toFixed(1)}%`;
     }
     
     if (indicadorCustoContrato) {
@@ -3011,7 +3018,7 @@ function abrirAnaliseDetalhada(tipo) {
             conteudo = gerarConteudoVeiculos(dashboardData);
             break;
         default:
-            titulo = 'ANÁLISE FINANCEIRA 360° COMPLETA';
+            titulo = 'ANÁLISE FINANCEIRA GERAL';
             conteudo = gerarConteudoGeral(dashboardData);
     }
     
@@ -3225,7 +3232,7 @@ function gerarConteudoGeral(data) {
             <div class="modal-section">
                 <h3 class="section-title">
                     <i class="fas fa-chart-network"></i>
-                    VISÃO GERAL 360°
+                    VISÃO GERAL
                 </h3>
                 <div class="data-row">
                     <span class="data-label">Receitas:</span>
@@ -3299,6 +3306,8 @@ function gerarConteudoDependencia(data) {
 }
 
 function gerarConteudoSalarios(data) {
+    const folha = data.folha_pagamento || {};
+    const setores = Array.isArray(folha.setores) ? folha.setores : [];
     return `
         <div class="modal-grid">
             <div class="modal-section">
@@ -3307,13 +3316,26 @@ function gerarConteudoSalarios(data) {
                     FOLHA DE PAGAMENTO
                 </h3>
                 <div class="data-row">
-                    <span class="data-label">Dados Específicos:</span>
-                    <span class="data-value">Necessário endpoint específico</span>
+                    <span class="data-label">Salários cadastrados:</span>
+                    <span class="data-value">${formatarMoeda(folha.total_salarios || 0)}</span>
                 </div>
                 <div class="data-row">
-                    <span class="data-label">Sugestão:</span>
-                    <span class="data-value">Criar endpoint /api/rh/folha-pagamento</span>
+                    <span class="data-label">Colaboradores ativos:</span>
+                    <span class="data-value">${folha.colaboradores_ativos || 0}</span>
                 </div>
+                <div class="data-row">
+                    <span class="data-label">Salário médio:</span>
+                    <span class="data-value">${formatarMoeda(folha.salario_medio || 0)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Sem salário informado:</span>
+                    <span class="data-value ${folha.sem_salario_informado ? 'warning' : ''}">${folha.sem_salario_informado || 0}</span>
+                </div>
+            </div>
+            <div class="modal-section">
+                <h3 class="section-title"><i class="fas fa-sitemap"></i> FOLHA POR SETOR</h3>
+                ${setores.length ? setores.map(item => `<div class="data-row"><span class="data-label">${item.setor} (${item.colaboradores})</span><span class="data-value">${formatarMoeda(item.salarios)}</span></div>`).join('') : '<p class="data-label">Nenhum salário cadastrado.</p>'}
+                <p class="data-label" style="margin-top:12px">${folha.observacao || ''}</p>
             </div>
         </div>
     `;
@@ -3584,7 +3606,7 @@ async function gerarRelatorioCompleto() {
         
         doc.save(`relatorio_financeiro_360_${new Date().toISOString().split('T')[0]}.pdf`);
         
-        mostrarNotificacao('Relatório 360° gerado com sucesso!', 'success');
+        mostrarNotificacao('Relatório gerado com sucesso!', 'success');
         
     } catch (error) {
         console.error('Erro ao gerar relatório:', error);
@@ -3678,7 +3700,7 @@ async function exportarParaExcel() {
         link.click();
         document.body.removeChild(link);
         
-        mostrarNotificacao('Dados 360° exportados com sucesso!', 'success');
+        mostrarNotificacao('Dados exportados com sucesso!', 'success');
         
     } catch (error) {
         console.error('Erro ao exportar para Excel:', error);
@@ -3759,7 +3781,7 @@ window.verTodosVeiculos = verTodosVeiculos;
 ">
     <div style="
         background: rgba(11, 20, 30, 0.95);
-        border: 1px solid rgba(47, 107, 91, 0.3);
+        border: 1px solid rgba(22, 112, 82, 0.3);
         border-radius: 12px;
         padding: 50px;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -3768,7 +3790,7 @@ window.verTodosVeiculos = verTodosVeiculos;
             font-size: 80px;
             color: var(--primary-green);
             margin-bottom: 20px;
-            text-shadow: 0 0 20px rgba(47, 107, 91, 0.5);
+            text-shadow: 0 0 20px rgba(22, 112, 82, 0.5);
         ">
             <i class="fas fa-shield-alt"></i>
         </div>
@@ -3784,7 +3806,7 @@ window.verTodosVeiculos = verTodosVeiculos;
             margin-bottom: 30px;
             max-width: 400px;
         ">
-            Este dashboard executivo 360° requer permissões de administrador ou gestor financeiro.
+            Esta visão financeira requer permissões de administrador ou gestor.
         </p>
         <button onclick="window.history.back()" style="
             background: linear-gradient(135deg, var(--primary-green), var(--emerald-green));

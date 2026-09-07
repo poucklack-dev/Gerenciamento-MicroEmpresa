@@ -211,6 +211,7 @@ from backend.banco_de_horas import banco_horas_bp
 from backend.pages import pages_bp
 from backend.media import media_bp
 from backend.empresa import company_context, empresa_bp
+from backend.rh import rh_bp
 
 app.context_processor(company_context)
 
@@ -236,6 +237,7 @@ app.register_blueprint(usuarios_bp)
 app.register_blueprint(banco_horas_bp)
 app.register_blueprint(media_bp)
 app.register_blueprint(empresa_bp)
+app.register_blueprint(rh_bp)
 
 # Handle large uploads gracefully and return JSON
 from werkzeug.exceptions import RequestEntityTooLarge
