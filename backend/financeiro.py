@@ -3,8 +3,8 @@
 # ===============================================================
 
 from flask import Blueprint, jsonify, request
-from core.database import get_conn
-from core.auth import admin_required as require_admin
+from backend.core.database import get_conn
+from backend.core.auth import admin_required as require_admin
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 

@@ -4,7 +4,7 @@ import time
 from datetime import date, datetime, timedelta
 from flask import Blueprint, jsonify, render_template, request
 from flask_login import current_user, login_required
-from core.database import get_conn
+from backend.core.database import get_conn
 from typing import Dict, List, Any, Optional, Tuple
 
 # Configuração do Logger

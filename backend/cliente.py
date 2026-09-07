@@ -4,7 +4,7 @@
 # ============================================================
 
 from flask import Blueprint, request, jsonify, render_template
-from core.database import get_conn
+from backend.core.database import get_conn
 import traceback
 import logging
 

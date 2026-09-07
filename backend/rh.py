@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 from flask import Blueprint, jsonify, request
 
-from core.auth import admin_required
-from core.database import get_conn
+from backend.core.auth import admin_required
+from backend.core.database import get_conn
 
 
 rh_bp = Blueprint("rh", __name__, url_prefix="/api/rh")

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, send_from_directory, redirect, current_app, send_file
-from core.database import get_conn
-from core.auth import admin_required as require_admin
-from core.storage import get_storage
+from backend.core.database import get_conn
+from backend.core.auth import admin_required as require_admin
+from backend.core.storage import get_storage
 import os
 from werkzeug.utils import secure_filename
 import uuid

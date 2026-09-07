@@ -2,7 +2,7 @@ from werkzeug.security import check_password_hash
 
 import pytest
 
-from core.auth import hash_senha, is_admin_role
+from backend.core.auth import hash_senha, is_admin_role
 
 
 def test_hash_senha_is_compatible_with_login():

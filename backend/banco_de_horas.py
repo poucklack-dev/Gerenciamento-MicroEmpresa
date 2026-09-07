@@ -7,7 +7,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
 from werkzeug.utils import secure_filename
-from core.database import get_conn
+from backend.core.database import get_conn
 
 banco_horas_bp = Blueprint("banco_horas", __name__, url_prefix="/api/banco_horas")
 

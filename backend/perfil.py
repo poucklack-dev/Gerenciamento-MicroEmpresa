@@ -4,9 +4,9 @@
 from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login import current_user, login_required
 from werkzeug.security import check_password_hash
-from core.database import get_conn
-from core.storage import get_storage, validate_image_upload
-from core.auth import hash_senha
+from backend.core.database import get_conn
+from backend.core.storage import get_storage, validate_image_upload
+from backend.core.auth import hash_senha
 
 perfil_bp = Blueprint("perfil", __name__, url_prefix="/perfil")
 

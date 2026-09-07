@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, send_file, current_app
-from core.database import get_conn
-from core.storage import get_storage
+from backend.core.database import get_conn
+from backend.core.storage import get_storage
 from datetime import time, date, datetime
 import io
 import traceback

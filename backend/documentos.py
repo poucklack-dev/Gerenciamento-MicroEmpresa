@@ -9,8 +9,8 @@ from functools import wraps
 import logging
 import traceback
 from flask_login import login_required, current_user
-from core.storage import get_storage
-from core.auth import admin_required
+from backend.core.storage import get_storage
+from backend.core.auth import admin_required
 
 
 # Configurar logging
@@ -204,7 +204,7 @@ def with_db_connection(func):
     """Decorator para gerenciar conexões com o banco de dados"""
     @wraps(func)
     def wrapper(*args, **kwargs):
-        from core.database import get_conn
+        from backend.core.database import get_conn
         conn = None
         try:
             conn = get_conn()
@@ -424,7 +424,7 @@ def criar_documento():
             }), 400
         
         # Inserir no banco
-        from core.database import get_conn
+        from backend.core.database import get_conn
         conn = get_conn()
         columns = get_column_names(conn)
         
@@ -491,7 +491,7 @@ def atualizar_documento(id):
         logger.info(f"Atualizar documento {id}")
         
         # Verificar se o documento existe
-        from core.database import get_conn
+        from backend.core.database import get_conn
         conn = get_conn()
         cur = conn.cursor()
         

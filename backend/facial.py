@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, send_file, current_app
-from core.database import get_conn
-from core.storage import get_storage, validate_image_upload
-from core.auth import admin_required
+from backend.core.database import get_conn
+from backend.core.storage import get_storage, validate_image_upload
+from backend.core.auth import admin_required
 from werkzeug.utils import secure_filename
 import io
 

@@ -1,6 +1,6 @@
 from flask_login import UserMixin
-from core.database import get_conn
-from core.auth import is_admin_role
+from backend.core.database import get_conn
+from backend.core.auth import is_admin_role
 
 class User(UserMixin):
     def __init__(self, user_id):

@@ -6,7 +6,7 @@ import os
 from flask import Blueprint, abort, redirect, request, send_file, session, url_for
 from flask_login import current_user
 
-from core.storage import get_storage
+from backend.core.storage import get_storage
 
 
 media_bp = Blueprint("media", __name__)

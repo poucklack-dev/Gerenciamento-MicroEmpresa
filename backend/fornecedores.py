@@ -4,8 +4,8 @@
 # ============================================================
 
 from flask import Blueprint, request, jsonify, current_app
-from core.database import get_conn, get_cursor
-from core.storage import get_storage
+from backend.core.database import get_conn, get_cursor
+from backend.core.storage import get_storage
 from datetime import datetime
 from werkzeug.utils import secure_filename
 

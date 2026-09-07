@@ -43,12 +43,7 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/pyth
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
 COPY backend/ ./backend/
-COPY core/ ./core/
-COPY templates/ ./templates/
-COPY static/ ./static/
-COPY seed_demo.py .
-COPY app.py .
-COPY config.py .
+COPY frontend/ ./frontend/
 
 RUN groupadd -g 1001 patagonia_user \
  && useradd --system --uid 1001 --gid 1001 --create-home --shell /usr/sbin/nologin patagonia_user
@@ -56,4 +51,4 @@ USER patagonia_user
 
 EXPOSE 8080
 
-CMD ["waitress-serve", "--host=0.0.0.0", "--port=8080", "app:app"]
+CMD ["waitress-serve", "--host=0.0.0.0", "--port=8080", "backend.app:app"]

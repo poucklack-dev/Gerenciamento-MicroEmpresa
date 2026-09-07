@@ -1,8 +1,8 @@
 import logging
 
 from flask import Blueprint, request, jsonify, session
-from core.database import get_conn
-from core.auth import hash_senha, is_admin_role
+from backend.core.database import get_conn
+from backend.core.auth import hash_senha, is_admin_role
 from flask_login import current_user
 
 usuarios_bp = Blueprint("usuarios", __name__, url_prefix="/api/usuarios")

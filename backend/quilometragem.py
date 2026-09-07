@@ -12,9 +12,9 @@ import io
 # ============================================================
 #   IMPORTAÇÃO REAL DO BANCO
 # ============================================================
-from core.database import get_cursor, get_conn
-from core.storage import get_storage
-from core.auth import admin_required as require_admin
+from backend.core.database import get_cursor, get_conn
+from backend.core.storage import get_storage
+from backend.core.auth import admin_required as require_admin
 
 # Criar Blueprint
 custos_bp = Blueprint("custos", __name__, url_prefix="/api/custos")

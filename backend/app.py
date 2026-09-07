@@ -4,19 +4,20 @@ from flask import Flask, jsonify, request, session
 from flask_login import LoginManager, current_user
 from flask_talisman import Talisman
 
-from core.database import get_conn, close_conn
-from core.user import User
-from core.auth import is_admin_role
-from core.limiter import limiter  # Import central limiter instance
-from config import get_config_class, get_env_name
+from backend.core.database import get_conn, close_conn
+from backend.core.user import User
+from backend.core.auth import is_admin_role
+from backend.core.limiter import limiter  # Import central limiter instance
+from backend.config import get_config_class, get_env_name
 
 # ============================================================
 #  APP Initialization
 # ============================================================
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
 app = Flask(__name__,
-            template_folder=os.path.join(BASE_DIR, 'templates'),
-            static_folder=os.path.join(BASE_DIR, 'static'))
+            template_folder=os.path.join(PROJECT_ROOT, 'frontend', 'templates'),
+            static_folder=os.path.join(PROJECT_ROOT, 'frontend', 'static'))
 app.config.from_object(get_config_class())
 app.url_map.strict_slashes = False
 

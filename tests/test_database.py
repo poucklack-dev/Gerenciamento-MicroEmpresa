@@ -1,10 +1,10 @@
 from unittest.mock import patch
 
 # Import the function to be tested
-from core.database import get_conn
+from backend.core.database import get_conn
 
-@patch('core.database.psycopg2.connect')
-@patch('core.database.os.getenv')
+@patch('backend.core.database.psycopg2.connect')
+@patch('backend.core.database.os.getenv')
 def test_get_conn_uses_local_postgres_env_vars(mock_getenv, mock_psycopg2_connect):
     """
     GIVEN a set of environment variables for a PostgreSQL connection
@@ -37,8 +37,8 @@ def test_get_conn_uses_local_postgres_env_vars(mock_getenv, mock_psycopg2_connec
         client_encoding="UTF8"
     )
 
-@patch('core.database.psycopg2.connect')
-@patch('core.database.os.getenv')
+@patch('backend.core.database.psycopg2.connect')
+@patch('backend.core.database.os.getenv')
 def test_get_conn_uses_default_port_when_not_provided(mock_getenv, mock_psycopg2_connect):
     """
     GIVEN environment variables for a local connection without a DB_PORT

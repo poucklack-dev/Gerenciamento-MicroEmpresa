@@ -1,8 +1,8 @@
 import re
 from flask import Blueprint, current_app, jsonify, redirect, render_template, request, session
 from flask_login import login_required
-from core.auth import is_admin_role
-from core.database import get_conn
+from backend.core.auth import is_admin_role
+from backend.core.database import get_conn
 
 empresa_bp = Blueprint("empresa", __name__)
 FIELDS = ("nome_fantasia", "razao_social", "cpf_cnpj", "telefone", "email", "endereco", "cidade", "estado", "cep", "segmento", "responsavel", "cor_institucional")

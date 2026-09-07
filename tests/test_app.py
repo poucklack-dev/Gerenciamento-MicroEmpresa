@@ -7,8 +7,8 @@ def test_app_creation(client):
 def test_app_paths(client):
     """Test that template_folder and static_folder are correctly set."""
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    assert client.application.template_folder == os.path.join(base_dir, 'templates')
-    assert client.application.static_folder == os.path.join(base_dir, 'static')
+    assert client.application.template_folder == os.path.join(base_dir, 'frontend', 'templates')
+    assert client.application.static_folder == os.path.join(base_dir, 'frontend', 'static')
 
 
 def test_health_endpoint_does_not_expose_internal_details(client):

@@ -14,8 +14,8 @@ import json
 from decimal import Decimal
 import os
 import threading
-from core.database import get_conn
-from core.storage import get_storage
+from backend.core.database import get_conn
+from backend.core.storage import get_storage
 
 bp_ponto = Blueprint('ponto', __name__, url_prefix='/ponto')
 

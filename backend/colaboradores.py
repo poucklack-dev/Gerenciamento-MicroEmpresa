@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from core.database import get_conn
-from core.auth import admin_required as require_admin
+from backend.core.database import get_conn
+from backend.core.auth import admin_required as require_admin
 from psycopg2.extras import DictCursor
 import re
 from datetime import datetime

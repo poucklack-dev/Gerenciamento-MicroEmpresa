@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from core.storage import LocalStorage
+from backend.core.storage import LocalStorage
 from werkzeug.datastructures import FileStorage
 import pytest
 

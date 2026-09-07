@@ -30,17 +30,14 @@ Funcionalidades herdadas do projeto original foram reposicionadas: quilometragem
 ## Arquitetura
 
 ```text
-backend/                blueprints e regras por domínio
-core/                   autenticação, banco, storage e serviços compartilhados
-infra/migrations/       evoluções incrementais e não destrutivas do banco
-static/css/             design system e estilos por tela
-static/js/              comportamento reutilizável da interface
-templates/              páginas Jinja
+backend/                aplicação Flask, módulos e serviços compartilhados
+frontend/templates/     páginas Jinja
+frontend/static/        CSS, JavaScript, imagens e design system
+database/               schema e migrations incrementais
 tests/                  testes automatizados
-schema.sql              schema completo para um banco novo
 ```
 
-`app.py` configura a aplicação e registra os blueprints. O projeto mantém SQL parametrizado e tipos `NUMERIC` para valores monetários. As migrations são incrementais: `001_empresa.sql` introduz a configuração central da empresa e `002_banco_horas.sql` adiciona setor, chefe direto e a consolidação mensal do banco de horas sem apagar registros existentes.
+`backend/app.py` configura a aplicação e registra os blueprints. O projeto mantém SQL parametrizado e tipos `NUMERIC` para valores monetários. As migrations são incrementais: `001_empresa.sql` introduz a configuração central da empresa e `002_banco_horas.sql` adiciona setor, chefe direto e a consolidação mensal do banco de horas sem apagar registros existentes.
 
 O Banco de Horas trabalha internamente em minutos, aceita carga mensal calculada ou direta, separa lançamentos detalhados de totais manuais, permite ajustes individuais, anulação auditável por período e exporta um `.xlsx` com resumo, detalhamento e configuração.
 
@@ -59,19 +56,9 @@ Acesse `http://localhost:8080`.
 Em banco já existente, aplique as migrations em ordem:
 
 ```powershell
-Get-Content -Raw infra/migrations/001_empresa.sql | docker compose exec -T db psql -U patagonia -d patagonia
-Get-Content -Raw infra/migrations/002_banco_horas.sql | docker compose exec -T db psql -U patagonia -d patagonia
+Get-Content -Raw database/migrations/001_empresa.sql | docker compose exec -T db psql -U patagonia -d patagonia
+Get-Content -Raw database/migrations/002_banco_horas.sql | docker compose exec -T db psql -U patagonia -d patagonia
 ```
-
-## Demonstração opcional
-
-O seed é idempotente, exige ativação explícita e usa somente pessoas e empresas fictícias. Ele cria a empresa **Aurora Serviços Empresariais**, usuário administrativo, clientes, fornecedores, colaboradores, contratos, documentos e movimentações financeiras demonstrativas.
-
-```powershell
-docker compose exec -e DEMO_SEED=1 -e DEMO_ADMIN_PASSWORD="escolha-uma-senha-segura" web python seed_demo.py
-```
-
-O usuário padrão do seed é `admin_demo`. Nenhuma senha é versionada.
 
 ## Segurança
 

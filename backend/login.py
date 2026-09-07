@@ -4,10 +4,10 @@ from flask import Blueprint, abort, flash, jsonify, redirect, render_template, r
 from werkzeug.security import check_password_hash
 from flask_login import login_user, logout_user
 
-from core.database import get_conn
-from core.auth import is_admin_role
-from core.user import User
-from core.limiter import limiter  # Import the central limiter instance
+from backend.core.database import get_conn
+from backend.core.auth import is_admin_role
+from backend.core.user import User
+from backend.core.limiter import limiter  # Import the central limiter instance
 
 # 🔥 AGORA SEM PREFIXO /auth
 login_bp = Blueprint('login', __name__)
