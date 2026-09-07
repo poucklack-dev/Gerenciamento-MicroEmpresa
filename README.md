@@ -73,16 +73,6 @@ docker compose exec -e DEMO_SEED=1 -e DEMO_ADMIN_PASSWORD="escolha-uma-senha-seg
 
 O usuário padrão do seed é `admin_demo`. Nenhuma senha é versionada.
 
-## Desenvolvimento sem Docker
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-Copy-Item .env.example .env
-python run_dev.py
-```
-
 ## Segurança
 
 - hash de senha PBKDF2 e rate limiting no login;
@@ -102,10 +92,6 @@ python -m pytest -q
 ```
 
 O workflow em `.github/workflows/tests.yml` executa a suíte em pushes e pull requests.
-
-## Screenshots
-
-Screenshots anonimizados podem ser adicionados em `docs/images/` para demonstrar login, dashboard, financeiro e cadastros.
 
 ## Licença
 
